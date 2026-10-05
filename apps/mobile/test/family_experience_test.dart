@@ -256,7 +256,7 @@ void main() {
   late File photo;
   setUp(() async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-experience-',
+      'momentnest-experience-',
     );
     photo = File('${directory.path}/synthetic.png');
     await photo.writeAsBytes(

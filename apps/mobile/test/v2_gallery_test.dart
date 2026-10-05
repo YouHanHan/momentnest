@@ -68,7 +68,7 @@ void main() {
 
   test('Android月份SQL是自然月闭开区间，不读取或删除原文件', () async {
     const channel = MethodChannel('com.fluttercandies/photo_manager');
-    const mediaChannel = MethodChannel('dev.jinchuan/media');
+    const mediaChannel = MethodChannel('dev.momentnest/media');
     var sdk = 28;
     final calls = <String>[];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(mediaChannel, (call) async {
@@ -98,7 +98,7 @@ void main() {
 
   test('真实SQLite按拍摄日筛选和排序，五月拍九月入库及缺失拍摄日回退一致', () async {
     const channel = MethodChannel('com.fluttercandies/photo_manager');
-    const mediaChannel = MethodChannel('dev.jinchuan/media');
+    const mediaChannel = MethodChannel('dev.momentnest/media');
     var sdk = 36;
     Map? query;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(mediaChannel, (call) async {

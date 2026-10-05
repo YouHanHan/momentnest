@@ -6,7 +6,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   root: resolve(__dirname, 'src/renderer'),
   plugins: [vue(), {
-    name: 'jinchuan-web-content-policy',
+    name: 'momentnest-web-content-policy',
     transformIndexHtml: (html) => html.replace('__CONNECT_SOURCES__', "'self' ws://127.0.0.1:5173"),
   }],
   server: { host: '127.0.0.1', port: 5173, strictPort: true },

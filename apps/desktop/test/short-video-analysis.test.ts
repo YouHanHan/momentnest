@@ -14,7 +14,7 @@ import type { BabyDecision, FamilyJob } from '../src/shared/family.ts'
 
 /** 只使用项目示例生成短视频，首尾保留人物，中间一秒覆盖为空白。 */
 test('普通三秒视频首尾有脸而中间无人时仍能找到宝宝，原文件和完成缓存保留', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-short-video-')), data = join(directory, 'state'), library = join(directory, 'media')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-short-video-')), data = join(directory, 'state'), library = join(directory, 'media')
   await mkdir(data); await mkdir(library)
   const sample = join(process.cwd(), 'design/layout-preview/assets/family-demo.png'), referencePath = join(library, 'reference.png'), videoPath = join(library, 'first-last-faces.mp4')
   await copyFile(sample, referencePath)

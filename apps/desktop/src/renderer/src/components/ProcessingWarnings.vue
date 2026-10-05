@@ -13,11 +13,11 @@ const legacyIncomplete = computed(() => !props.reportId && (props.skipped ?? 0) 
 
 /** 仅在查看详情时按页读取，切库与关闭后的迟到结果不再展示。 */
 async function load(page = 1): Promise<void> {
-  if (!props.reportId || !window.jinchuan) return
+  if (!props.reportId || !window.momentnest) return
   const current = ++sequence
   loading.value = true; error.value = ''
   try {
-    const result = await window.jinchuan.getJobWarnings(props.reportId, page, props.libraryId)
+    const result = await window.momentnest.getJobWarnings(props.reportId, page, props.libraryId)
     if (!disposed && current === sequence) report.value = result
   } catch (failure) { if (!disposed && current === sequence) error.value = userError(failure) }
   finally { if (!disposed && current === sequence) loading.value = false }

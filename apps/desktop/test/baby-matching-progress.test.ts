@@ -12,7 +12,7 @@ import type { BabyProfile, FamilyJob, MediaAsset } from '../src/shared/family.ts
 const vector = (degrees: number) => [Math.cos(degrees * Math.PI / 180), Math.sin(degrees * Math.PI / 180)]
 /** 合成缓存覆盖状态和不同角度；所有测试使用独立目录，不加载个人图库。 */
 async function fixture(count = 80) {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-baby-match-progress-')), first = join(directory, 'first'), second = join(directory, 'second')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-baby-match-progress-')), first = join(directory, 'first'), second = join(directory, 'second')
   await mkdir(first); await mkdir(second)
   const store = new Store(join(directory, 'state.sqlite')), firstId = randomUUID(), secondId = randomUUID(), assets: MediaAsset[] = [], detections: string[] = []
   store.put('library', { id: firstId, name: '合成当前库', path: first, enabled: true }); store.put('library', { id: secondId, name: '合成其他库', path: second, enabled: true })

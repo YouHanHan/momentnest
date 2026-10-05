@@ -166,7 +166,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-  const mediaChannel = MethodChannel('dev.jinchuan/media');
+  const mediaChannel = MethodChannel('dev.momentnest/media');
   const galleryChannel = MethodChannel('com.fluttercandies/photo_manager');
 
   test('真实 SQLite 搜索转义引号，百分号下划线按字面搜索，收藏与未知日期排序可组合', () async {

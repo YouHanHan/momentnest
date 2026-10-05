@@ -15,7 +15,7 @@ const firstLibrary = 'library-one', secondLibrary = 'library-two', babyId = 'bab
 const engine = { async ready() { return { ready: true, error: '' } }, async detect() { assert.fail('浏览不能启动人物检测') } }
 
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-browse-')), store = new Store(join(directory, 'state.sqlite'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-browse-')), store = new Store(join(directory, 'state.sqlite'))
   for (const id of [firstLibrary, secondLibrary]) store.put('library', { id, path: join(directory, id), name: id, enabled: true })
   return { directory, store, open: () => new MediaCatalog(store, directory, 'receiver', undefined, engine) }
 }

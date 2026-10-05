@@ -26,7 +26,7 @@ async function sample(path: string, color: string): Promise<void> {
 }
 
 test('当前库持久化，禁用或离线保留选择，不自动回退其他库', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-current-library-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-current-library-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   let receiver = new Receiver(data)
@@ -53,7 +53,7 @@ test('当前库持久化，禁用或离线保留选择，不自动回退其他�
 })
 
 test('图库、人物与候选按库隔离，共享识别缓存且预览不回退别库位置', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-library-scope-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-library-scope-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second'), empty = join(directory, 'empty')
   await Promise.all([data, first, second, empty].map(path => mkdir(path)))
   await sample(join(first, 'shared.jpg'), '#889966')
@@ -110,7 +110,7 @@ test('图库、人物与候选按库隔离，共享识别缓存且预览不回�
 })
 
 test('新复制计划默认当前库，切库后执行旧计划保持原库与日期', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-import-library-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-import-library-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second'), source = join(directory, 'source')
   await Promise.all([data, first, second, source].map(path => mkdir(path)))
   await sample(join(source, 'original.jpg'), '#aa8844')
@@ -136,7 +136,7 @@ test('新复制计划默认当前库，切库后执行旧计划保持原库与�
 })
 
 test('父子照片库分别扫描同一文件，位置归属不覆盖且旧缓存正常兼容', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-nested-library-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-nested-library-'))
   const data = join(directory, 'state'), parent = join(directory, 'photos'), child = join(parent, 'baby')
   await mkdir(data); await mkdir(child, { recursive: true }); await sample(join(child, 'shared.jpg'), '#669977')
   const store = new Store(join(data, 'receiver.sqlite')), parentId = randomUUID(), childId = randomUUID()
@@ -163,7 +163,7 @@ test('父子照片库分别扫描同一文件，位置归属不覆盖且旧缓�
 })
 
 test('真实 HTTPS 暴露电脑当前库，旧上传批次切库后保持原目录', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-library-http-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-library-http-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   const receiver = new Receiver(data)
@@ -213,7 +213,7 @@ test('真实 HTTPS 暴露电脑当前库，旧上传批次切库后保持原目�
 })
 
 test('处理任务按首次插入倒序取最近25条，先筛选照片库且更新旧错误不提升顺序', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-job-order-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-job-order-'))
   const store = new Store(join(directory, 'receiver.sqlite'))
   const engine = { async ready() { return { ready: true, error: '' } }, async detect() { return [] } }
   const catalog = new MediaCatalog(store, directory, 'receiver-test', undefined, engine)

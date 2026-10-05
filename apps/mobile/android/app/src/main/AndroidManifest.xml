@@ -14,8 +14,8 @@
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
         android:name="${applicationName}"
-        android:icon="@mipmap/jinchuan_launcher"
-        android:roundIcon="@mipmap/jinchuan_launcher">
+        android:icon="@mipmap/momentnest_launcher"
+        android:roundIcon="@mipmap/momentnest_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

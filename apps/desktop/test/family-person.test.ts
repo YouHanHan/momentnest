@@ -81,7 +81,7 @@ test('代表样本数量有界且优先保留独立照片和互补场景', () =>
 })
 
 test('新增照片识别复用重启前的多场景样本，合照中的相近人脸保持不同人物', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-person-scenes-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-person-scenes-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library)
   const store = new Store(join(data, 'family.sqlite')), calls: string[] = []
   store.put('library', { id: libraryId, path: library, name: '合成测试库', enabled: true })
@@ -107,7 +107,7 @@ test('新增照片识别复用重启前的多场景样本，合照中的相近�
 })
 
 test('人工合并的不同场景锚点在重启后继续指导新增照片分组', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-person-trusted-scenes-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-person-trusted-scenes-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library)
   const store = new Store(join(data, 'family.sqlite')), calls: string[] = []
   store.put('library', { id: libraryId, path: library, name: '合成测试库', enabled: true })
@@ -134,7 +134,7 @@ test('人工合并的不同场景锚点在重启后继续指导新增照片分�
 
 /** 构造独立领域记录，验证别名不会修改历史人脸、媒体或宝宝档案。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-person-alias-')), store = new Store(join(directory, 'family.sqlite'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-person-alias-')), store = new Store(join(directory, 'family.sqlite'))
   const firstId = randomUUID(), secondId = randomUUID()
   for (const id of [firstId, secondId]) store.put('library', { id, path: directory, name: id === firstId ? '第一库' : '第二库', enabled: true })
   for (const [id, angle, name] of [['one', 0, '旧名字'], ['two', 20, '保留名字'], ['three', 40, '第三人']] as const) store.put('familyPerson', { id, name, embedding: vector(angle) })

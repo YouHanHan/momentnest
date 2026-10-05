@@ -11,7 +11,7 @@ const rendererRoot = resolve(projectRoot, process.argv.includes('--baseline') ? 
 const artifactDirectory = resolve(projectRoot, '.cache/layout-verification')
 const baseline = process.argv.includes('--baseline')
 const label = baseline ? 'baseline' : 'current'
-const executable = [process.env.JINCHUAN_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(path => path && existsSync(path))
+const executable = [process.env.MOMENTNEST_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(path => path && existsSync(path))
 if (!executable) throw new Error('未找到本地 Edge、Chrome 或 Playwright 浏览器；未安装新软件。')
 const report = { checkedAt: new Date().toISOString(), label, browser: executable, checks: [], failures: [], errors: [], screenshots: [] }
 let server, browser
@@ -97,7 +97,7 @@ function installFixtures(options = {}) {
     async setBabyReference(babyId, assetId, faceId) { const baby = fixtures.family.babies.find(item => item.id === babyId); if (!baby.referenceFaces.some(item => item.faceId === faceId)) baby.referenceFaces.push({ assetId, faceId }) }, async matchBaby() {},
     async selectFolders() { return [] }, async previewFile() { return image(fixtures.assets[0]) }, async createPairing() { throw new Error('布局测试不会创建真实配对。') },
   }
-  Object.assign(window, { jinchuan: api, __layoutFixtures: fixtures })
+  Object.assign(window, { momentnest: api, __layoutFixtures: fixtures })
 }
 
 function record(viewport, scenario, check, passed, metrics) {
@@ -245,7 +245,7 @@ async function screenshot(page, name) {
 try {
   await mkdir(artifactDirectory, { recursive: true })
   server = await createServer({ configFile: false, root: rendererRoot, cacheDir: resolve(artifactDirectory, 'vite-cache'), plugins: [vue(), {
-    name: 'jinchuan-independent-layout', configureServer(instance) {
+    name: 'momentnest-independent-layout', configureServer(instance) {
       instance.middlewares.use((request, response, next) => {
         if (request.url === '/favicon.ico') { response.statusCode = 204; response.end(); return }
         if (request.url !== '/__layout_test') { next(); return }

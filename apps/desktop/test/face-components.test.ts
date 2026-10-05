@@ -9,7 +9,7 @@ import { chromium } from 'playwright'
 import type { Browser } from 'playwright'
 import sharp from 'sharp'
 
-const executable = [process.env.JINCHUAN_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((path): path is string => Boolean(path && existsSync(path)))
+const executable = [process.env.MOMENTNEST_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((path): path is string => Boolean(path && existsSync(path)))
 const rendererRoot = fileURLToPath(new URL('../src/renderer/', import.meta.url))
 let server: Awaited<ReturnType<typeof createServer>> | undefined, browser: Browser | undefined, base = ''
 const bootstrapPath = '/__face_component.js', bootstrapId = '\0face-component-bootstrap'

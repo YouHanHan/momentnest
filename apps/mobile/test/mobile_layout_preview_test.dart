@@ -164,7 +164,7 @@ void main() {
     }
     final previewDirectory = saveSnapshots
         ? output
-        : await Directory.systemTemp.createTemp('jinchuan-layout-preview-');
+        : await Directory.systemTemp.createTemp('momentnest-layout-preview-');
     previewOriginal = File('${previewDirectory.path}/preview-original.png');
     await previewOriginal.writeAsBytes(
       await syntheticThumbnail(0, height: 480),

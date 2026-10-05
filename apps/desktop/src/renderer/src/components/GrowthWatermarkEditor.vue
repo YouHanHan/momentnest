@@ -9,7 +9,7 @@ import UiSelect from './UiSelect.vue'
 
 const props = defineProps<{ assets: MediaAsset[]; baby: BabyProfile; libraryId?: string; libraryName?: string; inline?: boolean }>()
 const emit = defineEmits<{ close: []; inspect: [asset: MediaAsset]; finished: [results: WatermarkResult[]] }>()
-const api = window.jinchuan
+const api = window.momentnest
 const index = ref(0)
 const draft = reactive<Omit<WatermarkOptions, 'babyId'>>({ template: 'growth', growthMode: 'auto', shade: true, position: 'bottom-left', fontSize: 48, color: '#ffffff', opacity: 0.95, showName: false, showAge: true, showDayCount: false, showDate: true })
 const growthModeOptions = [{ label: '自动成长', value: 'auto' }, { label: '出生第几天', value: 'day-count' }] satisfies Array<{ label: string; value: NonNullable<WatermarkOptions['growthMode']> }>

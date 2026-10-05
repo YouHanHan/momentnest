@@ -11,7 +11,7 @@ import type { BabyDecision, BabyProfile, MediaAsset } from '../src/shared/family
 
 /** 使用独立临时数据库和合成媒体验证浏览失效，不访问个人照片或启动模型。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-browse-revision-')), libraryPath = join(directory, 'library'), databasePath = join(directory, 'state.sqlite')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-browse-revision-')), libraryPath = join(directory, 'library'), databasePath = join(directory, 'state.sqlite')
   await mkdir(libraryPath)
   const store = new Store(databasePath), libraryId = randomUUID(), assets: MediaAsset[] = []
   store.put('library', { id: libraryId, name: '合成照片库', path: libraryPath, enabled: true })
@@ -113,7 +113,7 @@ test('另一 SQLite 连接提交人工归属后版本失效，只读与未提交
 })
 
 test('Store 新实例不能复用上个实例的浏览版本', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-browse-epoch-')), path = join(directory, 'state.sqlite')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-browse-epoch-')), path = join(directory, 'state.sqlite')
   const first = new Store(path), firstRevision = first.browseRevision
   first.close()
   const second = new Store(path)
@@ -121,7 +121,7 @@ test('Store 新实例不能复用上个实例的浏览版本', async () => {
 })
 
 test('事务回滚保留原记录并保守使先前浏览版本失效', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-browse-rollback-')), store = new Store(join(directory, 'state.sqlite'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-browse-rollback-')), store = new Store(join(directory, 'state.sqlite'))
   try {
     store.put('familyDecision', { id: 'synthetic-decision', state: 'included' })
     const revision = store.browseRevision

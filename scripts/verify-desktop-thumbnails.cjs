@@ -47,9 +47,9 @@ async function waitFor(code, timeout = 15000) {
 }
 
 async function verify() {
-  await waitFor('Boolean(window.jinchuan)')
-  await evaluate('(async()=>{await window.jinchuan.addDirectories("library");const state=await window.jinchuan.getState();await window.jinchuan.scanMedia(state.currentLibraryId)})()')
-  await waitFor('(async()=>{const state=await window.jinchuan.getState();const family=await window.jinchuan.getFamilyState(state.currentLibraryId);return family.photoCount===3 && family.videoCount===1 && !family.jobs.some(job=>job.state==="running")})()', 30000)
+  await waitFor('Boolean(window.momentnest)')
+  await evaluate('(async()=>{await window.momentnest.addDirectories("library");const state=await window.momentnest.getState();await window.momentnest.scanMedia(state.currentLibraryId)})()')
+  await waitFor('(async()=>{const state=await window.momentnest.getState();const family=await window.momentnest.getFamilyState(state.currentLibraryId);return family.photoCount===3 && family.videoCount===1 && !family.jobs.some(job=>job.state==="running")})()', 30000)
   await waitFor('document.querySelectorAll(".media-card").length===4')
   await waitFor('[...document.querySelectorAll(".media-card img")].length===4 && [...document.querySelectorAll(".media-card img")].every(image=>image.naturalWidth>0)')
   assert.equal(mediaCalls.filter(call => call.thumbnail && call.success).length, 4)

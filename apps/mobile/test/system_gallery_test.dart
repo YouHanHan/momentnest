@@ -63,7 +63,7 @@ void main() {
   test('Android 分别授权时直接读取获准类别，并用系统设置管理授权', () async {
     TestWidgetsFlutterBinding.ensureInitialized();
     const channel = MethodChannel('com.fluttercandies/photo_manager');
-    const mediaChannel = MethodChannel('dev.jinchuan/media');
+    const mediaChannel = MethodChannel('dev.momentnest/media');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(mediaChannel, (call) async {
       expect(call.method, 'sdkInt');
       return 28;

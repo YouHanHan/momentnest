@@ -24,7 +24,7 @@ const waitJobs = async (catalog: MediaCatalog): Promise<void> => {
 }
 
 test('新图库扫描与导入预扫描固定用途，历史未分类任务保持原记录', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-purpose-')), source = join(directory, 'source'), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-purpose-')), source = join(directory, 'source'), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([source, library, data].map(path => mkdir(path)))
   await sample(join(source, 'source.jpg'), '#884466'); await sample(join(library, 'library.jpg'), '#447788')
   const store = new Store(join(data, 'state.sqlite')), rootId = randomUUID(), libraryId = randomUUID()
@@ -51,7 +51,7 @@ test('新图库扫描与导入预扫描固定用途，历史未分类任务保�
 })
 
 test('复制归档中间一张来源变化时记录原因并继续保存后续媒体', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-import-continue-')), source = join(directory, 'source'), archive = join(directory, 'archive'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-import-continue-')), source = join(directory, 'source'), archive = join(directory, 'archive'), data = join(directory, 'data')
   await Promise.all([source, archive, data].map(path => mkdir(path)))
   const first = join(source, '01-first.jpg'), changed = join(source, '02-changed.jpg'), last = join(source, '03-last.jpg')
   await sample(first, '#993344'); await sample(changed, '#446699'); await sample(last, '#33aa66')
@@ -77,7 +77,7 @@ test('复制归档中间一张来源变化时记录原因并继续保存后续�
 })
 
 test('超过 20 个扫描问题全部分页保留，同名子目录原因可辨且重启可读', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-warning-report-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-warning-report-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   for (let index = 0; index < 25; index++) { const child = join(library, `folder-${String(index).padStart(2, '0')}`); await mkdir(child); await writeFile(join(child, 'empty.jpg'), Buffer.alloc(0)) }
   await sample(join(library, 'valid.jpg'), '#446688')
@@ -106,7 +106,7 @@ test('超过 20 个扫描问题全部分页保留，同名子目录原因可辨�
 })
 
 test('预扫描完整报告关联计划，旧任务只返回实际保留的摘要', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-plan-report-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-plan-report-')), source = join(directory, 'source'), data = join(directory, 'data')
   await Promise.all([source, data].map(path => mkdir(path))); await writeFile(join(source, 'empty.mp4'), Buffer.alloc(0)); await sample(join(source, 'valid.jpg'), '#557799')
   const store = new Store(join(data, 'state.sqlite')), catalog = new MediaCatalog(store, data, 'receiver', undefined, engine), rootId = randomUUID()
   store.put('root', { id: rootId, path: source, enabled: true })
@@ -122,7 +122,7 @@ test('预扫描完整报告关联计划，旧任务只返回实际保留的摘�
 })
 
 test('JPEG 常见后缀正常索引，完整文件数与重复内容合并数量区分', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-jpeg-alias-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-jpeg-alias-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   const original = join(library, 'original.jpg'); await sample(original, '#447799')
   await copyFile(original, join(library, 'renamed.jfif')); await copyFile(original, join(library, 'other.jpe'))
@@ -140,7 +140,7 @@ test('JPEG 常见后缀正常索引，完整文件数与重复内容合并数量
 })
 
 test('逐项跳过机制仍在来源授权被停用时停止批次，保留已保存媒体', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-import-authorization-')), source = join(directory, 'source'), archive = join(directory, 'archive'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-import-authorization-')), source = join(directory, 'source'), archive = join(directory, 'archive'), data = join(directory, 'data')
   await Promise.all([source, archive, data].map(path => mkdir(path)))
   const first = join(source, '01-first.jpg'), second = join(source, '02-second.jpg')
   await sample(first, '#773344'); await sample(second, '#33aa77')
@@ -165,7 +165,7 @@ test('逐项跳过机制仍在来源授权被停用时停止批次，保留已�
 })
 
 test('人物分析失败只跳过当前媒体，成功与跳过数量合计为批次总量', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-counts-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-counts-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   await sample(join(library, '01-first.jpg'), '#883344'); await sample(join(library, '02-failed.jpg'), '#338866'); await sample(join(library, '03-last.jpg'), '#446699')
   const detector = { async ready() { return { ready: true, error: '' } }, async detect(path: string) { if (basename(path) === '02-failed.jpg') throw Object.assign(new Error('synthetic access failure'), { code: 'EACCES' }); return [] } }
@@ -182,7 +182,7 @@ test('人物分析失败只跳过当前媒体，成功与跳过数量合计为�
 })
 
 test('人物模型尚未就绪时保留预定总量，未处理照片不会冒充成功或跳过', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-unavailable-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-unavailable-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path))); await sample(join(library, 'first.jpg'), '#336688'); await sample(join(library, 'second.jpg'), '#775533')
   const detector = { async ready() { return { ready: false, error: '测试模型尚未就绪' } }, async detect() { assert.fail('模型未就绪时不能运行检测') } }
   const store = new Store(join(data, 'state.sqlite')), catalog = new MediaCatalog(store, data, 'receiver', undefined, detector), libraryId = randomUUID()
@@ -196,7 +196,7 @@ test('人物模型尚未就绪时保留预定总量，未处理照片不会冒�
 })
 
 test('扫描先统计完整文件数，有限并发保留重复位置、失败原因与来源原文件', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-estimate-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-estimate-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   const files = []
   for (let index = 0; index < 6; index++) { const path = join(library, `${index}.jpg`); await sample(path, `rgb(${index * 30},60,100)`); files.push(path) }
@@ -230,7 +230,7 @@ test('扫描先统计完整文件数，有限并发保留重复位置、失败�
 })
 
 test('无法完整统计目录时不提供预计总量，实际扫描仍保存失败原因', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-unknown-')), store = new Store(join(directory, 'state.sqlite')), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-unknown-')), store = new Store(join(directory, 'state.sqlite')), libraryId = randomUUID()
   store.put('library', { id: libraryId, path: join(directory, 'unavailable'), name: '离线图库', enabled: true })
   const catalog = new MediaCatalog(store, directory, 'receiver', undefined, engine)
   try {
@@ -242,7 +242,7 @@ test('无法完整统计目录时不提供预计总量，实际扫描仍保存�
 })
 
 test('统计后新增文件导致总量失效，扫描继续保留新增媒体', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-growing-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-growing-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path))); await sample(join(library, 'first.jpg'), '#446688')
   const store = new Store(join(data, 'state.sqlite')), libraryId = randomUUID(), catalog = new MediaCatalog(store, data, 'receiver', undefined, engine)
   store.put('library', { id: libraryId, path: library, name: '图库', enabled: true })
@@ -257,7 +257,7 @@ test('统计后新增文件导致总量失效，扫描继续保留新增媒体',
 })
 
 test('关闭并发扫描时等待在途文件完成，停止后不再写入已关闭的索引', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-close-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-close-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   for (let index = 0; index < 4; index++) await sample(join(library, `${index}.jpg`), `rgb(${index * 40},80,120)`)
   const store = new Store(join(data, 'state.sqlite')), libraryId = randomUUID(), catalog = new MediaCatalog(store, data, 'receiver', undefined, engine)

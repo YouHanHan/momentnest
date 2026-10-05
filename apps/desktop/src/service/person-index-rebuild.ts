@@ -117,7 +117,7 @@ function similarityCache() {
 /** 使用稳定人脸 ID 生成维护专用人物 ID，不依赖数据库遍历次序。 */
 function newPersonId(faceId: string, reserved: Set<string>): string {
   for (let attempt = 0; ; attempt++) {
-    const bytes = createHash('sha256').update(`jinchuan-person-rebuild-v2:${faceId}:${attempt}`).digest().subarray(0, 16)
+    const bytes = createHash('sha256').update(`momentnest-person-rebuild-v2:${faceId}:${attempt}`).digest().subarray(0, 16)
     bytes[6] = (bytes[6] & 15) | 80; bytes[8] = (bytes[8] & 63) | 128
     const hex = bytes.toString('hex'), id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
     if (!reserved.has(id)) return id

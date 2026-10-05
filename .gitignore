@@ -31,8 +31,8 @@ TestResults/
 *.db-wal
 *.sqlite
 *.sqlite3
-.jinchuan/
-.jinchuan-incoming/
+.momentnest/
+.momentnest-incoming/
 *.pfx
 *.p12
 *.key

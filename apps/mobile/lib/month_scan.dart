@@ -40,7 +40,7 @@ abstract class MonthPhotoSource {
     String month,
   ) async {
     final sdk = await const MethodChannel(
-      'dev.jinchuan/media',
+      'dev.momentnest/media',
     ).invokeMethod<int>('sdkInt');
     if (sdk == null) throw StateError('无法读取 Android 相册版本。');
     final filter = CustomFilter.sql(

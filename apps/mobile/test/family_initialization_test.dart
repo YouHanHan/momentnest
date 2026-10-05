@@ -52,7 +52,7 @@ void main() {
   bool failDirectory = false, failModel = false;
 
   setUp(() async {
-    directory = await Directory.systemTemp.createTemp('jinchuan-initialize-');
+    directory = await Directory.systemTemp.createTemp('momentnest-initialize-');
     store = InitializationStore();
     transfer = TransferController();
     model = FamilyController(transfer, store: store);

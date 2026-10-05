@@ -12,7 +12,7 @@ import type { Library, Receipt, UploadSession } from '../src/service/types.ts'
 const hash=(data:Buffer)=>createHash('sha256').update(data).digest('hex')
 
 test('真实 HTTPS：认证、原图保存、去重、历史核对、断点恢复和日期冻结',async()=>{
-  const directory=await mkdtemp(join(tmpdir(),'jinchuan-test-'))
+  const directory=await mkdtemp(join(tmpdir(),'momentnest-test-'))
   const data=join(directory,'state'), libraryPath=join(directory,'photos'), historyPath=join(directory,'old-photos')
   await Promise.all([mkdir(data),mkdir(libraryPath),mkdir(historyPath)])
   let receiver=new Receiver(data)
@@ -63,9 +63,9 @@ test('真实 HTTPS：认证、原图保存、去重、历史核对、断点恢�
     assert.equal((await call('POST',`/v1/uploads/${session.id}/complete`,{})).status,409)
     await receiver.close();receiver=new Receiver(data);await receiver.start(0,'127.0.0.1')
     assert.equal((await call('GET',`/v1/uploads/${session.id}`)).body.offset,7)
-    await writeFile(join(libraryPath,'.jinchuan-incoming',`${session.id}.part`),Buffer.concat([original.subarray(0,7),Buffer.from('unconfirmed-tail')]))
+    await writeFile(join(libraryPath,'.momentnest-incoming',`${session.id}.part`),Buffer.concat([original.subarray(0,7),Buffer.from('unconfirmed-tail')]))
     assert.equal((await call('GET',`/v1/uploads/${session.id}`)).body.offset,7)
-    assert.equal((await stat(join(libraryPath,'.jinchuan-incoming',`${session.id}.part`))).size,7)
+    assert.equal((await stat(join(libraryPath,'.momentnest-incoming',`${session.id}.part`))).size,7)
     const tail=await call('PUT',`/v1/uploads/${session.id}/content`,original.subarray(7),7)
     assert.equal(tail.status,200)
     const completed=await call('POST',`/v1/uploads/${session.id}/complete`,{})
@@ -93,7 +93,7 @@ test('真实 HTTPS：认证、原图保存、去重、历史核对、断点恢�
     await call('PUT',`/v1/uploads/${recovery.id}/content`,recoveryBytes,0)
     const persisted=receiver.store.get<UploadSession>('session',recovery.id)!
     persisted.state='committing';receiver.store.put('session',persisted)
-    await link(join(libraryPath,'.jinchuan-incoming',`${recovery.id}.part`),join(libraryPath,persisted.relativePath))
+    await link(join(libraryPath,'.momentnest-incoming',`${recovery.id}.part`),join(libraryPath,persisted.relativePath))
     await receiver.close();receiver=new Receiver(data);await receiver.start(0,'127.0.0.1')
     assert.equal((await call('GET',`/v1/uploads/${recovery.id}`)).body.state,'complete')
     await writeFile(join(libraryPath,completed.body.receipt.relativePath),Buffer.from('externally corrupted'))

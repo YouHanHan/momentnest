@@ -7,7 +7,7 @@ import { DatabaseSync } from 'node:sqlite'
 export function userDataDirectory(appData: string, applicationName: string, configured: string, packaged: boolean, home: string): string {
   const directory = resolve(configured)
   if (!packaged && directory !== resolve(join(appData, applicationName))) return directory
-  return resolve(join(home, '.jinchuan'))
+  return resolve(join(home, '.momentnest'))
 }
 
 /** 使用系统返回的物理目录，避免启动环境重定向后触发目录身份校验失败。 */
@@ -19,7 +19,7 @@ export function canonicalUserDataDirectory(directory: string): string {
 /** 首次沿用旧记录及生成缓存，校验完成后原子启用，旧目录保留作备份。 */
 export function migrateUserDataDirectory(appData: string, directory: string): boolean {
   const target = join(directory, 'receiver')
-  const legacy = join(appData, 'jinchuan', 'receiver')
+  const legacy = join(appData, 'momentnest', 'receiver')
   if (existsSync(join(target, 'receiver.sqlite')) || !existsSync(join(legacy, 'receiver.sqlite'))) return false
   const source = realpathSync.native(legacy)
   if (resolve(source).toLowerCase() === resolve(target).toLowerCase()) return false

@@ -28,7 +28,7 @@ test('测速中位数抵抗单次抖动，小幅提速不增加线程占用', as
 })
 
 test('相同硬件和模型复用磁盘结果，身份或可用核数变化后重新测速', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-performance-')), path = join(directory, 'nested', 'performance.json')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-performance-')), path = join(directory, 'nested', 'performance.json')
   let calls = 0
   const measure = async (threads: number) => { calls++; return [80 / threads, 81 / threads, 79 / threads] }
   assert.equal(await selectFaceThreads('hardware-model-a', [1, 2, 4], measure, path), 4)
@@ -43,7 +43,7 @@ test('相同硬件和模型复用磁盘结果，身份或可用核数变化后�
 })
 
 test('损坏缓存、失败配置或缓存不可写时不阻止本次识别配置选择', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-performance-failure-')), path = join(directory, 'performance.json')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-performance-failure-')), path = join(directory, 'performance.json')
   await writeFile(path, '{broken')
   const measure = async (threads: number) => { if (threads === 4) throw new Error('合成测速失败'); return [80 / threads, 81 / threads, 79 / threads] }
   assert.equal(await selectFaceThreads('synthetic', [1, 2, 4], measure, path), 2)

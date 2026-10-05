@@ -56,11 +56,11 @@ test('手机版本名和构建号连续递增，保留注释、换行和本机�
   const root = await fixture()
   const pubspecPath = join(root, 'apps/mobile/pubspec.yaml')
   const propertiesPath = join(root, 'apps/mobile/android/local.properties')
-  await writeFile(pubspecPath, '# 保留说明\r\nversion: 0.4.7+18 # 版本注释\r\nname: jinchuan\r\n')
+  await writeFile(pubspecPath, '# 保留说明\r\nversion: 0.4.7+18 # 版本注释\r\nname: momentnest\r\n')
   await writeFile(propertiesPath, '# 本机路径\r\nsdk.dir=C:/sdk\r\nflutter.versionName=0.4.7\r\nflutter.versionCode=18\r\n')
   assert.deepEqual(await advanceMobileVersion(root), { version: '0.4.8', buildNumber: 19, previousVersion: '0.4.7' })
   assert.deepEqual(await advanceMobileVersion(root), { version: '0.4.9', buildNumber: 20, previousVersion: '0.4.8' })
-  assert.equal(await readFile(pubspecPath, 'utf8'), '# 保留说明\r\nversion: 0.4.9+20 # 版本注释\r\nname: jinchuan\r\n')
+  assert.equal(await readFile(pubspecPath, 'utf8'), '# 保留说明\r\nversion: 0.4.9+20 # 版本注释\r\nname: momentnest\r\n')
   assert.equal(await readFile(propertiesPath, 'utf8'), '# 本机路径\r\nsdk.dir=C:/sdk\r\nflutter.versionName=0.4.9\r\nflutter.versionCode=20\r\n')
 })
 

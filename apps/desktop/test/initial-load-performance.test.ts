@@ -8,7 +8,7 @@ import { MediaCatalog } from '../src/service/media-catalog.ts'
 
 // 验证一万条合成索引的浏览路径，不访问个人媒体或运行真实识别。
 async function fixture(count: number, ready = async () => ({ ready: true, error: '' })) {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-initial-load-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-initial-load-'))
   const store = new Store(join(directory, 'state.sqlite'))
   store.put('library', { id: 'library', name: '合成图库', path: directory, enabled: true })
   store.transaction(() => {

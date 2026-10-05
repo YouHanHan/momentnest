@@ -78,7 +78,7 @@ class SwipeFamily extends FamilyController {
 void main() {
   late File photo;
   setUp(() async {
-    final directory = await Directory.systemTemp.createTemp('jinchuan-swipe-');
+    final directory = await Directory.systemTemp.createTemp('momentnest-swipe-');
     photo = File('${directory.path}/photo.png');
     await photo.writeAsBytes(
       base64Decode(

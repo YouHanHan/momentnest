@@ -17,7 +17,7 @@ export default defineConfig(({ command }) => ({
     plugins: [
       vue(),
       {
-        name: 'jinchuan-content-policy',
+        name: 'momentnest-content-policy',
         transformIndexHtml(html) {
           const connections = command === 'serve'
             ? "'self' ws://127.0.0.1:5173"

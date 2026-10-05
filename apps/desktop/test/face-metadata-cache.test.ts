@@ -11,7 +11,7 @@ const face = (id: string, embedding: unknown = [1, 0]) => ({ id, score: 0.95, de
 
 /** 所有缓存回归使用独立合成数据库，避免改动用户索引。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-metadata-')), path = join(directory, 'synthetic.sqlite')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-metadata-')), path = join(directory, 'synthetic.sqlite')
   return { path, store: new Store(path) }
 }
 

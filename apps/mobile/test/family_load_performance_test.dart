@@ -109,7 +109,7 @@ void main() {
       galleryGateway: SyntheticGateway(media),
       mediaResolver: (id) async => media[int.parse(id)],
     );
-    final directory = await Directory.systemTemp.createTemp('jinchuan-load-');
+    final directory = await Directory.systemTemp.createTemp('momentnest-load-');
     messenger.setMockMethodCallHandler(
       directoryChannel,
       (_) async => directory.path,

@@ -1,7 +1,7 @@
 name: momentnest_mobile
 description: "拾光匣：局域网原图与视频传输，离线整理宝宝成长相册。"
 publish_to: 'none'
-version: 0.4.24+35
+version: 0.4.25+36
 
 environment:
   sdk: ^3.10.4

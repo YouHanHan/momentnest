@@ -83,7 +83,7 @@ export class Receiver {
     try { identity=JSON.parse(await readFile(identityPath,'utf8')) }
     catch(error) {
       if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error
-      identity=await generate([{name:'commonName',value:'Jinchuan local receiver'}],{keySize:2048,notAfterDate:new Date(Date.now()+10*365*86400000)})
+      identity=await generate([{name:'commonName',value:'MomentNest local receiver'}],{keySize:2048,notAfterDate:new Date(Date.now()+10*365*86400000)})
       await writeFile(identityPath,JSON.stringify(identity),{flag:'wx',mode:0o600})
     }
     this.fingerprint=new X509Certificate(identity.cert).fingerprint256.replaceAll(':','').toLowerCase()
@@ -311,7 +311,7 @@ export class Receiver {
       const walk=async(directory:string):Promise<void>=>{
         for(const entry of await readdir(directory,{withFileTypes:true})) {
           if(this.closing) throw new Error('扫描已中断。')
-          if(entry.isSymbolicLink() || entry.name==='.jinchuan-incoming') continue
+          if(entry.isSymbolicLink() || entry.name==='.momentnest-incoming') continue
           const path=join(directory,entry.name)
           if(entry.isDirectory()) { try {await safePath(root.path,relative(root.path,path));await walk(path)} catch {errors++} }
           else if(entry.isFile() && mediaExtensions.has(extname(entry.name).toLowerCase())) {
@@ -403,15 +403,15 @@ export class Receiver {
     const receipt=await this.findReceipt(library,identity.hash,identity.size)
     const session:UploadSession={id,deviceId:device.id,clientKey,batchId:batch.id,libraryId:library.id,...identity,filename,archiveDate,captureDate,creationDate,kind:mediaKind(filename),dateSource:batch.mode==='capture'&&!captureDate?(creationDate?'creation':'upload-fallback'):batch.mode,relativePath:`${archiveDate}/${archiveName(filename,identity.hash,id)}`,offset:receipt?identity.size:0,state:receipt?'complete':'receiving',error:'',updatedAt:now(),...(receipt?{receipt}:{})}
     if(!receipt) {
-      const incoming=await safePath(library.path,'.jinchuan-incoming')
+      const incoming=await safePath(library.path,'.momentnest-incoming')
       await mkdir(incoming,{recursive:true})
-      await safePath(library.path,`.jinchuan-incoming/${id}.part`)
+      await safePath(library.path,`.momentnest-incoming/${id}.part`)
       const handle=await open(join(incoming,`${id}.part`),'wx');await handle.close()
     }
     this.store.put('session',session)
     return session
   }
-  private tempPath(session:UploadSession):Promise<string> {return safePath(this.library(session.libraryId).path,`.jinchuan-incoming/${session.id}.part`)}
+  private tempPath(session:UploadSession):Promise<string> {return safePath(this.library(session.libraryId).path,`.momentnest-incoming/${session.id}.part`)}
   /** 以已确认偏移截断未提交尾部；回执丢失可直接查回，文件丢失则重新传输。 */
   private async reconcile(session:UploadSession):Promise<UploadSession> {
     if(session.state==='cancelled') return session

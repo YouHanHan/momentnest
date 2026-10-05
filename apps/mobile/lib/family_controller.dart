@@ -31,7 +31,7 @@ class FamilyController extends ChangeNotifier {
   final SystemGalleryGateway galleryGateway;
   final Future<AssetEntity?> Function(String) mediaResolver;
   late final MediaFavorites favorites;
-  static const channel = MethodChannel('dev.jinchuan/family');
+  static const channel = MethodChannel('dev.momentnest/family');
   final Map<String, FamilyAsset> assets = {};
   final Map<String, FamilyAsset> _localIndex = {};
   final Map<String, BabyProfile> babies = {};

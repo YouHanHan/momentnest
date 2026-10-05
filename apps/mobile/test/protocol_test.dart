@@ -233,7 +233,7 @@ void main() {
         );
         expect(thumb['dataUrl'], startsWith('data:image/'));
         final temporary = await Directory.systemTemp.createTemp(
-          'jinchuan-mobile-download-',
+          'momentnest-mobile-download-',
         );
         final copied = File('${temporary.path}/verified.png');
         await api.download(

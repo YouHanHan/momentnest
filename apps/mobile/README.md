@@ -13,7 +13,7 @@ flutter run
 
 交付打包从项目根目录执行 `npm.cmd run mobile:apk:all`，一次递增版本与构建号并生成调试、正式签名 APK。正式签名配置仅从本机忽略目录读取；同轮两种 APK 共用版本。需要 Android SDK、JDK 与 Gradle 依赖，完整命令见 [开发说明](../../docs/development.md)。
 
-源码项目名为 `momentnest_mobile`，手机显示名称为「拾光匣」。Android 应用标识、Kotlin namespace、平台通道、私有数据库和已有签名继续沿用旧身份，规则见 [品牌与兼容](../../docs/branding.md)。正式 APK 不能直接覆盖旧调试签名版本，已有用户应使用对应签名的升级包。
+源码项目名为 `momentnest_mobile`，手机显示名称为「拾光匣」。Android 应用标识与 Kotlin namespace 为 `dev.momentnest.app`，平台通道和私有数据库使用 MomentNest 命名。当前按全新应用安装，重新建立档案和配对，规则见 [品牌与应用身份](../../docs/branding.md)。正式版和调试版后续升级分别使用各自证书。
 
 宝宝档案、人脸参考、人工归属、拍摄日期及水印在手机本机处理，不与电脑宝宝相册同步，不下载电脑原文件。进入后台时保存进度并暂停，不承诺锁屏持续上传或整理。
 

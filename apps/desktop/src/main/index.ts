@@ -12,7 +12,7 @@ import * as familyValidation from './family-validation'
 import { mediaResponse } from './media-response'
 import { canonicalUserDataDirectory, migrateUserDataDirectory, userDataDirectory } from './data-directory'
 
-const applicationUrl = 'jinchuan://app/'
+const applicationUrl = 'momentnest://app/'
 const rendererRoot = resolve(__dirname, '../renderer')
 let mainWindow: BrowserWindow | null = null
 let receiver: ServiceBridge | null = null
@@ -43,7 +43,7 @@ function identifier(value: unknown): string {
 function optionalLibrary(value:unknown):string|undefined {return value===undefined?undefined:identifier(value)}
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'jinchuan', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } },
+  { scheme: 'momentnest', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } },
 ])
 
 /** 仅允许本地开发服务器作为开发界面来源。 */
@@ -68,14 +68,14 @@ function requireTrustedSender(event: IpcMainInvokeEvent): BrowserWindow {
   const developmentUrl = getDevelopmentUrl()
   const trusted = developmentUrl
     ? senderUrl.origin === new URL(developmentUrl).origin
-    : senderUrl.protocol === 'jinchuan:' && senderUrl.host === 'app'
+    : senderUrl.protocol === 'momentnest:' && senderUrl.host === 'app'
   if (!trusted) throw new Error('拒绝来自未授权页面的请求。')
   return mainWindow
 }
 
 /** 只提供打包后的界面资源，阻止请求越出资源目录。 */
 function registerRendererProtocol(): void {
-  protocol.handle('jinchuan', async (request) => {
+  protocol.handle('momentnest', async (request) => {
     try {
       const url = new URL(request.url)
       if (url.host === 'media') {
@@ -140,8 +140,8 @@ async function createWindow(): Promise<void> {
     minHeight: 600,
     title: '拾光匣',
     icon: app.isPackaged
-      ? join(process.resourcesPath, 'app', 'assets', 'branding', 'jinchuan.ico')
-      : resolve(__dirname, '../../../../assets/branding/jinchuan.ico'),
+      ? join(process.resourcesPath, 'app', 'assets', 'branding', 'momentnest.ico')
+      : resolve(__dirname, '../../../../assets/branding/momentnest.ico'),
     backgroundColor: '#FEFEFE',
     titleBarStyle: 'hidden',
     titleBarOverlay: { color: '#fafbfa', symbolColor: '#65706a', height: 56 },
@@ -170,7 +170,7 @@ async function createWindow(): Promise<void> {
 /** 注册启动期能力，后续的照片接收服务独立接入。 */
 async function start(): Promise<void> {
   await app.whenReady()
-  if (configuredDataDirectory === resolve(app.getPath('home'), '.jinchuan')) migrateUserDataDirectory(app.getPath('appData'), dataDirectory)
+  if (configuredDataDirectory === resolve(app.getPath('home'), '.momentnest')) migrateUserDataDirectory(app.getPath('appData'), dataDirectory)
   // 发布界面完全使用本地资源；开发模式也只允许固定回环服务器。
   await session.defaultSession.setProxy({mode:'direct'})
   session.defaultSession.webRequest.onBeforeRequest({urls:['http://*/*','https://*/*','ws://*/*','wss://*/*']},(details,callback)=>{
@@ -250,7 +250,7 @@ async function start(): Promise<void> {
     for(const [key,value] of mediaCapabilities) if(value.expiresAt<Date.now()) mediaCapabilities.delete(key)
     if(mediaCapabilities.size>10000) throw new Error('预览数量过多，请关闭后重新打开相册。')
     const key=randomUUID();mediaCapabilities.set(key,{assetId:checked,thumbnail,libraryId:checkedLibrary,expiresAt:Date.now()+2*60*60*1000})
-    return `jinchuan://media/${key}`
+    return `momentnest://media/${key}`
   })
   handle('family:reveal',async(assetId,libraryId)=>shell.showItemInFolder(await receiver!.call<string>('mediaPath',identifier(assetId),false,optionalLibrary(libraryId))))
   handle('family:save-baby',(baby,matchScope)=>receiver!.call('saveBaby',familyValidation.baby(baby),familyValidation.optionalMatchScope(matchScope)))
@@ -277,7 +277,7 @@ async function start(): Promise<void> {
   })
   await createWindow()
   // 仅本机明确传入维护开关时重建，普通启动不会清理已有识别缓存。
-  if (app.commandLine.hasSwitch('jinchuan-rebuild-face-index')) {
+  if (app.commandLine.hasSwitch('momentnest-rebuild-face-index')) {
     try {
       const state = await receiver!.call<{ currentLibraryId: string | null; currentLibraryAvailable: boolean }>('snapshot')
       if (!state.currentLibraryId || !state.currentLibraryAvailable) throw new Error('当前照片库不可用，不能重建人脸索引。')

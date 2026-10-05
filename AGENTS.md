@@ -2,7 +2,7 @@
 
 - 始终使用简体中文沟通；新增必要注释使用中文，保留既有注释。
 - 先阅读 `README.md`、`docs/product-design.md` 和相关模块，再修改代码。
-- 手机端使用 Flutter + Dart（apps/mobile），首期构建 Android；旧 apps/android 仅保留为参考。桌面端使用 Electron + Vue 3 + TypeScript。
+- 手机端使用 Flutter + Dart（apps/mobile），首期构建 Android。桌面端使用 Electron + Vue 3 + TypeScript。
 - 桌面主进程处理受授权的系统访问；预加载层只开放明确、有限的 IPC 方法；界面不直接访问 Node.js。
 - 保持 `contextIsolation: true`、`sandbox: true`、`nodeIntegration: false`，验证 IPC 来源与参数。
 - 后续大目录扫描与哈希计算放到工作线程，避免阻塞桌面主进程和界面。

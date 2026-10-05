@@ -11,10 +11,10 @@ watch([() => props.assetId, () => props.libraryId, () => props.available], async
   const request = ++sequence
   src.value = ''; failed.value = false; loading.value = false
   if (!assetId) return
-  if (!libraryId || !available || !window.jinchuan) { failed.value = true; return }
+  if (!libraryId || !available || !window.momentnest) { failed.value = true; return }
   loading.value = true
   try {
-    const url = await window.jinchuan.mediaUrl(assetId, true, libraryId)
+    const url = await window.momentnest.mediaUrl(assetId, true, libraryId)
     if (!disposed && request === sequence) src.value = url
   } catch { if (!disposed && request === sequence) failed.value = true }
   finally { if (!disposed && request === sequence) loading.value = false }

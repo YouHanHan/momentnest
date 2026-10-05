@@ -6,7 +6,7 @@ import 'package:momentnest_mobile/transfer_controller.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('dev.jinchuan/media');
+  const channel = MethodChannel('dev.momentnest/media');
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
@@ -63,7 +63,7 @@ void main() {
 
   test('完整内容指纹覆盖空文件、读块边界及尾部变化，原文件只读', () async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-fingerprint-',
+      'momentnest-fingerprint-',
     );
     final file = File('${directory.path}/synthetic.bin');
     for (final size in [0, 1, 256 * 1024, 256 * 1024 + 7]) {

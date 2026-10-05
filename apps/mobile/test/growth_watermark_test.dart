@@ -59,7 +59,7 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
   late File image, updated;
   setUp(() async {
-    final directory = await Directory.systemTemp.createTemp('jinchuan-growth-');
+    final directory = await Directory.systemTemp.createTemp('momentnest-growth-');
     image = File('${directory.path}/synthetic.png');
     updated = File('${directory.path}/updated.png');
     final pixel = base64Decode(

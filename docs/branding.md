@@ -1,48 +1,37 @@
-# 拾光匣品牌与兼容规则
+# 拾光匣品牌与应用身份
 
-中文产品名为 **拾光匣**，英文展示名为 **MomentNest**，原名为「近传 · Jinchuan」。定位是本地家庭照片、视频与成长记忆管理，局域网传输是其中的备份能力。
+中文产品名为 **拾光匣**，英文名为 **MomentNest**，定位是本地家庭照片、视频与成长记忆管理。项目采用独立应用身份，首次使用重新建立本机档案、照片库与设备配对。
 
-英文名表达「珍藏家庭时刻的小窝」。中文启动器和窗口继续显示「拾光匣」，中英文项目介绍使用「拾光匣 · MomentNest」。GitHub 私有仓库目标为 `YouHanHan/momentnest`。
-
-2026-10-05 的同名检索发现已有 [MomentNest 纪念日服务](https://momentnest.app/om/)；本项目按维护者确认使用该英文名，不以此宣称名称唯一。先前本机试用的英文名 `ShiguangBox` 不再用于新构建命名，历史交付包及其验收记录保留。
-
-## 名称对应
+## 名称与标识
 
 | 用途 | 名称 |
 |---|---|
-| 手机启动器、桌面窗口、界面文案 | 拾光匣 |
-| GitHub 标题与介绍 | 拾光匣 · MomentNest |
-| 建议 GitHub 仓库名 / 根 npm 项目 | momentnest |
-| 桌面 workspace | @momentnest/desktop |
-| Dart 源码项目 | momentnest_mobile |
-| Windows 与 APK 文件前缀 | MomentNest |
-| 新手机水印副本目录 | Pictures/MomentNest |
+| 手机启动器、桌面窗口 | 拾光匣 |
+| GitHub 标题 | 拾光匣 · MomentNest |
+| 私有仓库 | YouHanHan/momentnest |
+| 根 npm 项目 / 桌面 workspace | momentnest / @momentnest/desktop |
+| Dart 项目 | momentnest_mobile |
+| Android applicationId 与 Kotlin namespace | dev.momentnest.app |
+| Android 平台通道 | dev.momentnest/family、dev.momentnest/network、dev.momentnest/media |
+| Android 私有数据库 | momentnest.sqlite |
+| Windows 数据目录 | %USERPROFILE%/.momentnest |
+| 桌面协议与预加载接口 | momentnest://、window.momentnest |
+| 接收临时分块目录 | .momentnest-incoming |
+| 图标资源前缀 | momentnest |
+| 新 Android 水印副本目录 | Pictures/MomentNest |
 
-目录 `apps/desktop` 和 `apps/mobile` 继续表达平台。现有照片与爱心图标继续使用；素材文件名和资源标识仍保留 `jinchuan`，它们是内部引用，不影响显示名称。
+源码不读取其他应用身份下的相册、宝宝档案、配对记录或数据库。应用记录重新建立，原照片、视频、归档与水印文件继续保留，可以重新授权并索引。
 
-## 兼容身份
+## 安装与后续升级
 
-以下名称继续沿用：
+当前 APK 使用独立 Android 应用 ID 和 MomentNest 正式证书，需要按新应用安装。正式 APK 与调试 APK 签名不同，后续升级使用同一渠道、同一证书，不通过卸载假定本机记录能够保留。规则见 [Android 应用身份](https://developer.android.com/build/configure-app-module) 与 [签名说明](https://developer.android.com/studio/publish/app-signing)。
 
-- Android `applicationId`：`dev.jinchuan.app`；Kotlin namespace：`dev.jinchuan.jinchuan_mobile`。
-- Android 平台通道：`dev.jinchuan/family`、`dev.jinchuan/network`、`dev.jinchuan/media`。
-- Android 私有数据库：`jinchuan.sqlite`；系统安全存储中的配对令牌键及记录结构。
-- Windows 持久数据：`%USERPROFILE%/.jinchuan`；旧 `%APPDATA%/jinchuan` 只用于既有兼容迁移。
-- 桌面本地协议与预加载接口：`jinchuan://`、`window.jinchuan`。
-- 上传临时分块目录：`.jinchuan-incoming`；现有证书、签名文件与密钥别名。
-
-改名不重签旧身份，不迁移用户照片，不修改数据库结构，不重建已有相册或上传回执。新水印副本进入 `Pictures/MomentNest`，已有 `Pictures/Jinchuan` 与试名阶段的 `Pictures/ShiguangBox` 文件继续保留，记录中的原路径继续可读。
-
-Android 更新需要使用原应用标识与兼容签名，见 [Android 应用身份规则](https://developer.android.com/build/configure-app-module)。当前正式包与调试包分别沿用自己的签名；正式包无法直接覆盖旧调试版，下载说明必须区分新安装和已有调试版升级。
+正式签名保存在本机忽略目录 .local/momentnest-signing，不进入源码、安装包或 GitHub。后续 MomentNest 版本固定使用这里的证书和上述应用身份。
 
 ## 交付命名
 
-```text
-MomentNest-<桌面版本>-win32-x64/
-  MomentNest-<桌面版本>.exe
-MomentNest-<桌面版本>-win32-x64.zip
-MomentNest-<手机版本>-build<构建号>-<架构>-debug.apk
-MomentNest-<手机版本>-build<构建号>-<架构>-release.apk
-```
+Windows：MomentNest-<版本>-win32-x64/MomentNest-<版本>.exe，ZIP 包含整个目录。Android：MomentNest-<版本>-build<构建号>-<架构>-debug.apk 与对应 release.apk。
 
-源码首次改名不直接改变版本；交付打包由既有统一入口递增。桌面同步根配置、workspace 和锁文件版本，手机同步版本名与构建号。同轮 APK 使用 `mobile:apk:all`，每个平台的版本独立维护，Release 说明列出两端兼容组合。已有旧品牌交付包保留原名称和真实版本。
+两端使用统一打包入口自动递增补丁版本，Android 同步递增构建号。同轮调试与正式 APK 共用版本；归档检查包内实际版本、架构与签名，不用修改文件名冒充新构建。
+
+MomentNest 已有 [同名纪念日服务](https://momentnest.app/om/)，本项目按维护者选择使用该名称，不宣称名称唯一。

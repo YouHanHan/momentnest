@@ -89,7 +89,7 @@ class TransferController extends ChangeNotifier {
   ReceiverApi? _activeApi;
   bool _foreground = true;
   bool _monthActive = true;
-  static const _media = MethodChannel('dev.jinchuan/media');
+  static const _media = MethodChannel('dev.momentnest/media');
 
   void changed() {
     if (!_disposed) notifyListeners();

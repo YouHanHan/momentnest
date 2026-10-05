@@ -14,7 +14,7 @@ const updatedAt = '2026-01-01T00:00:00Z'
 
 /** 只建立合成索引，人工核对与缓存匹配均不需要读取照片或运行检测。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-baby-review-')), store = new Store(join(directory, 'synthetic.sqlite'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-baby-review-')), store = new Store(join(directory, 'synthetic.sqlite'))
   for (const id of [firstId, secondId, disabledId]) store.put('library', { id, path: join(directory, id), name: id, enabled: id !== disabledId })
   const baby: BabyProfile = { id: babyId, name: '宝宝', birthday: '2024-01-01', autoMatch: false, referenceFaces: [], updatedAt }
   store.put('familyBaby', baby)

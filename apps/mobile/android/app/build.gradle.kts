@@ -9,13 +9,13 @@ plugins {
 
 // 私钥和密码只从本机忽略目录读取，调试构建继续使用原调试签名。
 val releaseSigningProperties = Properties()
-val releaseSigningFile = rootProject.file("../../../.local/android-signing/release.properties")
+val releaseSigningFile = rootProject.file("../../../.local/momentnest-signing/release.properties")
 if (releaseSigningFile.exists()) {
     releaseSigningFile.inputStream().use { releaseSigningProperties.load(it) }
 }
 
 android {
-    namespace = "dev.jinchuan.jinchuan_mobile"
+    namespace = "dev.momentnest.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "dev.jinchuan.app"
+        applicationId = "dev.momentnest.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 26

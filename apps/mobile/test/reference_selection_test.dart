@@ -136,7 +136,7 @@ void main() {
   setUp(() async {
     homeOwnsControllers = false;
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-reference-',
+      'momentnest-reference-',
     );
     final photo = File('${directory.path}/pixel.png');
     await photo.writeAsBytes(

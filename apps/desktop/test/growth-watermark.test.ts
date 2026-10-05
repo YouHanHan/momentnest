@@ -104,7 +104,7 @@ test('实际字形主行与日期分开、日期更小，四角和极窄图片�
 })
 
 test('成长预览与导出保持相同像素布局、EXIF朝向与完整分辨率，源图片字节保留', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-growth-image-')), original = join(directory, 'original.jpg'), output = join(directory, 'copy.jpg')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-growth-image-')), original = join(directory, 'original.jpg'), output = join(directory, 'copy.jpg')
   await sharp({ create: { width: 1000, height: 800, channels: 3, background: '#c8bcae' } }).withMetadata({ orientation: 6 }).jpeg({ quality: 95 }).toFile(original)
   const before = digest(await readFile(original)), text = watermarkText(baby, '2024-08-12', options)
   const preview = await watermarkPreview(original, 'photo', text, { ...options, shade: true }, directory)
@@ -125,7 +125,7 @@ test('成长预览与导出保持相同像素布局、EXIF朝向与完整分辨�
 })
 
 test('成长副本保存最终确认拍摄日，再读取不变成创建日且不复制定位、设备或旧方向', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-growth-date-')), original = join(directory, 'original.jpg'), output = join(directory, 'copy.jpg')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-growth-date-')), original = join(directory, 'original.jpg'), output = join(directory, 'copy.jpg')
   await sharp({ create: { width: 1000, height: 800, channels: 3, background: '#c8bcae' } }).withExif({
     IFD0: { Make: 'Private camera' },
     IFD2: { DateTimeOriginal: '2024:08:12 10:20:00' },
@@ -149,7 +149,7 @@ test('成长副本保存最终确认拍摄日，再读取不变成创建日且�
 
 /** 使用合成媒体建立真实保存位置，不依赖个人照片或人脸模型。 */
 async function catalogFixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-growth-batch-')), library = join(directory, 'library'), other = join(directory, 'other'), output = join(directory, 'output')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-growth-batch-')), library = join(directory, 'library'), other = join(directory, 'other'), output = join(directory, 'output')
   await Promise.all([library, other, output].map(path => mkdir(path)))
   const store = new Store(join(directory, 'records.sqlite')), assets: MediaAsset[] = []
   store.put('library', { id: 'library-one', path: library, name: '一号库', enabled: true })

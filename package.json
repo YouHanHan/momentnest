@@ -1,6 +1,6 @@
 {
   "name": "momentnest",
-  "version": "0.4.34",
+  "version": "0.4.35",
   "private": true,
   "description": "拾光匣：本地家庭相册、成长记忆与局域网原文件备份",
   "workspaces": [

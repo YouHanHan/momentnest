@@ -6,14 +6,14 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const directory = join(root, '.local', 'android-signing')
-const keystore = join(directory, 'jinchuan-release.jks')
+const directory = join(root, '.local', 'momentnest-signing')
+const keystore = join(directory, 'momentnest-release.jks')
 const properties = join(directory, 'release.properties')
 const passwordFile = join(directory, 'store-password.txt')
-const certificateFile = join(directory, 'jinchuan-release.cer')
-const certificatePem = join(directory, 'jinchuan-release.pem')
+const certificateFile = join(directory, 'momentnest-release.cer')
+const certificatePem = join(directory, 'momentnest-release.pem')
 const reportFile = join(directory, 'certificate-info.json')
-const alias = 'jinchuan-release'
+const alias = 'momentnest-release'
 
 // 正式签名身份必须长期复用，重复执行不会覆盖已有密钥或密码。
 if ([keystore, properties, passwordFile, certificateFile, certificatePem, reportFile].some(existsSync)) {
@@ -30,7 +30,7 @@ const password = randomBytes(32).toString('base64url')
 await writeFile(passwordFile, password, { flag: 'wx' })
 keytool(['-genkeypair', '-noprompt', '-storetype', 'JKS', '-keystore', keystore,
   '-alias', alias, '-keyalg', 'RSA', '-keysize', '3072', '-sigalg', 'SHA256withRSA',
-  '-validity', '10000', '-dname', 'CN=Jinchuan, OU=Mobile, O=Jinchuan, C=CN',
+  '-validity', '10000', '-dname', 'CN=MomentNest, OU=Mobile, O=MomentNest, C=CN',
   '-storepass:file', passwordFile, '-keypass:file', passwordFile])
 keytool(['-exportcert', '-keystore', keystore, '-alias', alias,
   '-storepass:file', passwordFile, '-file', certificateFile])
@@ -38,7 +38,7 @@ keytool(['-exportcert', '-rfc', '-keystore', keystore, '-alias', alias,
   '-storepass:file', passwordFile, '-file', certificatePem])
 await writeFile(properties, [
   '# 本机正式签名配置；整个目录已被 .gitignore 排除，请另行备份。',
-  'storeFile=../../../.local/android-signing/jinchuan-release.jks',
+  'storeFile=../../../.local/momentnest-signing/momentnest-release.jks',
   `storePassword=${password}`, `keyAlias=${alias}`, `keyPassword=${password}`, '',
 ].join('\n'), { flag: 'wx' })
 const certificate = new X509Certificate(await readFile(certificateFile))

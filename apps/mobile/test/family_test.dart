@@ -273,7 +273,7 @@ void main() {
 
   test('原文件只读取手机相册，旧电脑下载副本不会冒充本机媒体', () async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-local-source-',
+      'momentnest-local-source-',
     );
     final original = File('${directory.path}/retained.bin');
     await original.writeAsBytes([1, 2, 3, 4]);
@@ -296,7 +296,7 @@ void main() {
 
   test('手机缓存路径或修改时间变化时校验内容，内容未变仍可预览', () async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-local-cache-',
+      'momentnest-local-cache-',
     );
     final original = File('${directory.path}/source.bin');
     await original.writeAsBytes([1, 2, 3, 4]);
@@ -325,7 +325,7 @@ void main() {
 
   test('手机媒体内容已改变时拒绝以新内容替代旧记录，也不向电脑下载', () async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-local-change-',
+      'momentnest-local-change-',
     );
     final original = File('${directory.path}/source.bin');
     await original.writeAsBytes([1, 2, 3, 4]);

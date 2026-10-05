@@ -1,10 +1,10 @@
 # 拾光匣 · MomentNest
 
-<img src="assets/branding/jinchuan-icon.png" alt="拾光匣图标" width="88" />
+<img src="assets/branding/momentnest-icon.png" alt="拾光匣图标" width="88" />
 
 **把家庭照片收好，让成长有迹可循。**
 
-拾光匣是一款面向家庭的本地照片与视频管理工具，原名「近传 · Jinchuan」。它帮助你整理电脑图库、建立宝宝成长相册，并通过局域网将 Android 手机上的原文件备份到 Windows 电脑。
+拾光匣是一款面向家庭的本地照片与视频管理工具。它帮助你整理电脑图库、建立宝宝成长相册，并通过局域网将 Android 手机上的原文件备份到 Windows 电脑。
 
 相册与人脸辅助整理在本机运行。手机和电脑各自维护宝宝记录，电脑连接用于原文件上传和备份核对；当前不提供宝宝相册跨设备同步或从电脑下载原文件。
 
@@ -55,11 +55,11 @@ Android 相册与宝宝相册：
 
 上传时保持手机应用在前台，电脑应用保持运行。VPN、跨子网及仅移动数据环境会被拒绝；访客 Wi-Fi 或无线隔离可能阻止两端连接。详细操作见 [使用说明](docs/user-guide.md)。
 
-## 升级与数据
+## 安装身份与数据
 
-改名保留 Android 应用标识 `dev.jinchuan.app`、现有签名配置、配对协议及本机记录格式。Windows 继续使用用户目录下的 `.jinchuan`，手机继续读取原私有数据库，已有相册不因品牌名称调整而重新建立。
+MomentNest 使用独立 Android 应用标识 `dev.momentnest.app`、正式证书、平台通道和本机数据库。Windows 使用用户目录下的 `.momentnest`。首次使用重新登记照片库、建立宝宝档案并配对；原照片和视频可重新授权与索引。
 
-正式 APK 和旧调试 APK 的签名不同，正式包不能直接覆盖安装旧调试版。已有调试版用户使用相同签名的调试升级包；新安装可选正式包。不要通过卸载旧应用解决升级问题后再假定本机记录仍然存在。详见 [品牌与兼容规则](docs/branding.md)。
+当前 APK 按新应用安装，不承接其他应用身份的旧记录。正式版与调试版签名不同，后续升级使用相同渠道及证书。详见 [品牌与应用身份](docs/branding.md)。
 
 ## 当前限制
 
@@ -93,15 +93,15 @@ npm.cmd run dev
 | [使用说明](docs/user-guide.md) | 相册、传输、成长整理及常见问题 |
 | [开发说明](docs/development.md) | 环境、运行、测试、构建与签名 |
 | [隐私与数据](docs/privacy.md) | 权限、数据位置、网络与保存边界 |
-| [品牌与兼容](docs/branding.md) | 两端名称、安装包命名及旧数据兼容 |
+| [品牌与应用身份](docs/branding.md) | 两端标识、安装包命名与数据位置 |
 | [GitHub 发布准备](docs/github-release.md) | 上传范围、仓库设置、发布资料与检查清单 |
 | [产品设计](docs/product-design.md) / [接口说明](docs/api.md) | 行为约束与实现边界 |
 | [更新记录](CHANGELOG.md) / [验收记录](docs/verification.md) | 变更与验证证据 |
 
 ## 授权与反馈
 
-本项目当前保留原有授权状态，未授予项目级开源许可。GitHub 仓库准备为私有；项目的 npm `private` 配置用于阻止 npm 发布，不决定 GitHub 可见性。第三方软件和模型适用各自的许可证，见 [第三方许可说明](THIRD_PARTY_NOTICES.md)。
+本项目当前保留原有授权状态，未授予项目级开源许可。GitHub 仓库为私有；项目的 npm `private` 配置用于阻止 npm 发布，不决定 GitHub 可见性。第三方软件和模型适用各自的许可证，见 [第三方许可说明](THIRD_PARTY_NOTICES.md)。
 
 有仓库访问权限的使用者可以通过 Issues 反馈。请附平台、版本、复现步骤与脱敏日志，不要提交私人照片、人脸特征、配对二维码、令牌或签名文件。贡献与安全报告方式见 [贡献说明](CONTRIBUTING.md) 和 [安全说明](SECURITY.md)。
 
-旧 README 的完整功能与迭代说明已归档到 [历史说明](docs/history/readme-jinchuan.md)，其中旧同步描述以当前文档为准。
+文档按当前应用行为维护，构建与设备验证见 [验收记录](docs/verification.md)。

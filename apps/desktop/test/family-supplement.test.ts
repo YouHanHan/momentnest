@@ -25,7 +25,7 @@ async function waitJobs(store: Store): Promise<void> {
 }
 
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-supplement-')), data = join(directory, 'state')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-supplement-')), data = join(directory, 'state')
   await mkdir(data)
   const store = new Store(join(data, 'synthetic.sqlite'))
   const library = async (name: string, enabled = true) => {

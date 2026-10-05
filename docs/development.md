@@ -1,6 +1,6 @@
 # 开发说明
 
-当前产品名称为「拾光匣 · MomentNest」，根 npm 项目为 `momentnest`，桌面 workspace 为 `@momentnest/desktop`，Dart 项目为 `momentnest_mobile`。安装身份、数据目录、模型资源及本地协议继续兼容旧名称，详见 [品牌规则](branding.md)。
+当前产品名称为「拾光匣 · MomentNest」，根 npm 项目为 `momentnest`，桌面 workspace 为 `@momentnest/desktop`，Dart 项目为 `momentnest_mobile`。Android 安装身份、数据目录、图标资源及本地协议独立使用 MomentNest 命名，详见 [品牌规则](branding.md)。
 
 ## 已验证的环境
 
@@ -63,13 +63,13 @@ service/worker.ts 承载 Receiver，处理 HTTPS、SQLite、历史扫描、流�
 
 ## 数据可靠性
 
-完整内容身份是 SHA-256 + size；历史匹配与当前库回执分开保存。已确认偏移只在分块写入并 fsync 后提交。临时文件保存在所选接收库的 .jinchuan-incoming 中，与最终文件同卷；最终提交使用独占目标、完整哈希校验和 SQLite 事务，重启处理 committing 中间状态。
+完整内容身份是 SHA-256 + size；历史匹配与当前库回执分开保存。已确认偏移只在分块写入并 fsync 后提交。临时文件保存在所选接收库的 .momentnest-incoming 中，与最终文件同卷；最终提交使用独占目标、完整哈希校验和 SQLite 事务，重启处理 committing 中间状态。
 
 所有上传会话绑定授权设备、目标库和不可变批次日期。重放创建请求复用 clientKey；同目录同内容复用已验证回执，不能因换文件名重复写入。缺失或损坏的已保存图会在核对时识别，可重新传输。
 
 SQLite 使用 WAL；桌面 Store 采用 records 与 locations 持久化，内容指纹、幂等键与近期时间建立索引。手机 SQLite 保存队列与核对状态，令牌不进入普通偏好记录。不要把测试数据、个人照片、配对 JSON 或证书加入源码。
 
-桌面日常启动固定使用 `app.getPath('home')/.jinchuan`，Windows 对应 `%USERPROFILE%/.jinchuan`。该目录位于 AppData 之外，避免从商店应用启动时被 Windows 重定向，开发、预览、版本化 EXE 共用同一份 `receiver/receiver.sqlite`、媒体缓存及界面偏好。启动时核对物理目录；首次用 SQLite 一致快照沿用原 `%APPDATA%/jinchuan/receiver` 的记录和生成缓存，并修正应用内部缓存路径，校验后启用，原目录仅作迁移备份保留。后续启动不再读取备份，不接受旧 `--jinchuan-data-directory` 参数切换相册。自动化验收在加载主进程前显式设置独立目录，保持合成数据隔离。升级和普通构建不会清空数据；清除记录需用户明确授权，不删除用户选择的原媒体及导出目录。
+桌面日常启动固定使用 `app.getPath('home')/.momentnest`，Windows 对应 `%USERPROFILE%/.momentnest`。该目录位于 AppData 之外，避免从商店应用启动时被 Windows 重定向，开发、预览、版本化 EXE 共用同一份 `receiver/receiver.sqlite`、媒体缓存及界面偏好。启动时核对物理目录；首次用 SQLite 一致快照沿用原 `%APPDATA%/momentnest/receiver` 的记录和生成缓存，并修正应用内部缓存路径，校验后启用，原目录仅作迁移备份保留。后续启动不再读取备份，不接受旧 `--momentnest-data-directory` 参数切换相册。自动化验收在加载主进程前显式设置独立目录，保持合成数据隔离。升级和普通构建不会清空数据；清除记录需用户明确授权，不删除用户选择的原媒体及导出目录。
 
 Windows 原生 Electron 验收需在正常本机执行环境运行，使用独立数据目录和随机回环端口。受限执行环境可能使原生子进程无法加载组件并触发崩溃弹窗；遇到此情况先停止重试并检查残留测试进程，不通过修改系统错误报告或关闭应用窗口的安全隔离来绕过。
 
@@ -79,11 +79,11 @@ Windows 原生 Electron 验收需在正常本机执行环境运行，使用独�
 
 ## 应用 Logo 与 Android 正式签名
 
-Logo 原稿位于 `assets/branding/jinchuan-logo.png`，采用相叠照片、绿色与暖色爱心。`npm run icons:build` 使用已有 sharp 依赖生成 Windows 多尺寸 ICO、PNG 与 Android 各密度启动图标；Android 自适应图标由独立前景和浅色背景组成。原有 Flutter 默认图标文件保留，清单指向新的 `jinchuan_launcher`。Windows 打包和窗口使用同一 ICO。
+Logo 原稿位于 `assets/branding/momentnest-logo.png`，采用相叠照片、绿色与暖色爱心。`npm run icons:build` 使用已有 sharp 依赖生成 Windows 多尺寸 ICO、PNG 与 Android 各密度启动图标；Android 自适应图标由独立前景和浅色背景组成。原有 Flutter 默认图标文件保留，清单指向新的 `momentnest_launcher`。Windows 打包和窗口使用同一 ICO。
 
-首次在本机执行 `npm run mobile:signing:init`，生成 RSA 3072 位、有效期 10000 天的正式签名证书。私钥、密码及 `release.properties` 位于 `.local/android-signing/`，已由 `.gitignore` 的 `.local/` 规则排除。生成脚本拒绝覆盖已有文件；后续版本沿用同一证书。`jinchuan-release.cer` 和 `.pem` 为不含私钥的公开证书，指纹及有效期见 `certificate-info.json`。
+首次在本机执行 `npm run mobile:signing:init`，生成 RSA 3072 位、有效期 10000 天的正式签名证书。私钥、密码及 `release.properties` 位于 `.local/momentnest-signing/`，已由 `.gitignore` 的 `.local/` 规则排除。生成脚本拒绝覆盖已有文件；后续版本沿用同一证书。`momentnest-release.cer` 和 `.pem` 为不含私钥的公开证书，指纹及有效期见 `certificate-info.json`。
 
-`npm run mobile:apk:release` 构建正式签名的分 ABI APK；`npm run mobile:apk` 仍使用原调试签名。正式构建缺少签名配置时失败，不自动回退调试证书。正式证书与旧调试版不同，不能直接覆盖安装旧版；已有手机继续使用调试版升级包，正式包用于新安装。签名目录需要单独妥善备份，丢失密钥后无法用相同身份发布后续升级。参见 [Android 签名规则](https://developer.android.com/studio/publish/app-signing)。
+`npm run mobile:apk:release` 构建正式签名的分 ABI APK；`npm run mobile:apk` 仍使用原调试签名。正式构建缺少签名配置时失败，不自动回退调试证书。当前 APK 按独立应用安装，不承接其他应用记录。正式证书与调试证书不同，后续升级固定使用相同渠道与证书。签名目录需要单独妥善备份，丢失密钥后无法用相同身份发布后续升级。参见 [Android 签名规则](https://developer.android.com/studio/publish/app-signing)。
 
 ## 打包版本与交付命名
 
@@ -97,4 +97,4 @@ Android 可加 `--arm64` 只构建 arm64；已有依赖缓存时可加 `--offlin
 npm.cmd run mobile:apk:all -- --offline --arm64
 ```
 
-Windows PowerShell 使用 `npm.cmd` 传递以上参数，避免 `npm.ps1` 将它们识别成 npm 配置。Android 应用标识和签名身份沿用原配置；递增的是应用版本及交付文件名。Flutter 分 ABI 时会给版本码附加架构偏移，例如构建号 19 的 arm64 APK 为 2019。
+Windows PowerShell 使用 `npm.cmd` 传递以上参数，避免 `npm.ps1` 将它们识别成 npm 配置。Android 应用标识与 MomentNest 专用签名固定复用；递增的是应用版本及交付文件名。Flutter 分 ABI 时会给版本码附加架构偏移，例如构建号 19 的 arm64 APK 为 2019。

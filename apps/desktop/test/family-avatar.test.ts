@@ -14,7 +14,7 @@ const profile = (): BabyProfile => ({ id: randomUUID(), name: '测试宝宝', bi
 
 /** 合成索引与独立 SQLite 验证头像记录，不读取或改变个人媒体。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-baby-avatar-')), database = join(directory, 'avatar.sqlite')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-baby-avatar-')), database = join(directory, 'avatar.sqlite')
   const store = new Store(database), libraryId = randomUUID(), disabledLibraryId = randomUUID(), rootId = randomUUID(), disabledRootId = randomUUID()
   store.put('library', { id: libraryId, path: directory, name: '合成照片库', enabled: true })
   store.put('library', { id: disabledLibraryId, path: directory, name: '未授权照片库', enabled: false })

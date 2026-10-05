@@ -49,7 +49,7 @@ test('月龄使用日历月，处理月底、闰年和出生前日期', () => {
 })
 
 test('真实目录导入：日期冻结、原字节校验、多位置去重、水印副本和持久化', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-family-')), source = join(directory, 'source'), destination = join(directory, 'archive'), output = join(directory, 'output'), data = join(directory, 'state')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-family-')), source = join(directory, 'source'), destination = join(directory, 'archive'), output = join(directory, 'output'), data = join(directory, 'state')
   await Promise.all([source, destination, output, data].map(path => mkdir(path)))
   const original = join(source, 'original.jpg'), fallback = join(source, 'creation.jpg')
   await sample(original, '#cc9988', '2024:03:10 09:30:00'); await sample(fallback, '#113355')
@@ -115,7 +115,7 @@ test('真实目录导入：日期冻结、原字节校验、多位置去重、�
 })
 
 test('人物参考匹配保留人工排除，低置信度只进入候选且不导出特征向量', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-faces-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-faces-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data)
   await sample(join(source, 'first.jpg'), '#ffaaaa', '2024:03:10 10:00:00')
   await sample(join(source, 'excluded.jpg'), '#aaffaa', '2024:03:11 10:00:00')
@@ -144,7 +144,7 @@ test('人物参考匹配保留人工排除，低置信度只进入候选且不�
 })
 
 test('视频原字节传输与日期元数据，认证同步不泄露电脑路径，范围读取可恢复', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-video-')), data = join(directory, 'data'), library = join(directory, 'library'), video = join(directory, 'sample.mp4')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-video-')), data = join(directory, 'data'), library = join(directory, 'library'), video = join(directory, 'sample.mp4')
   await mkdir(data); await mkdir(library)
   await new Promise<void>((resolve, reject) => execFile(ffmpegPath!, ['-v', 'error', '-f', 'lavfi', '-i', 'color=c=blue:s=320x240:d=1', '-c:v', 'libx264', '-metadata', 'creation_time=2024-03-10T23:30:00-09:00', video], { windowsHide: true }, error => error ? reject(error) : resolve()))
   const metadata = await readMetadata(video, 'video'); assert.ok(metadata.duration > 0); assert.equal(metadata.width, 320); assert.ok(metadata.captureDate)
@@ -181,7 +181,7 @@ test('视频原字节传输与日期元数据，认证同步不泄露电脑路�
 })
 
 test('人工决定与日期独立分页，未收到的原图也保留人工记录', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-sync-')), store = new Store(join(directory, 'family.sqlite')), catalog = new MediaCatalog(store, directory, 'receiver', undefined, stubEngine)
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-sync-')), store = new Store(join(directory, 'family.sqlite')), catalog = new MediaCatalog(store, directory, 'receiver', undefined, stubEngine)
   const baby: BabyProfile = { id: randomUUID(), name: '宝宝', birthday: '2024-01-01', autoMatch: false, referenceFaces: [], updatedAt: new Date().toISOString() }
   catalog.saveBaby(baby)
   try {
@@ -199,7 +199,7 @@ test('人工决定与日期独立分页，未收到的原图也保留人工记�
 })
 
 test('视频抽帧分析失败重试复用已检测人脸，不重复人物分组', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-retry-')), source = join(directory, 'source'), data = join(directory, 'data'), video = join(source, 'retry.mp4')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-retry-')), source = join(directory, 'source'), data = join(directory, 'data'), video = join(source, 'retry.mp4')
   await mkdir(source); await mkdir(data)
   await new Promise<void>((resolve, reject) => execFile(ffmpegPath!, ['-v', 'error', '-f', 'lavfi', '-i', 'color=c=green:s=320x240:d=6', '-c:v', 'libx264', video], { windowsHide: true }, error => error ? reject(error) : resolve()))
   let calls = 0, closed = false
@@ -221,7 +221,7 @@ test('视频抽帧分析失败重试复用已检测人脸，不重复人物分�
 })
 
 test('人脸分析重启复用包含无脸结果的缓存，重扫后只检测新媒体', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-incremental-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-incremental-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data)
   await sample(join(source, 'existing.jpg'), '#aa5555'); await sample(join(source, 'no-face.jpg'), '#55aa55')
   const detected: string[] = []
@@ -248,7 +248,7 @@ test('人脸分析重启复用包含无脸结果的缓存，重扫后只检测�
 })
 
 test('日期待确认双向筛选与移除宝宝参考立即生效，保留人工归属', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-reference-edit-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-reference-edit-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data)
   await sample(join(source, 'reference.jpg'), '#dd5555', '2024:03:10 10:00:00')
   await sample(join(source, 'matched.jpg'), '#55dd55', '2024:03:12 10:00:00')
@@ -283,7 +283,7 @@ test('日期待确认双向筛选与移除宝宝参考立即生效，保留人�
 })
 
 test('空媒体跳过并保留可执行计划，图库扫描不会因一个坏文件中断', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-warning-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-warning-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data)
   await writeFile(join(source, 'empty.mp4'), Buffer.alloc(0))
   await sample(join(source, 'valid.jpg'), '#33cc77', '2024:03:10 10:00:00')
@@ -304,7 +304,7 @@ test('空媒体跳过并保留可执行计划，图库扫描不会因一个坏�
 })
 
 test('失效的旧归档回执可重新保存原文件，不触发内容唯一约束', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-stale-receipt-')), source = join(directory, 'source'), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-stale-receipt-')), source = join(directory, 'source'), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([source, library, data].map(path => mkdir(path)))
   const original = join(source, 'original.jpg'); await sample(original, '#557799', '2024:03:10 10:00:00')
   const identity = await hashFile(original), libraryId = randomUUID(), rootId = randomUUID()
@@ -322,7 +322,7 @@ test('失效的旧归档回执可重新保存原文件，不触发内容唯一�
 })
 
 test('接收库同路径被其他内容覆盖，不冒充原回执或继承旧拍摄日期', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-overwritten-library-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-overwritten-library-')), library = join(directory, 'library'), data = join(directory, 'data')
   await mkdir(library); await mkdir(data)
   const file = join(library, 'shared.jpg'); await sample(file, '#aa3344', '2024:03:10 10:00:00')
   const identity = await hashFile(file), libraryId = randomUUID()
@@ -342,7 +342,7 @@ test('接收库同路径被其他内容覆盖，不冒充原回执或继承旧�
 })
 
 test('来自另一端的人工归属优先于本机较新的识别结果，自动开关同步后重新计算候选', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-sync-priority-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-sync-priority-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data)
   await sample(join(source, 'reference.jpg'), '#3388aa', '2024:03:10 10:00:00'); await sample(join(source, 'match.jpg'), '#aa7733', '2024:03:11 10:00:00'); await sample(join(source, 'another.jpg'), '#7744aa', '2024:03:12 10:00:00')
   const store = new Store(join(data, 'family.sqlite')), catalog = new MediaCatalog(store, data, 'receiver', undefined, stubEngine)
@@ -373,7 +373,7 @@ test('本地大视频索引与归档允许超过 2 GiB，网络传输仍保持�
 })
 
 test('离线来源目录保留不可用状态，其余已授权目录继续扫描', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-offline-root-')), source = join(directory, 'source'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-offline-root-')), source = join(directory, 'source'), data = join(directory, 'data')
   await mkdir(source); await mkdir(data); await sample(join(source, 'valid.jpg'), '#336688')
   const store = new Store(join(data, 'family.sqlite')), catalog = new MediaCatalog(store, data, 'receiver', undefined, stubEngine), missingId = randomUUID(), validId = randomUUID()
   store.put('root', { id: missingId, path: join(directory, 'offline-drive'), enabled: true, state: 'ready', count: 10, error: '', scannedAt: null })
@@ -404,14 +404,14 @@ test('长中文月龄水印完整换行，日期有可见像素且四角和极�
       assert.ok(composite.length > 0)
     }
   }
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-watermark-wrap-')), original = join(directory, 'original.jpg')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-watermark-wrap-')), original = join(directory, 'original.jpg')
   await sharp({ create: { width: 512, height: 512, channels: 3, background: '#335577' } }).jpeg().toFile(original)
   const preview = await watermarkPreview(original, 'photo', text, options, directory)
   assert.equal((await sharp(preview).metadata()).width, 512)
 })
 
 test('零字节、单字节及截断图片头的元数据解析显式关闭文件句柄', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-exif-close-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-exif-close-'))
   type Reader = { read(path: string): Promise<void>; file?: { fh?: { fd: number; stat(): Promise<unknown> }; close?(): Promise<void> } }
   const prototype = (exifr.Exifr as unknown as { prototype: Reader }).prototype, originalRead = prototype.read
   const captured: { reader: Reader; handle: NonNullable<NonNullable<Reader['file']>['fh']> }[] = []
@@ -447,7 +447,7 @@ test('复制目录比较统一 Windows 路径形式，禁止同目录和父子�
 })
 
 test('实际复制目录同目录及父子关系在预扫描前拒绝，互不包含可正常复制', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-copy-paths-')), source = join(directory, 'source'), nested = join(source, 'archive'), library = join(directory, 'archive'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-copy-paths-')), source = join(directory, 'source'), nested = join(source, 'archive'), library = join(directory, 'archive'), data = join(directory, 'data')
   await mkdir(source); await Promise.all([nested, library, data].map(path => mkdir(path)))
   const original = join(source, 'photo.jpg'); await sample(original, '#773344', '2024:03:10 10:00:00')
   const identity = await hashFile(original), rootId = randomUUID(), libraryId = randomUUID()
@@ -469,7 +469,7 @@ test('实际复制目录同目录及父子关系在预扫描前拒绝，互不�
 })
 
 test('旧复制计划执行前与处理下一项前重新验证目录，保留已保存照片', async context => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-copy-revalidate-')), source = join(directory, 'source'), library = join(directory, 'archive'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-copy-revalidate-')), source = join(directory, 'source'), library = join(directory, 'archive'), data = join(directory, 'data')
   await Promise.all([source, library, data].map(path => mkdir(path)))
   await sample(join(source, 'first.jpg'), '#773388', '2024:03:10 10:00:00'); await sample(join(source, 'second.jpg'), '#33aa77', '2024:03:11 10:00:00')
   const firstHash = (await hashFile(join(source, 'first.jpg'))).hash, secondHash = (await hashFile(join(source, 'second.jpg'))).hash, rootId = randomUUID(), libraryId = randomUUID()

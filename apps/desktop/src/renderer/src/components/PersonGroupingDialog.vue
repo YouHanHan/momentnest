@@ -21,7 +21,7 @@ const pending = new Set<string>()
 
 /** 全部候选共用六个缩略图请求名额，切库后的迟到响应不写入新缓存。 */
 function loadThumbnails(): void {
-  if (disposed || !window.jinchuan || !plan.value || props.loading) return
+  if (disposed || !window.momentnest || !plan.value || props.loading) return
   const libraryId = props.libraryId ?? plan.value.libraryId
   const assetIds = new Set(visible.value.flatMap(merge => [merge.source.reference, merge.target.reference]).filter(reference => reference?.kind === 'photo' && reference.face.frameTime === undefined).map(reference => reference!.assetId))
   for (const assetId of assetIds) {
@@ -32,12 +32,12 @@ function loadThumbnails(): void {
 }
 
 function drainThumbnails(): void {
-  if (disposed || !window.jinchuan) return
+  if (disposed || !window.momentnest) return
   while (activeRequests < 6 && queue.length) {
     const request = queue.shift()!
     if (request.generation !== generation) continue
     activeRequests++
-    void window.jinchuan.mediaUrl(request.assetId, true, request.libraryId).then(url => {
+    void window.momentnest.mediaUrl(request.assetId, true, request.libraryId).then(url => {
       if (!disposed && request.generation === generation) urls[request.assetId] = url
     }).catch(() => {
       if (!disposed && request.generation === generation) failed.add(request.assetId)

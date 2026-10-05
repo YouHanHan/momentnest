@@ -1,4 +1,4 @@
-package dev.jinchuan.jinchuan_mobile
+package dev.momentnest.app
 
 import android.content.ContentUris
 import android.content.ContentValues

@@ -14,7 +14,7 @@ type SavedPerson = { id: string; name: string; embedding: number[]; mergedIntoId
 
 /** 每个用例仅建立独立临时目录与合成记录，模型不接触真实照片。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-person-grouping-')), data = join(directory, 'state')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-person-grouping-')), data = join(directory, 'state')
   const firstId = randomUUID(), secondId = randomUUID(), paths = new Map([[firstId, join(directory, 'first')], [secondId, join(directory, 'second')]])
   await mkdir(data); for (const path of paths.values()) await mkdir(path)
   const store = new Store(join(data, 'family.sqlite')), calls = { ready: 0, detected: [] as string[] }, embeddings = new Map<string, number[]>()

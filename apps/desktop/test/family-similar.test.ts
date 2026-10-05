@@ -19,7 +19,7 @@ interface SeedOptions {
 
 /** 使用纯缓存夹具验证查询范围，测试不读取任何实际照片或目录。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-query-')), store = new Store(join(directory, 'state.sqlite'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-query-')), store = new Store(join(directory, 'state.sqlite'))
   store.put('library', { id: libraryId, path: join(directory, 'library-one'), name: '当前库', enabled: true })
   store.put('library', { id: otherLibraryId, path: join(directory, 'library-two'), name: '另一个库', enabled: true })
   store.put('root', { id: rootId, path: join(directory, 'history'), enabled: true })

@@ -49,7 +49,7 @@ void main() {
   late File original;
   setUp(() async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-original-',
+      'momentnest-original-',
     );
     original = File('${directory.path}/original.png');
     final recorder = ui.PictureRecorder();

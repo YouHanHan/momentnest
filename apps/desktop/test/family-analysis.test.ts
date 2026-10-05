@@ -26,7 +26,7 @@ async function sample(path: string, color: string): Promise<void> {
 const detected = (score = 0.95) => [{ x: 0.1, y: 0.1, width: 0.4, height: 0.5, score, embedding: [1, 0] }]
 
 test('两阶段宝宝参考分别找到相似人脸，不依赖人物分组，保留人工排除并复用检测缓存', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-multiple-references-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-multiple-references-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library)
   const embeddings: Record<string, number[]> = {
     'reference-early.jpg': [1, 0, 0], 'reference-later.jpg': [0, 1, 0],
@@ -71,7 +71,7 @@ test('两阶段宝宝参考分别找到相似人脸，不依赖人物分组，�
 })
 
 test('全部参考失效、照片与人脸不对应或人脸不清晰时明确拒绝宝宝查找', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-invalid-references-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-invalid-references-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library); await sample(join(library, 'reference.jpg'), '#447799')
   const store = new Store(join(data, 'family.sqlite'))
   let detections = 0
@@ -95,7 +95,7 @@ test('全部参考失效、照片与人脸不对应或人脸不清晰时明确�
 })
 
 test('有效宝宝参考自动增量整理，人工排除优先，失败不随轮询重跑且关闭开关停止新增识别', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-auto-faces-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-auto-faces-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library); await sample(join(library, 'reference.jpg'), '#aa3344')
   const store = new Store(join(data, 'family.sqlite'))
   const calls = new Map<string, number>()
@@ -153,7 +153,7 @@ test('有效宝宝参考自动增量整理，人工排除优先，失败不随�
 })
 
 test('重启后宝宝自动整理仅补新内容，人物头像只选当前库清晰可用照片且不泄露特征', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-person-preview-')), data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-person-preview-')), data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   await sample(join(first, 'lower.jpg'), '#bb4444'); await sample(join(first, 'clear.jpg'), '#44bb44'); await sample(join(second, 'other.jpg'), '#4444bb')
   const store = new Store(join(data, 'family.sqlite')), firstId = randomUUID(), secondId = randomUUID()
@@ -187,7 +187,7 @@ test('重启后宝宝自动整理仅补新内容，人物头像只选当前库�
 })
 
 test('自动整理必须有明确启用照片库，档案保存和兼容全局状态读取不扩大扫描范围', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-auto-face-scope-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-auto-face-scope-')), data = join(directory, 'state'), library = join(directory, 'photos'), libraryId = randomUUID()
   await mkdir(data); await mkdir(library); await sample(join(library, 'reference.jpg'), '#5588aa')
   const store = new Store(join(data, 'family.sqlite'))
   let calls = 0
@@ -215,7 +215,7 @@ test('自动整理必须有明确启用照片库，档案保存和兼容全局�
 })
 
 test('日期排序双向稳定分页，未知日期始终最后且服务与 IPC 拒绝非法排序', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-date-order-')), store = new Store(join(directory, 'family.sqlite')), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-date-order-')), store = new Store(join(directory, 'family.sqlite')), libraryId = randomUUID()
   store.put('library', { id: libraryId, path: directory, name: '测试库', enabled: true })
   for (const [letter, date] of [['a', '2026-01-01'], ['b', '2026-01-05'], ['c', '2026-01-05'], ['d', null]] as const) {
     const hash = letter.repeat(64), id = `${hash}-1`

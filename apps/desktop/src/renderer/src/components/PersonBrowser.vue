@@ -20,7 +20,7 @@ watch(() => JSON.stringify({ libraryId: props.libraryId, assets: visible.value.m
   await Promise.all(Array.from({ length: Math.min(6, ids.length) }, async () => {
     while (cursor < ids.length && current === generation) {
       const id = ids[cursor++]
-      try { const url = await window.jinchuan?.mediaUrl(id, true, libraryId); if (current === generation && libraryId === props.libraryId && url) urls[id] = url }
+      try { const url = await window.momentnest?.mediaUrl(id, true, libraryId); if (current === generation && libraryId === props.libraryId && url) urls[id] = url }
       catch { if (current === generation) failed.add(id) }
     }
   }))

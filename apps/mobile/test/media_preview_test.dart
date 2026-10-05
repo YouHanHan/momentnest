@@ -41,7 +41,7 @@ BabyProfile baby() => BabyProfile({
 void main() {
   late File photo;
   setUp(() async {
-    final directory = await Directory.systemTemp.createTemp('jinchuan-widget-');
+    final directory = await Directory.systemTemp.createTemp('momentnest-widget-');
     photo = File('${directory.path}/pixel.png');
     await photo.writeAsBytes(
       base64Decode(

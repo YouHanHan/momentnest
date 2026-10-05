@@ -6,7 +6,7 @@ import { createInterface } from 'node:readline'
 import { createHash } from 'node:crypto'
 import type { Library, Receipt } from '../src/service/types.ts'
 
-const root=await mkdtemp(join(tmpdir(),'jinchuan-protocol-'))
+const root=await mkdtemp(join(tmpdir(),'momentnest-protocol-'))
 await mkdir(join(root,'state'));await mkdir(join(root,'photos'))
 const receiver=new Receiver(join(root,'state'))
 await receiver.addDirectory(join(root,'photos'),'library')

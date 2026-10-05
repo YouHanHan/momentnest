@@ -18,7 +18,7 @@ test('重建 IPC 使用统一来源校验，维护启动入口必须由明确开
   const handle = main.match(/function handle\([\s\S]*?\n\}/)?.[0]
   assert.ok(handle)
   assert.match(handle, /requireTrustedSender\(event\)[\s\S]*?return action\(\.\.\.args\)/)
-  const startup = main.match(/if \(app\.commandLine\.hasSwitch\('jinchuan-rebuild-face-index'\)\) \{([\s\S]*?)\n  \}/)?.[1]
+  const startup = main.match(/if \(app\.commandLine\.hasSwitch\('momentnest-rebuild-face-index'\)\) \{([\s\S]*?)\n  \}/)?.[1]
   assert.ok(startup)
   assert.match(startup, /!state\.currentLibraryId\s*\|\|\s*!state\.currentLibraryAvailable/)
   assert.match(startup, /receiver!\.call\('rebuildFaceIndex',\s*identifier\(state\.currentLibraryId\)\)/)

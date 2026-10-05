@@ -33,7 +33,7 @@ import { closePopupMenus } from '../popup-dismiss'
 
 const props = defineProps<{ module: 'import' | 'library' | 'baby'; page: string; receiver: ReceiverState | null; recordsOpen?: boolean }>()
 const emit = defineEmits<{ 'refresh-receiver': []; navigate: ['import' | 'library' | 'baby']; 'change-page': [string]; 'close-records': []; 'processing-status': [{ running: number; unread: boolean }] }>()
-const api = window.jinchuan
+const api = window.momentnest
 /** 分页记录整批替换，避免为大图库中的每个嵌套字段建立响应依赖。 */
 const family = shallowRef<FamilyState | null>(null), media = shallowRef<MediaPage | null>(null)
 const babyMatchCounts = ref({ included: 0, candidates: 0 })
@@ -91,7 +91,7 @@ function toggleAutomaticWatermark(): void {
   if (!id) return
   automaticWatermark.value = !automaticWatermark.value
   watermarkDisplayMemory.set(id, automaticWatermark.value)
-  try { localStorage.setItem(`jinchuan.growth-display.v1.${id}`, automaticWatermark.value ? 'on' : 'off') } catch { /* 存储不可用时保留本次会话的显示偏好。 */ }
+  try { localStorage.setItem(`momentnest.growth-display.v1.${id}`, automaticWatermark.value ? 'on' : 'off') } catch { /* 存储不可用时保留本次会话的显示偏好。 */ }
 }
 function automaticStamp(asset: MediaAsset, enabled = automaticWatermark.value) {
   return enabled && props.module === 'baby' && baby.value && !similarReference.value && props.page !== 'references'
@@ -100,7 +100,7 @@ function automaticStamp(asset: MediaAsset, enabled = automaticWatermark.value) {
 watch(selectedBabyId, id => {
   let enabled = watermarkDisplayMemory.get(id) ?? true
   if (!watermarkDisplayMemory.has(id)) {
-    try { const saved = localStorage.getItem(`jinchuan.growth-display.v1.${id}`); if (saved === 'on' || saved === 'off') enabled = saved === 'on' } catch { /* 查看照片不依赖浏览器存储可用。 */ }
+    try { const saved = localStorage.getItem(`momentnest.growth-display.v1.${id}`); if (saved === 'on' || saved === 'off') enabled = saved === 'on' } catch { /* 查看照片不依赖浏览器存储可用。 */ }
     watermarkDisplayMemory.set(id, enabled)
   }
   automaticWatermark.value = enabled

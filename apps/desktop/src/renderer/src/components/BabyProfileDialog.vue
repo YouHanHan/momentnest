@@ -26,7 +26,7 @@ let searchTimer: ReturnType<typeof setTimeout> | undefined
 
 /** 按页读取现有照片索引，选头像不会创建人脸参考或启动扫描。 */
 async function loadPhotos(append = false): Promise<void> {
-  if (disposed || !props.libraryId || !props.libraryAvailable || !window.jinchuan || append && loading.value) return
+  if (disposed || !props.libraryId || !props.libraryAvailable || !window.momentnest || append && loading.value) return
   if (!append) {
     clearTimeout(searchTimer)
     contextSequence++; photos.value = []; total.value = 0; page = 0; unavailable.clear()
@@ -35,14 +35,14 @@ async function loadPhotos(append = false): Promise<void> {
   const context = contextSequence, request = ++requestSequence, libraryId = props.libraryId, nextPage = append ? page + 1 : 1
   loading.value = true; photoError.value = ''
   try {
-    const result = await window.jinchuan.queryMedia({ libraryId, kind: 'photo', page: nextPage, limit: 24, order: 'desc', ...(search.value.trim() ? { search: search.value.trim() } : {}) })
+    const result = await window.momentnest.queryMedia({ libraryId, kind: 'photo', page: nextPage, limit: 24, order: 'desc', ...(search.value.trim() ? { search: search.value.trim() } : {}) })
     if (disposed || context !== contextSequence || request !== requestSequence || libraryId !== props.libraryId) return
     const existing = new Set(photos.value.map(photo => photo.id))
     photos.value = append ? [...photos.value, ...result.items.filter(photo => !existing.has(photo.id))] : result.items
     total.value = result.total; page = nextPage
     await Promise.all(result.items.filter(photo => photo.kind === 'photo' && photo.available).map(async photo => {
       try {
-        const url = await window.jinchuan!.mediaUrl(photo.id, true, libraryId)
+        const url = await window.momentnest!.mediaUrl(photo.id, true, libraryId)
         if (!disposed && context === contextSequence && libraryId === props.libraryId) urls[photo.id] = url
       } catch { if (!disposed && context === contextSequence) unavailable.add(photo.id) }
     }))
@@ -58,16 +58,16 @@ function useDefaultAvatar(): void { if (!props.busy) delete draft.avatarAssetId 
 function save(event: SubmitEvent): void { if (!props.busy) emit('save', plainData(draft), (event.submitter as HTMLButtonElement | null)?.value === 'add-references') }
 /** 参考从全部仍授权目录按标识读取，头像选图和相册筛选不影响此列表。 */
 async function loadReferences(): Promise<void> {
-  if (disposed || props.creating || !draft.referenceFaces.length || !window.jinchuan) return
+  if (disposed || props.creating || !draft.referenceFaces.length || !window.momentnest) return
   const sequence = ++referenceSequence
   referencesLoading.value = true; referencesError.value = ''; failedReferences.clear()
   try {
-    const result = await window.jinchuan.queryMedia({ referenceBabyId: props.profile.id, scope: 'all', page: 1, limit: 20 })
+    const result = await window.momentnest.queryMedia({ referenceBabyId: props.profile.id, scope: 'all', page: 1, limit: 20 })
     if (disposed || sequence !== referenceSequence) return
     referencePhotos.value = result.items
     await Promise.all(result.items.filter(photo => photo.available).map(async photo => {
       try {
-        const url = await window.jinchuan!.mediaUrl(photo.id, true)
+        const url = await window.momentnest!.mediaUrl(photo.id, true)
         if (!disposed && sequence === referenceSequence) referenceUrls[photo.id] = url
       } catch { if (!disposed && sequence === referenceSequence) failedReferences.add(photo.id) }
     }))

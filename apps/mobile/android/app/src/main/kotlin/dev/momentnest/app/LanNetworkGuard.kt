@@ -1,4 +1,4 @@
-package dev.jinchuan.jinchuan_mobile
+package dev.momentnest.app
 
 import android.content.Context
 import android.net.ConnectivityManager

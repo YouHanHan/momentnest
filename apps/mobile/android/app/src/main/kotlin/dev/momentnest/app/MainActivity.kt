@@ -1,4 +1,4 @@
-package dev.jinchuan.jinchuan_mobile
+package dev.momentnest.app
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -28,7 +28,7 @@ class MainActivity : FlutterActivity() {
     // 优先保留 EXIF 原始拍摄日，没有时使用系统明确记录的拍摄时间。
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.jinchuan/family")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/family")
             .setMethodCallHandler { call, result ->
                 if (call.method == "chooseAvatar") {
                     if (avatarResult != null) {
@@ -71,7 +71,7 @@ class MainActivity : FlutterActivity() {
                 }
             }
         val networkGuard = LanNetworkGuard(this)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.jinchuan/network")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/network")
             .setMethodCallHandler { call, result ->
                 if (call.method != "bindLan") {
                     result.notImplemented()
@@ -84,7 +84,7 @@ class MainActivity : FlutterActivity() {
                     }
                 }
             }
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.jinchuan/media")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/media")
             .setMethodCallHandler { call, result ->
                 if (call.method == "sdkInt") {
                     result.success(android.os.Build.VERSION.SDK_INT)

@@ -42,4 +42,4 @@ const desktopApi: DesktopApi = {
   exportWatermark: (assetIds,options,libraryId) => ipcRenderer.invoke('family:export-watermark',assetIds,options,libraryId),
 }
 
-contextBridge.exposeInMainWorld('jinchuan', desktopApi)
+contextBridge.exposeInMainWorld('momentnest', desktopApi)

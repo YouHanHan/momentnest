@@ -24,7 +24,7 @@ class IdentityStore extends LocalStore {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const media = MethodChannel('dev.jinchuan/media');
+  const media = MethodChannel('dev.momentnest/media');
   late Directory directory;
   late File file;
   late IdentityStore store;
@@ -33,7 +33,7 @@ void main() {
   String? captureDate, creationDate;
 
   setUp(() async {
-    directory = await Directory.systemTemp.createTemp('jinchuan-source-date-');
+    directory = await Directory.systemTemp.createTemp('momentnest-source-date-');
     file = await File('${directory.path}/source.jpg').writeAsBytes([1, 2, 3]);
     store = IdentityStore();
     model = TransferController(store: store);

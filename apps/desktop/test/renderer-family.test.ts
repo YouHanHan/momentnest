@@ -12,7 +12,7 @@ import { reactive } from 'vue'
 import ffmpegPath from 'ffmpeg-static'
 import { plainData } from '../src/renderer/src/family-ui.ts'
 
-const executable = [process.env.JINCHUAN_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((path): path is string => Boolean(path && existsSync(path)))
+const executable = [process.env.MOMENTNEST_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((path): path is string => Boolean(path && existsSync(path)))
 let server: Awaited<ReturnType<typeof createServer>> | undefined, browser: Browser | undefined, base = ''
 const rendererRoot = fileURLToPath(new URL('../src/renderer/', import.meta.url))
 const bootstrapPath = '/__family_test_bootstrap.js'
@@ -306,7 +306,7 @@ const installMocks = (scenario: { module?: string; page?: string; count?: number
     async prepareImport(rootId: string, mode: string, libraryId?: string) { const plan = { id: 'plan-one', rootId, mode, libraryId, state: 'ready', count: 1, bytes: 1024, unknownDates: 0, creationDates: 0, skipped: 1, warnings: ['empty.jpg：文件为空，已跳过'], preview: [{ filename: 'photo-1.jpg', date: '2024-03-10', dateSource: 'capture', relativePath: '2024-03-10/photo-1.jpg' }] }; fixtures.family.importPlans = [plan]; return clone(plan) },
     async executeImport() { fixtures.family.jobs.push({ id: 'job-one', kind: 'import', state: 'done', processed: 1, total: 2, skipped: 1, warnings: ['bad.jpg：文件损坏，已跳过'], label: '合成归档', error: '' }) },
   }
-  Object.assign(window, { jinchuan: api, __fixtures: fixtures })
+  Object.assign(window, { momentnest: api, __fixtures: fixtures })
 }
 async function openPage(scenario: Parameters<typeof installMocks>[0] = {}): Promise<Page> {
   // 固定测试时区，覆盖本地日期与 UTC 跨日的记录标题。
@@ -1458,7 +1458,7 @@ test('档案保存后添加参考复用逐张明确选脸，清除旧筛选并�
     assert.equal(await preview.locator('.face-selector button[aria-pressed="true"]').count(), 0)
     await preview.locator('.face-selector button').first().click()
     await page.evaluate(() => {
-      const fixtures = (window as any).__fixtures, api = (window as any).jinchuan, readFamily = api.getFamilyState
+      const fixtures = (window as any).__fixtures, api = (window as any).momentnest, readFamily = api.getFamilyState
       let hold = true
       api.getFamilyState = async (libraryId?: string) => {
         const snapshot = await readFamily(libraryId)
@@ -3119,7 +3119,7 @@ test('旧分组整理：候选头像共用六个并发名额，加载更多复�
   try {
     await installGroupingPreview(page, 13)
     await page.evaluate(async () => {
-      const fixtures = (window as any).__fixtures, api = (window as any).jinchuan, original = api.mediaUrl
+      const fixtures = (window as any).__fixtures, api = (window as any).momentnest, original = api.mediaUrl
       ;(window as any).__testApp.unmount()
       fixtures.thumbStarted = []; fixtures.thumbCompleted = []; fixtures.thumbResolvers = []; fixtures.thumbActive = 0; fixtures.thumbPeak = 0
       api.mediaUrl = async (id: string, thumbnail: boolean, libraryId: string) => {
@@ -3282,7 +3282,7 @@ test('人物头像临时加载失败后保留手动重试，两次轮询不重�
   const page = await openPage({ module: 'library', page: 'people', count: 0 })
   try {
     await page.evaluate(() => {
-      const fixtures = (window as any).__fixtures, api = (window as any).jinchuan, original = api.mediaUrl
+      const fixtures = (window as any).__fixtures, api = (window as any).momentnest, original = api.mediaUrl
       fixtures.avatarFailure = true; fixtures.avatarAttempts = []
       fixtures.family.people[0].reference = { assetId: 'avatar-retry', kind: 'photo', face: { id: 'face-retry', x: 0.2, y: 0.2, width: 0.2, height: 0.3, score: 0.95 } }
       api.mediaUrl = async (id: string, thumbnail: boolean, libraryId: string) => {
@@ -3596,7 +3596,7 @@ test('失效缩略图地址只自动更新一次，持续解码失败停止重�
     const page = await openPage({ module: 'import', page: 'folder', count: 2, noReferences: true })
     try {
       await page.evaluate(mode => {
-        const fixtures = (window as any).__fixtures, api = (window as any).jinchuan, original = api.mediaUrl
+        const fixtures = (window as any).__fixtures, api = (window as any).momentnest, original = api.mediaUrl
         fixtures.thumbnailBrokenMode = mode; fixtures.thumbnailDecodeAttempts = 0
         api.mediaUrl = async (id: string, thumbnail: boolean, libraryId?: string) => {
           const url = await original(id, thumbnail, libraryId)
@@ -5254,7 +5254,7 @@ test('自动成长水印存储写入失败时切换宝宝仍保留本次显示�
   try {
     await waitForIndexed(page, 1)
     await page.evaluate(() => {
-      localStorage.setItem('jinchuan.growth-display.v1.baby-one', 'on')
+      localStorage.setItem('momentnest.growth-display.v1.baby-one', 'on')
       Storage.prototype.setItem = () => { throw new DOMException('合成存储配额失败', 'QuotaExceededError') }
     })
     const toggle = page.getByRole('switch', { name: '自动显示成长水印', exact: true })

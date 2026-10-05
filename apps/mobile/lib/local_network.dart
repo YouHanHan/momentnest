@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 /// 在创建每条连接之前确认直连局域网，并固定 Android 使用的物理网络。
 class LocalNetwork {
-  static const _channel = MethodChannel('dev.jinchuan/network');
+  static const _channel = MethodChannel('dev.momentnest/network');
 
   static Future<void> bind(Uri address) async {
     if (Platform.isAndroid) {

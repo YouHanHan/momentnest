@@ -17,7 +17,7 @@ import type { BabyProfile } from '../src/shared/family.ts'
 const detector = { async ready() { return { ready: true, error: '' } }, async detect() { return [{ x: 0.1, y: 0.2, width: 0.3, height: 0.4, score: 0.99, embedding: [1, 0] }] } }
 
 async function setup() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-revision-')), library = join(directory, 'library'), data = join(directory, 'data')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-revision-')), library = join(directory, 'library'), data = join(directory, 'data')
   await Promise.all([library, data].map(path => mkdir(path)))
   const store = new Store(join(data, 'state.sqlite')), libraryId = randomUUID(), catalog = new MediaCatalog(store, data, 'receiver', undefined, detector)
   store.put('library', { id: libraryId, path: library, name: '测试图库', enabled: true })
@@ -207,7 +207,7 @@ test('手动确认日期优先于新 EXIF，已有新记录的人工排除不能
 })
 
 test('JPG 后缀的 WEBP 按真实结构读拍摄日期，日期段不改变内容签名', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-webp-date-')), path = join(directory, 'photo.jpg')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-webp-date-')), path = join(directory, 'photo.jpg')
   await sharp({ create: { width: 32, height: 24, channels: 3, background: '#884466' } }).withExif({ IFD2: { DateTimeOriginal: '2024:07:24 12:00:00' } }).webp().toFile(path)
   const metadata = await readMetadata(path, 'photo')
   assert.equal(metadata.captureDate, '2024-07-24'); assert.equal(metadata.dateSource, 'capture'); assert.equal(metadata.width, 32)

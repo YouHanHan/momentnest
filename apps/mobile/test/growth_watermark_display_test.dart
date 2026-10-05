@@ -72,7 +72,7 @@ void main() {
   late File image;
   setUp(() async {
     final directory = await Directory.systemTemp.createTemp(
-      'jinchuan-display-',
+      'momentnest-display-',
     );
     image = File('${directory.path}/synthetic.png');
     final recorder = ui.PictureRecorder();

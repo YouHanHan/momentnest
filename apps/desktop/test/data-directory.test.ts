@@ -12,16 +12,12 @@ test('开发、预览和不同版本正式包读取同一数据库，重启保�
   const appData = join(process.cwd(), '.cache', 'tests', randomUUID())
   const home = join(appData, 'profile')
   const scenarios = [
-    { name: '@jinchuan/desktop', packaged: false },
-    { name: 'jinchuan', packaged: true },
-    { name: 'Jinchuan-0.4.25', packaged: true },
-    { name: '@shiguangbox/desktop', packaged: false },
-    { name: 'ShiguangBox-0.4.33', packaged: true },
     { name: '@momentnest/desktop', packaged: false },
     { name: 'MomentNest-0.4.34', packaged: true },
-    { name: '@jinchuan/desktop', packaged: false },
+    { name: 'MomentNest-0.4.35', packaged: true },
+    { name: '@momentnest/desktop', packaged: false },
   ]
-  const expected = join(home, '.jinchuan')
+  const expected = join(home, '.momentnest')
   await mkdir(join(expected, 'receiver'), { recursive: true })
   for (const [index, scenario] of scenarios.entries()) {
     const directory = userDataDirectory(appData, scenario.name, join(appData, scenario.name), scenario.packaged, home)
@@ -34,32 +30,52 @@ test('开发、预览和不同版本正式包读取同一数据库，重启保�
   }
 })
 
+test('全新应用目录不读取其他应用的相册和配对记录', async () => {
+  const root = join(process.cwd(), '.cache', 'tests', randomUUID())
+  const appData = join(root, 'app-data'), previous = join(appData, 'previous-application', 'receiver')
+  await mkdir(previous, { recursive: true })
+  const original = new Store(join(previous, 'receiver.sqlite'))
+  try {
+    original.put('familyBaby', { id: 'previous-baby', name: '其他应用档案' })
+    original.put('device', { id: 'previous-device', token: 'synthetic-token' })
+    const current = canonicalUserDataDirectory(userDataDirectory(appData, 'momentnest', join(appData, 'momentnest'), true, join(root, 'profile')))
+    assert.equal(migrateUserDataDirectory(appData, current), false)
+    await mkdir(join(current, 'receiver'), { recursive: true })
+    const fresh = new Store(join(current, 'receiver', 'receiver.sqlite'))
+    try {
+      assert.equal(fresh.list('familyBaby').length, 0)
+      assert.equal(fresh.list('device').length, 0)
+    } finally { fresh.close() }
+    assert.equal(original.list('familyBaby').length, 1)
+  } finally { original.close() }
+})
+
 test('验收脚本的独立目录不接触日常数据库', () => {
   const appData = join(process.cwd(), '.cache', 'synthetic-app-data')
   const isolated = join(process.cwd(), '.cache', 'synthetic-verification')
   assert.equal(userDataDirectory(appData, 'Electron', isolated, false, process.cwd()), isolated)
-  assert.notEqual(isolated, join(appData, 'jinchuan'))
+  assert.notEqual(isolated, join(appData, 'momentnest'))
 })
 
 test('正式包不因外部旧目录配置切换相册', () => {
   const appData = join(process.cwd(), '.cache', 'synthetic-app-data')
   const legacy = join(process.cwd(), '.cache', 'desktop-smoke')
-  assert.equal(userDataDirectory(appData, 'jinchuan', legacy, true, process.cwd()), join(process.cwd(), '.jinchuan'))
+  assert.equal(userDataDirectory(appData, 'momentnest', legacy, true, process.cwd()), join(process.cwd(), '.momentnest'))
 })
 
 test('同一用户在不同启动环境使用固定目录，物理目录可通过缓存安全校验', async () => {
   const home = join(process.cwd(), '.cache', 'tests', randomUUID())
   const ordinary = join(home, 'AppData', 'Roaming'), redirected = join(home, 'package-cache', 'Roaming')
-  const expected = join(home, '.jinchuan')
-  for (const appData of [ordinary, redirected]) assert.equal(userDataDirectory(appData, 'jinchuan', join(appData, 'jinchuan'), true, home), expected)
+  const expected = join(home, '.momentnest')
+  for (const appData of [ordinary, redirected]) assert.equal(userDataDirectory(appData, 'momentnest', join(appData, 'momentnest'), true, home), expected)
   const canonical = canonicalUserDataDirectory(expected)
   assert.equal(await safePath(canonical, 'receiver/family-cache/thumbs/synthetic.jpg'), join(canonical, 'receiver', 'family-cache', 'thumbs', 'synthetic.jpg'))
 })
 
 test('迁移包含 WAL 中已提交记录和生成缓存，修正内部路径并保留原数据库', async () => {
   const directory = join(process.cwd(), '.cache', 'tests', randomUUID())
-  const appData = join(directory, 'legacy-app-data'), legacy = join(appData, 'jinchuan', 'receiver')
-  const current = canonicalUserDataDirectory(join(directory, 'profile', '.jinchuan')), target = join(current, 'receiver')
+  const appData = join(directory, 'legacy-app-data'), legacy = join(appData, 'momentnest', 'receiver')
+  const current = canonicalUserDataDirectory(join(directory, 'profile', '.momentnest')), target = join(current, 'receiver')
   await mkdir(join(legacy, 'family-cache', 'thumbs'), { recursive: true })
   await mkdir(join(legacy, 'face-index-backups'), { recursive: true })
   const thumbnail = join(legacy, 'family-cache', 'thumbs', 'synthetic.jpg'), backup = join(legacy, 'face-index-backups', 'synthetic.sqlite')

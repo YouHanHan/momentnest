@@ -16,7 +16,7 @@ const detection = (x = 0.1, embedding = [1, 0]): Detection => ({ x, y: 0.1, widt
 
 /** 合成文件只供验证授权路径及内容保护，不接触真实相册。 */
 async function fixture() {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-face-rebuild-')), data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-face-rebuild-')), data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   const firstId = randomUUID(), secondId = randomUUID(), store = new Store(join(data, 'family.sqlite'))
   const paths = new Map([[firstId, first], [secondId, second]])

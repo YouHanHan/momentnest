@@ -11,7 +11,7 @@ import 'package:photo_manager/photo_manager.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('com.fluttercandies/photo_manager');
-  const mediaChannel = MethodChannel('dev.jinchuan/media');
+  const mediaChannel = MethodChannel('dev.momentnest/media');
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 

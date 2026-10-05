@@ -15,14 +15,14 @@
 
 | 数据 | 位置 |
 |---|---|
-| Windows 相册索引、回执、证书及生成缓存 | 当前用户目录的 `.jinchuan`，核心数据库为 `receiver/receiver.sqlite` |
+| Windows 相册索引、回执、证书及生成缓存 | 当前用户目录的 `.momentnest`，核心数据库为 `receiver/receiver.sqlite` |
 | Windows 原媒体及归档副本 | 用户明确登记或选择的照片目录 |
-| Android 记录与任务 | 应用私有目录中的 SQLite；改名沿用 `jinchuan.sqlite` |
+| Android 记录与任务 | 独立应用私有目录中的 `momentnest.sqlite` |
 | Android 配对令牌 | 系统安全存储；电脑保存对应令牌哈希 |
-| Android 新水印副本 | 系统相册 `Pictures/ShiguangBox`；已有旧目录媒体保留 |
+| Android 新水印副本 | 系统相册 `Pictures/MomentNest`；已有媒体保留 |
 | Windows 水印副本 | 用户选择的导出目录 |
 
-电脑便携程序的解压目录不等于数据目录。更换 EXE 名称或升级不会自动清空 `.jinchuan`。Android 禁用系统应用自动备份；卸载或清除应用数据可能丢失本机档案、参考、任务与设置，但不能据此认为系统相册里的原照片已删除。
+电脑便携程序的解压目录不等于数据目录。更换 EXE 名称或升级不会自动清空 `.momentnest`。Android 禁用系统应用自动备份；卸载或清除应用数据可能丢失本机档案、参考、任务与设置，但不能据此认为系统相册里的原照片已删除。
 
 ## Android 权限
 

@@ -196,7 +196,7 @@ void main() {
 
   setUp(() async {
     homeOwnsControllers = false;
-    directory = await Directory.systemTemp.createTemp('jinchuan-scan-resume-');
+    directory = await Directory.systemTemp.createTemp('momentnest-scan-resume-');
     messenger.setMockMethodCallHandler(
       directoryChannel,
       (_) async => directory.path,

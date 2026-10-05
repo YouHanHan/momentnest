@@ -136,7 +136,7 @@ class PhotoManagerGalleryGateway extends SystemGalleryGateway {
     final requestedType = _requestedType(type);
     if (requestedType == null) return [];
     final sdk = await const MethodChannel(
-      'dev.jinchuan/media',
+      'dev.momentnest/media',
     ).invokeMethod<int>('sdkInt');
     if (sdk == null) throw StateError('无法读取 Android 相册版本。');
     final dateColumn = _dateColumn(sdk >= 29);
@@ -182,7 +182,7 @@ class PhotoManagerGalleryGateway extends SystemGalleryGateway {
     if (requestedType == null) return null;
     final media = _mediaTypes(requestedType);
     final sdk = await const MethodChannel(
-      'dev.jinchuan/media',
+      'dev.momentnest/media',
     ).invokeMethod<int>('sdkInt');
     if (sdk == null) throw StateError('无法读取 Android 相册版本。');
     final usesDateTaken = sdk >= 29;

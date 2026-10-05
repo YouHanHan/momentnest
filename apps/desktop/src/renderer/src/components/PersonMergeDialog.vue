@@ -25,7 +25,7 @@ watch(() => [props.libraryId, source.value?.reference?.assetId, sourceRetry.valu
   sourceUrl.value = ''; sourceFailed.value = false
   if (!assetId) return
   try {
-    const url = await window.jinchuan?.mediaUrl(assetId, true, libraryId)
+    const url = await window.momentnest?.mediaUrl(assetId, true, libraryId)
     if (current === avatarGeneration && libraryId === props.libraryId && url) sourceUrl.value = url
   } catch { if (current === avatarGeneration) sourceFailed.value = true }
 }, { immediate: true })

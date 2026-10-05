@@ -24,7 +24,7 @@ async function until(check: () => boolean, message: string): Promise<void> {
 
 /** 使用合成原图和已保存参考，验证队列及内容缓存的实际协作。 */
 async function fixture(detect?: (filename: string) => Promise<void>, autoMatch = true) {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-automatic-queue-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-automatic-queue-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   const store = new Store(join(data, 'family.sqlite')), libraryId = randomUUID(), otherId = randomUUID()
@@ -223,7 +223,7 @@ test('关闭服务取消延迟唤醒，原照片与待处理队列保留', async
 })
 
 test('真实 HTTPS 接收提交后排队，切库不改变旧批次目标且成功回执不等待识别', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-queue-receiver-'))
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-queue-receiver-'))
   const data = join(directory, 'state'), first = join(directory, 'first'), second = join(directory, 'second')
   await Promise.all([data, first, second].map(path => mkdir(path)))
   const receiver = new Receiver(data)

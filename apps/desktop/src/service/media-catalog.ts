@@ -556,7 +556,7 @@ export class MediaCatalog {
     const visit = async (directory: string): Promise<void> => {
       for (const entry of await readdir(directory, { withFileTypes: true })) {
         requireValue(!this.closed, '任务已中断。')
-        if (entry.isSymbolicLink() || entry.name === '.jinchuan-incoming') continue
+        if (entry.isSymbolicLink() || entry.name === '.momentnest-incoming') continue
         const path = join(directory, entry.name), child = relative(root, path)
         try {
           if (!options.countOnly || entry.isDirectory()) await safePath(root, child)

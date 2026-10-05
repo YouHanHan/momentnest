@@ -12,7 +12,7 @@ class LocalStore {
   Future<void> open() async {
     final path = await getDatabasesPath();
     _db = await openDatabase(
-      '$path/jinchuan.sqlite',
+      '$path/momentnest.sqlite',
       version: 1,
       onCreate: (db, version) async {
         await db.execute(

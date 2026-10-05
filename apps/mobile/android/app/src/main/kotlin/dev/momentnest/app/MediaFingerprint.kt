@@ -1,4 +1,4 @@
-package dev.jinchuan.jinchuan_mobile
+package dev.momentnest.app
 
 import java.io.File
 import java.security.MessageDigest

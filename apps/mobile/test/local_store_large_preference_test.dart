@@ -120,7 +120,7 @@ void main() {
     final original = jsonEncode(assets);
     expect(utf8.encode(original).length, greaterThan(fixture.windowBytes));
     fixture.preferences['family-assets'] = original;
-    final database = await openDatabase('/synthetic-database/jinchuan.sqlite');
+    final database = await openDatabase('/synthetic-database/momentnest.sqlite');
     await expectLater(
       database.query(
         'preferences',
@@ -214,7 +214,7 @@ void main() {
       ]),
       'family-growth-watermark:baby': 'false',
     });
-    final directory = await Directory.systemTemp.createTemp('jinchuan-window-');
+    final directory = await Directory.systemTemp.createTemp('momentnest-window-');
     messenger.setMockMethodCallHandler(
       directoryChannel,
       (_) async => directory.path,

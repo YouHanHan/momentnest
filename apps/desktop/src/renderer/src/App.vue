@@ -7,7 +7,7 @@ import MediaPreview from './components/MediaPreview.vue'
 import UiIcon from './components/UiIcon.vue'
 import UiLoading from './components/UiLoading.vue'
 import UiPopover from './components/UiPopover.vue'
-import jinchuanLogo from '../../../../../assets/branding/jinchuan-icon.png'
+import momentnestLogo from '../../../../../assets/branding/momentnest-icon.png'
 import { userError } from './ui-error'
 import { closePopupMenus } from './popup-dismiss'
 
@@ -24,7 +24,7 @@ const previewLoading = ref(false), previewError = ref(''), previewActionError = 
 const pageContent = ref<HTMLElement | null>(null)
 let timer:ReturnType<typeof setInterval>|undefined
 let refreshSequence=0, previewSequence=0
-const api=window.jinchuan!
+const api=window.momentnest!
 const active=computed(()=>state.value?.sessions.filter(item=>item.libraryId===state.value?.currentLibraryId&&!['cancelled','failed'].includes(item.state)&&!hasSavedReceipt(item))??[])
 const enabledLibraries=computed(()=>state.value?.libraries.filter(item=>item.enabled)??[])
 const currentLibrary = computed(() => state.value?.libraries.find(item => item.id === state.value?.currentLibraryId) ?? null)
@@ -221,7 +221,7 @@ onUnmounted(()=>{clearInterval(timer);previewSequence++})
 <template>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="header-brand"><span class="brand-symbol"><img class="brand-logo" :src="jinchuanLogo" alt="拾光匣" width="28" height="28" /></span><strong>拾光匣</strong></div>
+      <div class="header-brand"><span class="brand-symbol"><img class="brand-logo" :src="momentnestLogo" alt="拾光匣" width="28" height="28" /></span><strong>拾光匣</strong></div>
       <nav class="module-navigation" aria-label="功能模块">
         <button aria-label="照片与视频" title="照片与视频" :class="{selected:module==='library'&&!settingsOpen}" @click="setModule('library')"><UiIcon :name="module==='library'&&!settingsOpen?'photo-filled':'photo'" /><span>照片与视频</span></button>
         <button aria-label="宝宝相册" title="宝宝相册" :class="{selected:module==='baby'&&!settingsOpen}" @click="setModule('baby')"><UiIcon name="baby" /><span>宝宝相册</span></button>

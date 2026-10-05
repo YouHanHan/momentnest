@@ -21,7 +21,7 @@ async function waitJobs(store: Store): Promise<void> {
 }
 
 test('大于读块的合成文件仍使用全部字节计算指纹，并保留文件身份校验', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-hash-block-')), path = join(directory, 'synthetic.bin')
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-hash-block-')), path = join(directory, 'synthetic.bin')
   const bytes = Buffer.alloc(1024 * 1024 + 17)
   for (let index = 0; index < bytes.length; index++) bytes[index] = (index * 31 + (index >>> 16)) & 255
   await writeFile(path, bytes)
@@ -32,7 +32,7 @@ test('大于读块的合成文件仍使用全部字节计算指纹，并保留�
 })
 
 test('未变化的媒体重扫不改写资产，保持相同大小和修改时间的内容变化仍重新索引', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-rescan-write-')), data = join(directory, 'data'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-rescan-write-')), data = join(directory, 'data'), library = join(directory, 'photos'), libraryId = randomUUID()
   await Promise.all([data, library].map(path => mkdir(path)))
   const image = await sharp({ create: { width: 120, height: 90, channels: 3, background: '#557799' } }).withExif({ IFD2: { DateTimeOriginal: '2024:08:12 10:20:00' } }).jpeg().toBuffer()
   const bytes = Buffer.concat([image, Buffer.from([7, 9])]), path = join(library, 'synthetic.jpg'), modifiedAt = new Date('2024-08-13T00:00:00Z')
@@ -59,7 +59,7 @@ test('未变化的媒体重扫不改写资产，保持相同大小和修改时�
 })
 
 test('扫描先完成完整索引，可视照片按需生成相同缩略图，重复扫描保留日期收藏和人脸缓存', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'jinchuan-scan-lazy-')), data = join(directory, 'data'), library = join(directory, 'photos'), libraryId = randomUUID()
+  const directory = await mkdtemp(join(tmpdir(), 'momentnest-scan-lazy-')), data = join(directory, 'data'), library = join(directory, 'photos'), libraryId = randomUUID()
   await Promise.all([data, library].map(path => mkdir(path)))
   const bytes = await sharp({ create: { width: 1200, height: 900, channels: 3, background: '#7799aa' } }).withExif({ IFD2: { DateTimeOriginal: '2024:08:12 10:20:00' } }).jpeg().toBuffer()
   const original = join(library, 'first.jpg'), duplicate = join(library, 'duplicate.jpg')
