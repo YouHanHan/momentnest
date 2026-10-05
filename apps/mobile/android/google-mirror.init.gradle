@@ -1,0 +1,21 @@
+// 只作用于显式指定的本次构建，同时覆盖插件自身的 Google Maven 依赖。
+def mirrorGoogle = { repositories ->
+    repositories.all { repository ->
+        if (repository instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository) {
+            def url = repository.url.toString()
+            if (url.contains('dl.google.com') || url.contains('maven.google.com')) {
+                repository.setUrl('https://maven.aliyun.com/repository/google')
+            } else if (url.contains('repo.maven.apache.org') || url.contains('repo1.maven.org')) {
+                repository.setUrl('https://maven.aliyun.com/repository/central')
+            }
+        }
+    }
+}
+settingsEvaluated { settings ->
+    mirrorGoogle(settings.pluginManagement.repositories)
+    mirrorGoogle(settings.dependencyResolutionManagement.repositories)
+}
+allprojects { project ->
+    mirrorGoogle(project.repositories)
+    mirrorGoogle(project.buildscript.repositories)
+}

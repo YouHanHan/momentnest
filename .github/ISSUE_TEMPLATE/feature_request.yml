@@ -1,0 +1,18 @@
+name: 功能建议
+description: 描述使用场景与期望改善
+title: "[建议] "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 描述当前遇到的具体困难，不需要提供私人照片。
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 期望的行为
+      description: 说明希望怎样完成任务，以及 Windows 或 Android 的适用范围。
+    validations:
+      required: true

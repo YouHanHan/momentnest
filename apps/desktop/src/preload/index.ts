@@ -1,0 +1,45 @@
+import { contextBridge, ipcRenderer } from 'electron'
+import type { DesktopApi } from '../shared/desktop-api'
+
+// 只暴露明确能力，不向界面开放通用 IPC 或 Node.js 接口。
+const desktopApi: DesktopApi = {
+  getAppInfo: () => ipcRenderer.invoke('app:get-info'),
+  selectFolders: (multiple) => ipcRenderer.invoke('directories:select', multiple),
+  getState: () => ipcRenderer.invoke('receiver:state'),
+  setCurrentLibrary: (id) => ipcRenderer.invoke('receiver:current-library', id),
+  addDirectories: (kind) => ipcRenderer.invoke('receiver:add-directories', kind),
+  toggleDirectory: (kind, id, enabled) => ipcRenderer.invoke('receiver:toggle-directory', kind, id, enabled),
+  scan: () => ipcRenderer.invoke('receiver:scan'),
+  setAccepting: (value) => ipcRenderer.invoke('receiver:accept', value),
+  createPairing: () => ipcRenderer.invoke('receiver:pair'),
+  revokeDevice: (id) => ipcRenderer.invoke('receiver:revoke', id),
+  revealFile: (id) => ipcRenderer.invoke('receiver:reveal', id),
+  previewFile: (id) => ipcRenderer.invoke('receiver:preview', id),
+  getFamilyState: (libraryId) => ipcRenderer.invoke('family:state',libraryId),
+  getJobWarnings: (jobId,page=1,libraryId) => ipcRenderer.invoke('family:job-warnings',jobId,page,libraryId),
+  queryMedia: (query) => ipcRenderer.invoke('family:query', query),
+  querySimilarFaces: (query) => ipcRenderer.invoke('family:similar-query', query),
+  scanMedia: (libraryId) => ipcRenderer.invoke('family:scan',libraryId),
+  prepareImport: (rootId,mode,libraryId) => ipcRenderer.invoke('family:prepare-import',rootId,mode,libraryId),
+  executeImport: (planId) => ipcRenderer.invoke('family:execute-import',planId),
+  mediaUrl: (assetId,thumbnail=true,libraryId) => ipcRenderer.invoke('family:media-url',assetId,thumbnail,libraryId),
+  revealMedia: (assetId,libraryId) => ipcRenderer.invoke('family:reveal',assetId,libraryId),
+  saveBaby: (baby,matchScope) => ipcRenderer.invoke('family:save-baby',baby,matchScope),
+  setBabyMembership: (babyId,assetIds,included) => ipcRenderer.invoke('family:membership',babyId,assetIds,included),
+  setMediaDate: (assetId,date) => ipcRenderer.invoke('family:date',assetId,date),
+  setFavorite: (assetId,favorite) => ipcRenderer.invoke('family:favorite',assetId,favorite),
+  analyzeFaces: (libraryId,retryOnlyFailed) => ipcRenderer.invoke('family:analyze',libraryId,retryOnlyFailed),
+  supplementFaces: (libraryId) => ipcRenderer.invoke('family:supplement-faces',libraryId),
+  rebuildFaceIndex: (libraryId) => ipcRenderer.invoke('family:rebuild-face-index',libraryId),
+  namePerson: (personId,name) => ipcRenderer.invoke('family:name-person',personId,name),
+  mergePersons: (sourceId,targetId,libraryId) => ipcRenderer.invoke('family:merge-persons',sourceId,targetId,libraryId),
+  preparePersonGrouping: libraryId => ipcRenderer.invoke('family:prepare-person-grouping',libraryId),
+  applyPersonGrouping: (planId,libraryId,sourceIds) => ipcRenderer.invoke('family:apply-person-grouping',planId,libraryId,sourceIds),
+  undoPersonGrouping: (token,libraryId) => ipcRenderer.invoke('family:undo-person-grouping',token,libraryId),
+  setBabyReference: (babyId,assetId,faceId) => ipcRenderer.invoke('family:reference',babyId,assetId,faceId),
+  matchBaby: (babyId,libraryId,scope) => ipcRenderer.invoke('family:match-baby',babyId,libraryId,scope),
+  previewWatermark: (assetId,options,libraryId) => ipcRenderer.invoke('family:preview-watermark',assetId,options,libraryId),
+  exportWatermark: (assetIds,options,libraryId) => ipcRenderer.invoke('family:export-watermark',assetIds,options,libraryId),
+}
+
+contextBridge.exposeInMainWorld('jinchuan', desktopApi)

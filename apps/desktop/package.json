@@ -1,0 +1,36 @@
+{
+  "name": "@momentnest/desktop",
+  "version": "0.4.34",
+  "private": true,
+  "description": "拾光匣：Windows 家庭相册与局域网接收端",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && vue-tsc --noEmit -p tsconfig.web.json",
+    "preview": "electron-vite preview",
+    "dev:web": "vite --config vite.web.config.ts"
+  },
+  "dependencies": {
+    "exifr": "^7.1.3",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "naive-ui": "2.45.3",
+    "onnxruntime-node": "^1.30.0",
+    "qrcode": "^1.5.4",
+    "selfsigned": "^5.5.0",
+    "sharp": "^0.35.5",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "@types/node": "24.19.0",
+    "@types/qrcode": "^1.5.6",
+    "@vitejs/plugin-vue": "6.0.9",
+    "electron": "44.4.5",
+    "electron-vite": "5.0.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vue-tsc": "3.3.11"
+  }
+}

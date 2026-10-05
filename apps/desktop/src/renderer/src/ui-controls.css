@@ -1,0 +1,24 @@
+/* 基础组件沿用紧凑主题，历史原生输入样式不影响组件库内部结构。 */
+.ui-date-picker input.n-input__input-el,.ui-select input.n-base-selection-input__input{height:100%!important;min-height:0!important;max-width:100%;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;font:inherit!important;color:inherit!important;outline:none!important}
+.ui-date-picker .n-input,.ui-select .n-base-selection{min-height:32px;--n-border-radius:8px}
+.ui-select .n-base-selection-label{min-width:0}.ui-select .n-base-selection-label .n-base-selection-label__render-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu-trigger{display:inline-flex;align-items:center;justify-content:center;flex:none;width:34px;height:34px;min-height:34px;padding:0;border:1px solid #e1e9e3;border-radius:50%;background:#fff;color:#3b755c}
+.menu-trigger:hover,.ui-popover[data-open=true] .menu-trigger{background:#edf4ef;border-color:#bbd0c2}
+.ui-popover-content .tools-menu,.ui-popover-content.library-menu,.ui-popover-content .advanced-filter-fields{position:static;inset:auto;z-index:auto;max-width:calc(100vw - 52px);box-shadow:none;border:0;padding:2px;background:transparent}
+.ui-popover-content.library-menu{min-width:min(280px,calc(100vw - 52px));width:min(440px,calc(100vw - 52px));border-radius:0;padding:6px}
+.ui-popover-content .advanced-filter-fields{width:min(420px,calc(100vw - 52px));grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:8px}
+.ui-popover-content .advanced-filter-fields>.text-button{grid-column:1/-1;text-align:left;justify-self:start;padding:4px 0}
+.ui-popover-content .gallery-actions{grid-column:1/-1;position:static;min-width:0;border-top:1px solid #e3ebe5;padding-top:8px}
+.ui-popover-content .tools-menu button{white-space:normal;min-height:34px}
+.ui-popover-content label{display:flex;flex-direction:column;min-width:0;gap:7px;font-size:12px;color:#65786b}
+.ui-popover-content>p{max-width:260px;font-size:12px;margin:8px 0 2px}
+.ui-popover-content.device-menu{width:130px}.device-menu button{width:100%;text-align:left;border-radius:6px;min-height:34px}.device-menu button:hover{background:#edf4ef}
+.gallery-order .ui-select{width:118px}.baby-selector .ui-select{width:min(240px,100%);flex:1}.baby-review-toolbar .ui-select,.similar-search-heading .ui-select{width:160px}.face-actions .ui-select{width:180px}.selection-toolbar>.ui-select{width:180px}
+.media-toolbar-heading h1{white-space:nowrap}
+.ui-popover.growth-extra{margin:0}.growth-extra .menu-trigger{width:28px;height:28px;min-height:28px;border:0}
+.media-dialog:has(.ui-date-picker),.media-dialog:has(.ui-select){overflow:visible!important}
+.ui-dialog-surface.person-name-backdrop{padding:20px;width:min(420px,calc(100vw - 36px));gap:12px}.ui-dialog-surface.person-name-backdrop .field{margin:0}
+.ui-dialog-surface .n-date-panel,.ui-dialog-surface .n-base-select-menu{border-radius:10px}
+.ui-dialog-surface .baby-profile-title,.ui-dialog-surface .growth-editor-header{border-radius:12px 12px 0 0}.ui-dialog-surface .baby-profile-footer,.ui-dialog-surface .growth-editor-footer{border-radius:0 0 12px 12px}
+@media(max-width:420px){.ui-popover-content .advanced-filter-fields{padding:4px;gap:10px}.gallery-order .ui-select{width:108px}.ui-select,.ui-date-picker{max-width:100%}}
+@media(max-width:760px){.media-search-toolbar>.media-toolbar-heading{flex:0 0 auto}}

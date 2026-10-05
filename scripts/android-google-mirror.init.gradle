@@ -1,0 +1,16 @@
+// 仅对本次构建替换不可达的 Google Maven 地址，保持 HTTPS 证书校验。
+def configureGoogleMirror = { repositories ->
+    repositories.all { repository ->
+        if (repository instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository) {
+            def address = repository.url.toString()
+            if (address.contains('dl.google.com') || address.contains('maven.google.com')) {
+                repository.setUrl('https://maven.aliyun.com/repository/google')
+            }
+        }
+    }
+}
+settingsEvaluated { settings ->
+    configureGoogleMirror(settings.pluginManagement.repositories)
+    configureGoogleMirror(settings.dependencyResolutionManagement.repositories)
+}
+allprojects { project -> configureGoogleMirror(project.repositories) }

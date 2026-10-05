@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">近传</string>
+    <string name="sender_title">手机发送端</string>
+    <string name="intro">把照片保存到电脑，清楚记录每一次传输。</string>
+    <string name="pairing_title">连接电脑</string>
+    <string name="pairing_description">打开电脑接收端后，通过扫码配对。</string>
+    <string name="photos_title">我的照片</string>
+    <string name="photos_description">浏览已授权的照片，筛选未上传、已上传和电脑已有。</string>
+    <string name="archive_title">按日期归档</string>
+    <string name="archive_description">选择目标目录，预览每批照片的日期文件夹。</string>
+    <string name="development_notice">开发准备版 · 配对和图片传输尚未接入</string>
+</resources>

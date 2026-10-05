@@ -1,0 +1,64 @@
+# 本地工具与编辑器文件
+.idea/
+.vs/
+.vscode/
+/.omc/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# Android 构建和机器配置
+.gradle/
+.kotlin/
+**/build/
+local.properties
+*.jks
+*.keystore
+
+# .NET 构建
+**/bin/
+**/obj/
+TestResults/
+
+# 运行数据与私有配置
+.local/
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+.jinchuan/
+.jinchuan-incoming/
+*.pfx
+*.p12
+*.key
+*.log
+
+# Electron 与前端依赖
+node_modules/
+out/
+dist/
+release/
+.vite/
+*.tsbuildinfo
+.cache/
+
+# Flutter 生成缓存
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+coverage/
+*.iml
+
+# 发布准备：模型由校验下载脚本提供，历史设计图与临时素材先不上传。
+models/*.onnx
+/design/
+/.family-*-test.*
+*.pem
+*.apk
+*.aab

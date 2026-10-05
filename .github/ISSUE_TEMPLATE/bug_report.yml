@@ -1,0 +1,32 @@
+name: 问题反馈
+description: 提交可复现的问题与脱敏信息
+title: "[问题] "
+body:
+  - type: markdown
+    attributes:
+      value: 请勿上传私人照片、配对二维码、令牌、签名文件、人脸特征或完整数据库。安全问题请先阅读 SECURITY.md。
+  - type: input
+    id: versions
+    attributes:
+      label: 平台与版本
+      description: 填写 Windows / Android 系统版本及两端应用版本。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 从打开应用开始描述必要操作，可使用合成媒体。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 脱敏错误信息与截图
+      description: 隐藏姓名、生日、私人路径、地址与凭据；说明是否能稳定复现。
