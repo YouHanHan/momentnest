@@ -1,0 +1,4 @@
+contact_links:
+  - name: 安全问题与私密报告
+    url: https://github.com/YouHanHan/momentnest/blob/main/SECURITY.md
+    about: 凭据泄露、越权访问或未授权传输请先阅读安全报告流程，不公开漏洞细节或个人媒体。

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
 import { packager } from '@electron/packager'
 import { advanceDesktopVersion } from './release-version.mjs'
+import { copyRuntimeLicenses } from './third-party-licenses.mjs'
 
 const root=dirname(dirname(fileURLToPath(import.meta.url)))
 const stamp=new Date().toISOString().replace(/[:.]/g,'-')
@@ -42,7 +43,11 @@ async function copyDependency(name,fromDirectory,parentDestination,optional=fals
 for(const name of nativeModules) await copyDependency(name,join(root,'apps','desktop'),input)
 await cp(join(root,'models'),join(input,'models'),{recursive:true})
 await cp(join(root,'THIRD_PARTY_NOTICES.md'),join(input,'THIRD_PARTY_NOTICES.md'))
-await writeFile(join(input,'package.json'),JSON.stringify({name:'momentnest',version:desktop.version,description:'拾光匣：本地家庭相册与局域网传输',main:'out/main/index.js',author:'MomentNest',license:'UNLICENSED',dependencies:Object.fromEntries(nativeModules.map(name=>[name,desktop.dependencies[name]]))},null,2))
+await cp(join(root,'LICENSE'),join(input,'LICENSE'))
+await cp(join(root,'third_party','licenses'),join(input,'licenses'),{recursive:true})
+const licenseReport=await copyRuntimeLicenses(root,join(input,'licenses'))
+if(licenseReport.missingNotices.length) console.warn(`以下运行依赖未发现顶层许可文本，对外分发前需补核：${licenseReport.missingNotices.join('、')}`)
+await writeFile(join(input,'package.json'),JSON.stringify({name:'momentnest',version:desktop.version,description:'拾光匣：本地家庭相册与局域网传输',main:'out/main/index.js',author:'MomentNest',license:desktop.license,dependencies:Object.fromEntries(nativeModules.map(name=>[name,desktop.dependencies[name]]))},null,2))
 // 每次打包写入独立目录，主进程与工作线程已包含运行所需的 JavaScript 依赖。
 const paths=await packager({dir:input,name:packageName,icon:join(root,'assets','branding','momentnest.ico'),appCopyright:'MomentNest',platform:'win32',arch:'x64',electronVersion:desktop.devDependencies.electron,out:output,asar:false,prune:false,overwrite:false,win32metadata:{ProductName:'拾光匣',FileDescription:'拾光匣本地家庭相册'}})
 await writeFile(join(root,'release','latest.json'),JSON.stringify({version:desktop.version,directory:paths[0],executable:join(paths[0],`${packageName}.exe`),createdAt:new Date().toISOString()},null,2))

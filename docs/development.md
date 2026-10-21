@@ -18,7 +18,9 @@ Windows 便携程序自带 Electron，运行无需 Node 或 Flutter。开发命�
 
 ## 命令
 
-在根目录先 npm ci、npm run models:setup，再 npm run mobile:deps。依赖分别锁在 package-lock.json 与 apps/mobile/pubspec.lock。models:setup 从 OpenCV Zoo 下载 YuNet 与 SFace，校验官方 LFS 的 SHA-256 和大小，并保留授权文件；初次需要联网，运行时全部使用本地模型。
+在根目录先 npm ci、npm run models:setup；开发 Android 时再 npm run mobile:deps。依赖分别锁在 package-lock.json 与 apps/mobile/pubspec.lock。models:setup 从 OpenCV Zoo 的固定提交下载 YuNet 与 SFace，以仓库内 models/manifest.json 的 SHA-256 和大小为准；校验失败不覆盖已有模型，不更新清单或许可文本。初次需要联网，已有模型通过校验时无需联网，运行时全部使用本地模型。
+
+模型升级需要单独审核新版本、来源与许可，显式更新清单中的固定提交、大小和哈希，并验证识别行为；不要将安装过程变为自动追随上游 main。
 
 | 命令 | 用途 |
 |---|---|
@@ -38,6 +40,24 @@ Windows 便携程序自带 Electron，运行无需 Node 或 Flutter。开发命�
 | npm run mobile:apk:all | 同一新版本同时构建调试与正式 APK |
 | npm run package:test | 打包版本、交付命名及旧包保护专项验证 |
 | npm run check:env | 只读环境检查 |
+| npm run opensource:check | 检查源码、Git 本地可达历史及许可元数据，在 .cache/open-source 中生成脱敏报告 |
+
+## 首次检出的验证顺序
+
+桌面只需 Node 和 npm；Android 另需上表中的 Flutter、Android SDK 与 JDK。以下命令不启动应用界面，也不分配新版本：
+
+```powershell
+npm.cmd ci
+npm.cmd run models:setup
+npm.cmd run package:test
+npm.cmd run build
+```
+
+`npm ci` 的安装脚本会准备 Electron 和其他运行依赖，首次安装可能需要较长时间及可访问的上游下载地址。`npm ci --ignore-scripts` 仅可用于受限环境中的静态编译检查，不能视为已经准备好可运行或可分发的程序。
+
+Android 首次准备执行 `npm.cmd run mobile:deps`，再运行 `mobile:analyze` 与 `mobile:test`。普通 `mobile:dev` 和非离线 APK 入口由 Flutter 准备平台工具；`--offline` 入口只适用于已完成依赖、Gradle Wrapper 和构建缓存准备的本机，不是全新检出的默认入口。
+
+需要实际开发窗口或交付包时，再按项目启动约定检查并复用实例，使用统一入口。正式签名只由发行维护者保管；其他贡献者使用自己的调试身份，不需要也不应取得项目正式私钥。外部分发还须完成 [二进制发行许可核查](binary-distribution.md)。
 
 Android 的 local.properties 含本机 SDK 路径，不纳入源码。若 Google Maven 在本地出现 TLS 连接错误，优先恢复正常网络；也可自行选择可信镜像。该环境本次构建使用单次 Gradle init script 将 Google Maven 地址映射到阿里云镜像，未关闭 TLS 校验，也未修改全局配置。可选示例见 scripts/android-google-mirror.init.gradle；在 apps/mobile/android 执行：
 

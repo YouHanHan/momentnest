@@ -2,6 +2,7 @@
   "name": "momentnest",
   "version": "0.4.35",
   "private": true,
+  "license": "MIT",
   "description": "拾光匣：本地家庭相册、成长记忆与局域网原文件备份",
   "workspaces": [
     "apps/desktop"
@@ -12,6 +13,7 @@
   "scripts": {
     "postinstall": "node ./node_modules/electron/install.js",
     "check:env": "node scripts/check-environment.mjs",
+    "opensource:check": "node scripts/check-open-source.mjs",
     "dev": "npm run dev --workspace @momentnest/desktop",
     "build": "npm run build --workspace @momentnest/desktop",
     "typecheck": "npm run typecheck --workspace @momentnest/desktop",

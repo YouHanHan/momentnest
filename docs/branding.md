@@ -8,7 +8,7 @@
 |---|---|
 | 手机启动器、桌面窗口 | 拾光匣 |
 | GitHub 标题 | 拾光匣 · MomentNest |
-| 私有仓库 | YouHanHan/momentnest |
+| 源码仓库 | YouHanHan/momentnest |
 | 根 npm 项目 / 桌面 workspace | momentnest / @momentnest/desktop |
 | Dart 项目 | momentnest_mobile |
 | Android applicationId 与 Kotlin namespace | dev.momentnest.app |

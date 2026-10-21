@@ -1,6 +1,6 @@
 # 拾光匣第三方许可说明
 
-项目当前保留原有授权状态，未选择项目级开源许可证。以下第三方软件和模型仍按各自许可使用，本文件不改变它们的版权与授权。
+项目自有代码采用 [MIT 许可证](LICENSE)。以下第三方软件和模型仍按各自许可使用，项目的 MIT 声明不改变它们的版权与授权，也不表示整个安装包的所有组件都采用 MIT。
 
 ## 已核对的主要组件
 
@@ -24,7 +24,9 @@
 
 Flutter、Dart 及手机端插件按各自许可使用，完整依赖版本保存在 `apps/mobile/pubspec.lock`。打包时还需核对 Gradle 与插件携带的原生组件及声明。
 
-模型来源、大小与 SHA-256 保存在 [模型清单](models/manifest.json)，由 [下载脚本](scripts/setup-models.mjs) 准备，发布包携带模型与原始许可文本。
+桌面打包收集实际运行依赖的许可、版权和 NOTICE，覆盖编入 JavaScript 的依赖，生成 `resources/app/licenses/npm-manifest.json`。缺少随包许可的已核实版本使用 [补充许可原文](third_party/README.md)，上游来源和原文哈希逐项记录。当前 `vdirs@0.1.8` 虽声明 MIT，但对应版权与许可全文尚未核实，仍需在程序对外分发前补齐；这份清单不代表原生库及所有二进制义务已完成。
+
+模型来源、大小与 SHA-256 保存在 [模型清单](models/manifest.json)，下载地址固定到 OpenCV Zoo 提交 `48b10fa505aeb51fbd127fc60a5c660040e823b7`，由 [下载脚本](scripts/setup-models.mjs) 按清单准备。原始许可文本随源码保留，安装准备不会自动覆盖清单或许可文件；发布包携带模型与许可文本。
 
 ## 当前 FFmpeg / ffprobe 二进制
 
@@ -37,6 +39,8 @@ Flutter、Dart 及手机端插件按各自许可使用，完整依赖版本保�
 
 两者不是仅 LGPL 的构建。`ffprobe-static` 的 npm 包标记 MIT 也不能替代 ffprobe 本身的许可要求。FFmpeg 的许可随启用的组件而变化，官方依据见 [FFmpeg 许可说明](https://ffmpeg.org/legal.html)，工具包来源见 [ffmpeg-static](https://github.com/eugeneware/ffmpeg-static) 与 [ffprobe-static](https://github.com/joshwnj/ffprobe-static)。
 
+2026-10-21 按锁文件重新安装后，实际执行 `ffprobe -version` 和 `-L` 再次确认 Windows x64 工具为 `4.0.2`、GPLv3-or-later，SHA-256 为 `4303ec85855340689b1f8aa5d9c1dc06ef3e3090682de3034edc3fca2b0798d5`。包内 README 将 Windows 来源指向现已停运的 Zeranoe 服务；不能据此假定对应构建源码仍可取得。
+
 向他人分发具体 Windows 包前，应为实际携带的两个二进制补齐对应许可证、版权说明、准确对应的源码与构建配置，依适用许可证选择可核实的源码提供方式，并核查启用的外部库。只提供泛用的上游首页或宣称整个包采用 MIT 都不足以完成这项检查。
 
-当前这份文件记录已发现的组件与待补齐资料，不宣称已完成二进制发行许可审计。首次私有源码上传不附带 Windows 程序或模型二进制；公开或向其他使用者分发安装包前继续核对。
+具体采证命令、对应源码资料要求和发行检查见 [二进制发行许可核查](docs/binary-distribution.md)。当前这份文件记录已发现的组件与待补齐资料，不宣称已完成二进制发行许可审计。源码仓库不包含这些工具或模型的二进制；向其他使用者分发安装包前继续核对实际产物。

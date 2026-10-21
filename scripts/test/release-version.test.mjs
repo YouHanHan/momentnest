@@ -9,6 +9,7 @@ const workspace = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 
 /** 在应用忽略目录创建隔离样本，不改动真实版本和发布包。 */
 async function fixture() {
+  await mkdir(join(workspace, '.cache'), { recursive: true })
   const root = await mkdtemp(join(workspace, '.cache', 'package-version-test-'))
   await mkdir(join(root, 'apps/desktop'), { recursive: true })
   await mkdir(join(root, 'apps/mobile/android'), { recursive: true })

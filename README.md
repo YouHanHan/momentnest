@@ -16,7 +16,7 @@
 | Android 8.0 / API 26 及以上 | Flutter 手机应用，APK 按版本、架构和签名类型区分 |
 | iOS、macOS、Linux | 尚未提供经过验收的发行版本 |
 
-源码仓库为 [YouHanHan/momentnest](https://github.com/YouHanHan/momentnest)，当前为私有，需要仓库访问权限。尚未发布 GitHub Release；发布后从 Releases 获取安装包，GitHub 自动生成的源码 ZIP 不包含可直接运行的 Windows 应用。源码版本以 [桌面配置](apps/desktop/package.json) 和 [手机配置](apps/mobile/pubspec.yaml) 为准，具体构建与设备验证见 [验收记录](docs/verification.md)。
+源码仓库为 [YouHanHan/momentnest](https://github.com/YouHanHan/momentnest)，采用 [MIT 许可证](LICENSE)，访问范围以 GitHub 仓库设置为准。尚未发布 GitHub Release；发布后从 Releases 获取安装包，GitHub 自动生成的源码 ZIP 不包含可直接运行的 Windows 应用。源码版本以 [桌面配置](apps/desktop/package.json) 和 [手机配置](apps/mobile/pubspec.yaml) 为准，具体构建与设备验证见 [验收记录](docs/verification.md)。
 
 ## 可以做什么
 
@@ -73,18 +73,17 @@ MomentNest 使用独立 Android 应用标识 `dev.momentnest.app`、正式证书
 
 ## 从源码运行
 
-需要已就绪的 Node.js、Flutter、Android SDK 与 JDK。使用现有锁文件安装依赖，首次准备依赖和公开模型需要联网；发布程序的整理与识别使用包内模型。
+桌面开发需要 Node.js 22.12 及以上版本，建议使用受支持的 LTS。Android 开发另需 Flutter、Android SDK 与 JDK。使用现有锁文件安装依赖，首次准备依赖和公开模型需要联网；发布程序的整理与识别使用包内模型。
 
 ```powershell
 npm.cmd ci
 npm.cmd run models:setup
-npm.cmd run mobile:deps
 npm.cmd run dev
 ```
 
-手机开发运行：`npm.cmd run mobile:dev`。环境基线、模块边界和验证命令见 [开发说明](docs/development.md)。
+手机开发先执行 `npm.cmd run mobile:deps`，再执行 `npm.cmd run mobile:dev`。模型版本、大小及 SHA-256 固定在仓库清单中，准备脚本不会自动更新模型或许可文件。环境基线、模块边界和首次构建检查见 [开发说明](docs/development.md)。
 
-交付打包使用 `npm.cmd run desktop:package` 与 `npm.cmd run mobile:apk:all`，自动递增补丁版本；同轮调试和正式 APK 共用版本及构建号。旧包保留，不通过改文件名冒充新版本。
+交付打包使用 `npm.cmd run desktop:package` 与 `npm.cmd run mobile:apk:all`，自动递增补丁版本；同轮调试和正式 APK 共用版本及构建号。旧包保留，不通过改文件名冒充新版本。向他人分发安装包前，须完成 [二进制发行许可核查](docs/binary-distribution.md)，当前 FFmpeg / ffprobe 的对应源码资料尚未补齐。
 
 ## 文档
 
@@ -100,8 +99,10 @@ npm.cmd run dev
 
 ## 授权与反馈
 
-本项目当前保留原有授权状态，未授予项目级开源许可。GitHub 仓库为私有；项目的 npm `private` 配置用于阻止 npm 发布，不决定 GitHub 可见性。第三方软件和模型适用各自的许可证，见 [第三方许可说明](THIRD_PARTY_NOTICES.md)。
+项目自有代码采用 [MIT 许可证](LICENSE)，允许使用、修改、商用和再分发，须保留版权与许可声明；软件按许可证中的「按原样」条款提供。第三方软件和模型适用各自的许可证，见 [第三方许可说明](THIRD_PARTY_NOTICES.md)。npm 的 `private` 配置只阻止 npm 发布，不决定 GitHub 可见性，也不限制 MIT 授予的权利。
 
-有仓库访问权限的使用者可以通过 Issues 反馈。请附平台、版本、复现步骤与脱敏日志，不要提交私人照片、人脸特征、配对二维码、令牌或签名文件。贡献与安全报告方式见 [贡献说明](CONTRIBUTING.md) 和 [安全说明](SECURITY.md)。
+欢迎通过 Issues 反馈或提交 Pull Request。请附平台、版本、复现步骤与脱敏日志，不要提交私人照片、人脸特征、配对二维码、令牌或签名文件。贡献与私密安全报告方式见 [贡献说明](CONTRIBUTING.md) 和 [安全说明](SECURITY.md)。
+
+维护者可运行 `npm.cmd run opensource:check` 生成本地整备报告，核对源码与本地 Git 历史中的常见敏感信息、授权元数据及运行依赖许可缺口。报告的范围与人工待办见 [发布准备](docs/github-release.md)。
 
 文档按当前应用行为维护，构建与设备验证见 [验收记录](docs/verification.md)。

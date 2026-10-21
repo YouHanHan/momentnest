@@ -1,0 +1,27 @@
+{
+  "css-render@0.15.14": {
+    "file": "css-render-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/07akioni/css-render/9345145da71707d1d05a99c1d3a6e89315ac0574/LICENSE",
+    "sha256": "306f57de421d7ef77f7dc145e1234f9c0ec76b710d28769b4d98ef3c4f8a64bd"
+  },
+  "@css-render/plugin-bem@0.15.14": {
+    "file": "css-render-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/07akioni/css-render/9345145da71707d1d05a99c1d3a6e89315ac0574/LICENSE",
+    "sha256": "306f57de421d7ef77f7dc145e1234f9c0ec76b710d28769b4d98ef3c4f8a64bd"
+  },
+  "@css-render/vue3-ssr@0.15.14": {
+    "file": "css-render-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/07akioni/css-render/9345145da71707d1d05a99c1d3a6e89315ac0574/LICENSE",
+    "sha256": "306f57de421d7ef77f7dc145e1234f9c0ec76b710d28769b4d98ef3c4f8a64bd"
+  },
+  "onnxruntime-node@1.30.0": {
+    "file": "onnxruntime-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.30.0/LICENSE",
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+  },
+  "onnxruntime-common@1.30.0": {
+    "file": "onnxruntime-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.30.0/LICENSE",
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+  }
+}

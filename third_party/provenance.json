@@ -1,0 +1,43 @@
+{
+  "checkedOn": "2026-10-21",
+  "ffmpeg": {
+    "package": "ffmpeg-static@5.3.0",
+    "binaryRelease": "https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1",
+    "reportedWindowsBuild": "6.1.1-essentials_build-www.gyan.dev",
+    "upstreamBuildRelease": "https://github.com/GyanD/codexffmpeg/releases/tag/6.1.1",
+    "upstreamReportedSourceCommit": "e38092ef9395d7049f871ef4d5411eb410e283e0",
+    "sourceCommitUrl": "https://github.com/FFmpeg/FFmpeg/commit/e38092ef9395d7049f871ef4d5411eb410e283e0",
+    "sourceStatus": "upstream-reported-commit-only",
+    "remaining": [
+      "核对实际发行二进制与此上游构建的对应关系",
+      "完整外部库版本、源码、补丁、编译脚本及工具链资料",
+      "确定并验证最终发行时的对应源码提供方式"
+    ]
+  },
+  "ffprobe": {
+    "package": "ffprobe-static@3.1.0",
+    "version": "4.0.2",
+    "platform": "win32-x64",
+    "sha256": "4303ec85855340689b1f8aa5d9c1dc06ef3e3090682de3034edc3fca2b0798d5",
+    "reportedLicense": "GPL-3.0-or-later",
+    "sourceStatus": "corresponding-build-sources-unverified",
+    "packageRepository": "https://github.com/joshwnj/ffprobe-static",
+    "remaining": [
+      "包内 README 指向已停运的 Zeranoe，需取得对应构建源码及资料",
+      "完整外部库版本、源码、补丁、编译脚本及工具链资料"
+    ]
+  },
+  "vdirs": {
+    "package": "vdirs@0.1.8",
+    "declaredLicense": "MIT",
+    "declaredAuthor": "07akioni",
+    "npmMetadataUrl": "https://registry.npmjs.org/vdirs/0.1.8",
+    "npmGitHead": "a437193b3399502247732fc448bf2ddaa39916d7",
+    "repository": "https://github.com/07akioni/vdirs",
+    "licenseStatus": "corresponding-copyright-and-license-text-unverified",
+    "remaining": [
+      "npm 包未携带许可全文，当前仓库 API 未声明许可证",
+      "npm gitHead 在该仓库的树查询返回 404，不能据此补造版权文字或许可文件"
+    ]
+  }
+}

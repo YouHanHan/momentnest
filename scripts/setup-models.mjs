@@ -1,37 +1,49 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const directory = join(root, 'models')
-const models = [
-  ['face_detection_yunet', 'face_detection_yunet_2023mar.onnx'],
-  ['face_recognition_sface', 'face_recognition_sface_2021dec.onnx'],
-]
-await mkdir(directory, { recursive: true })
-const manifest = []
-for (const [folder, filename] of models) {
-  const source = `https://raw.githubusercontent.com/opencv/opencv_zoo/main/models/${folder}`
-  const pointerResponse = await fetch(`${source}/${filename}`)
-  if (!pointerResponse.ok) throw new Error(`模型清单下载失败：${pointerResponse.status}`)
-  const pointer = await pointerResponse.text()
-  const hash = pointer.match(/oid sha256:([a-f0-9]{64})/)?.[1]
-  const size = Number(pointer.match(/size (\d+)/)?.[1])
-  if (!hash || !size || size > 50 * 1024 ** 2) throw new Error('模型内容指纹无效。')
-  let bytes
-  try { bytes = await readFile(join(directory, filename)) } catch { /* 首次安装下载公开模型。 */ }
-  if (!bytes || createHash('sha256').update(bytes).digest('hex') !== hash) {
-    const response = await fetch(`https://media.githubusercontent.com/media/opencv/opencv_zoo/main/models/${folder}/${filename}`)
-    if (!response.ok) throw new Error(`模型下载失败：${response.status}`)
-    bytes = Buffer.from(await response.arrayBuffer())
-    if (bytes.length !== size || createHash('sha256').update(bytes).digest('hex') !== hash) throw new Error('模型校验失败。')
-    await writeFile(join(directory, filename), bytes)
+/** 只按仓库内已审核的清单准备模型，不在安装时更新模型身份或许可证。 */
+export async function prepareModels(projectRoot = root, fetchModel = fetch) {
+  const directory = join(projectRoot, 'models')
+  const manifest = JSON.parse(await readFile(join(directory, 'manifest.json'), 'utf8'))
+  if (!Array.isArray(manifest) || !manifest.length) throw new Error('模型清单不能为空。')
+  const filenames = new Set()
+  for (const model of manifest) {
+    if (!model || typeof model !== 'object' || typeof model.filename !== 'string' ||
+        !/^[a-z0-9_]+\.onnx$/.test(model.filename) || filenames.has(model.filename) ||
+        typeof model.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(model.sha256) ||
+        !Number.isSafeInteger(model.size) || model.size < 1 || model.size > 50 * 1024 ** 2 ||
+        typeof model.source !== 'string') throw new Error('模型清单的文件名、大小或指纹无效。')
+    const source = /^https:\/\/raw\.githubusercontent\.com\/opencv\/opencv_zoo\/([a-f0-9]{40})\/models\/(face_[a-z_]+)\/([a-z0-9_]+\.onnx)$/.exec(model.source)
+    if (!source || source[3] !== model.filename) throw new Error('模型来源必须固定到 OpenCV Zoo 提交，并与文件名一致。')
+    filenames.add(model.filename)
+    const license = await readFile(join(directory, `${source[2]}-LICENSE.txt`), 'utf8')
+    if (!license.trim()) throw new Error(`模型许可文本缺失：${model.filename}`)
   }
-  const license = await fetch(`${source}/LICENSE`)
-  if (!license.ok) throw new Error('模型授权文件下载失败。')
-  await writeFile(join(directory, `${folder}-LICENSE.txt`), await license.text())
-  manifest.push({ filename, sha256: hash, size, source: `${source}/${filename}` })
-  console.log(`模型已校验：${filename} (${size} 字节)`)
+
+  for (const { filename, sha256, size, source } of manifest) {
+    const matches = bytes => bytes?.length === size && createHash('sha256').update(bytes).digest('hex') === sha256
+    const destination = join(directory, filename)
+    let bytes
+    try { bytes = await readFile(destination) }
+    catch (error) { if (error.code !== 'ENOENT') throw error }
+    if (!matches(bytes)) {
+      const download = source.replace('https://raw.githubusercontent.com/', 'https://media.githubusercontent.com/media/')
+      const response = await fetchModel(download, { signal: AbortSignal.timeout(60000) })
+      if (!response.ok) throw new Error(`模型下载失败：${filename}，HTTP ${response.status}`)
+      bytes = Buffer.from(await response.arrayBuffer())
+      if (!matches(bytes)) throw new Error(`模型大小或 SHA-256 与已审核清单不符：${filename}`)
+      await writeFile(destination, bytes)
+    }
+    console.log(`模型已校验：${filename} (${size} 字节)`)
+  }
 }
-await writeFile(join(directory, 'manifest.json'), JSON.stringify(manifest, null, 2))
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await prepareModels().catch(error => {
+    console.error(`模型准备失败：${error.message}`)
+    process.exitCode = 1
+  })
+}

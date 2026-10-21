@@ -2,6 +2,7 @@
   "name": "@momentnest/desktop",
   "version": "0.4.35",
   "private": true,
+  "license": "MIT",
   "description": "拾光匣：Windows 家庭相册与局域网接收端",
   "main": "./out/main/index.js",
   "scripts": {

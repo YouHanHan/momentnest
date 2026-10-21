@@ -1,0 +1,2 @@
+# 许可原文按原始字节保存，避免换行转换破坏 SHA-256 校验。
+/third_party/licenses/* -text
