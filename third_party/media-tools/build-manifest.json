@@ -1,0 +1,83 @@
+{
+  "version": "6.1.1",
+  "buildId": "momentnest-source-1",
+  "platform": "win32-x64",
+  "archives": [
+    {
+      "filename": "ffmpeg-e38092ef9395d7049f871ef4d5411eb410e283e0.tar.gz",
+      "commit": "e38092ef9395d7049f871ef4d5411eb410e283e0",
+      "sha256": "7578feb5284b22e6172c6f4020ddc43d746eb3ca44363756d1b47a96fd2d68f5",
+      "name": "ffmpeg",
+      "url": "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/e38092ef9395d7049f871ef4d5411eb410e283e0",
+      "size": 15113045,
+      "role": "runtime-source",
+      "directory": "FFmpeg-e38092ef9395d7049f871ef4d5411eb410e283e0"
+    },
+    {
+      "filename": "x264-31e19f92f00c7003fa115047ce50978bc98c3a0d.tar.gz",
+      "commit": "31e19f92f00c7003fa115047ce50978bc98c3a0d",
+      "sha256": "d053c9d86988d6bc78237ca5205865c5ddf99c98ef4cd9927eec8f6d388f6dd9",
+      "name": "x264",
+      "url": "https://codeload.github.com/mirror/x264/tar.gz/31e19f92f00c7003fa115047ce50978bc98c3a0d",
+      "size": 943381,
+      "role": "runtime-source",
+      "directory": "x264-31e19f92f00c7003fa115047ce50978bc98c3a0d"
+    },
+    {
+      "filename": "dav1d-42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa.tar.gz",
+      "commit": "42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa",
+      "sha256": "e26d41e2f496c1598f418726b871ce252ce9f18f8dbe3ad199349a42ed2cb02f",
+      "name": "dav1d",
+      "url": "https://codeload.github.com/videolan/dav1d/tar.gz/42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa",
+      "size": 1712972,
+      "role": "runtime-source",
+      "directory": "dav1d-42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa"
+    },
+    {
+      "filename": "zlib-51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf.tar.gz",
+      "commit": "51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+      "sha256": "d9e270d46252734aa49770fbc544125391617956266f220bd63216c834f3a522",
+      "name": "zlib",
+      "url": "https://codeload.github.com/madler/zlib/tar.gz/51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+      "size": 1572004,
+      "role": "runtime-source",
+      "directory": "zlib-51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf"
+    },
+    {
+      "filename": "w64devkit-x64-2.10.1.7z.exe",
+      "commit": null,
+      "sha256": "add1edf984ce4d473cfeb7c52e0ab38db73a855bba6c7f564d5e16648eb2896a",
+      "name": "w64devkit",
+      "url": "https://github.com/skeeto/w64devkit/releases/download/v2.10.1/w64devkit-x64-2.10.1.7z.exe",
+      "size": 67263552,
+      "role": "build-tool"
+    },
+    {
+      "filename": "meson-1.7.2.whl",
+      "commit": null,
+      "sha256": "82c6818dc81743c96de3a458f06175776ebfde4081195ea31ea6971838f25e38",
+      "name": "meson",
+      "url": "https://files.pythonhosted.org/packages/e5/2b/46bda4ef5a7ae4135dbfe27fc0368c44e5a349a897a54fdf2cedb8dcb66e/meson-1.7.2-py3-none-any.whl",
+      "size": 991596,
+      "role": "build-tool"
+    },
+    {
+      "filename": "ninja-1.12.1-win.zip",
+      "commit": null,
+      "sha256": "f550fec705b6d6ff58f2db3c374c2277a37691678d6aba463adcbb129108467a",
+      "name": "ninja",
+      "url": "https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-win.zip",
+      "size": 275425,
+      "role": "build-tool"
+    },
+    {
+      "filename": "nasm-2.16.03-win64.zip",
+      "commit": null,
+      "sha256": "3ee4782247bcb874378d02f7eab4e294a84d3d15f3f6ee2de2f47a46aa7226e6",
+      "name": "nasm",
+      "url": "https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip",
+      "size": 513543,
+      "role": "build-tool"
+    }
+  ]
+}

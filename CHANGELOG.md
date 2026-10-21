@@ -2,6 +2,16 @@
 
 Windows 与 Android 分别维护版本，以配置和包内元数据为准。当前检查与真实构建见 [验收记录](docs/verification.md)。
 
+## 待发布：媒体工具与开源发行资料
+
+- FFmpeg 与 ffprobe 统一为固定源码构建的 6.1.1，替代原先来源不同的预构建工具。
+- 同步保存四个运行库完整源码、构建脚本、工具链信息和许可，Windows 打包前核对实际二进制与源码 ZIP。
+- 补充 vdirs 已发布的 MIT 声明和作者署名，标注整理依据；收集运行依赖许可时检查声明一致性。
+- main 通过 PR 更新，管理员同样受保护，禁止强推、删除并要求解决讨论，支持单人维护自行合并。
+- 保留既有原图质量、视频信息读取、抽帧、水印副本与原文件完整性规则。
+
+本轮 Windows 实际构建 **0.4.36**，同时准备媒体工具完整对应源码 ZIP 与校验文件。Android 未重新构建；未发布 GitHub Release。验证范围见 [验收记录](docs/verification.md)。
+
 ## 待发布：MomentNest 独立应用身份
 
 - Android 应用 ID、Kotlin namespace 与平台通道统一使用 MomentNest。

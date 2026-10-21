@@ -7,7 +7,7 @@ export default defineConfig(({ command }) => ({
     build: {
       externalizeDeps: false,
       rollupOptions: {
-        external: ['sharp', 'onnxruntime-node', 'ffmpeg-static', 'ffprobe-static'],
+        external: ['sharp', 'onnxruntime-node', '@momentnest/media-tools'],
         input: { index: resolve('src/main/index.ts'), receiver: resolve('src/service/worker.ts') },
       },
     },

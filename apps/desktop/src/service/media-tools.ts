@@ -1,12 +1,11 @@
 import { execFile } from 'node:child_process'
-import { createRequire } from 'node:module'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import sharp from 'sharp'
 import exifr from 'exifr'
 import type { Exifr } from 'exifr'
-import ffmpegPath from 'ffmpeg-static'
+import { ffmpegPath, ffprobePath } from '@momentnest/media-tools'
 import { webpExif } from './media-content.ts'
 import { localDate, requireValue, validDate } from './files.ts'
 import type { BabyProfile, DateSource, MediaKind, WatermarkOptions } from '../shared/family.ts'
@@ -14,8 +13,6 @@ import type { BabyProfile, DateSource, MediaKind, WatermarkOptions } from '../sh
 // 避免 Windows 文件句柄缓存锁住已读照片，保留正常编辑和再次索引能力。
 sharp.cache({ files: 0 })
 
-const require = createRequire(typeof __filename === 'string' ? __filename : import.meta.url)
-const ffprobePath: string = require('ffprobe-static').path
 const ExifReader = exifr.Exifr as unknown as typeof Exifr
 type ClosableExifReader = Exifr & { file?: { close?(): Promise<void> | void } }
 export interface MediaMetadata {

@@ -1,0 +1,9 @@
+{
+  "name": "@momentnest/media-tools",
+  "version": "6.1.1",
+  "private": true,
+  "description": "拾光匣从固定源码构建的 FFmpeg 和 ffprobe",
+  "license": "(MIT AND GPL-3.0-or-later)",
+  "main": "index.cjs",
+  "types": "index.d.ts"
+}

@@ -55,6 +55,9 @@ export async function copyRuntimeLicenses(projectRoot, destination) {
     const supplement = supplements[identity]
     if (!entry.files.length && supplement) {
       if (typeof supplement.file !== 'string' || basename(supplement.file) !== supplement.file) throw new Error(`补充许可文件名无效：${identity}`)
+      const author = typeof metadata.author === 'string' ? metadata.author : metadata.author?.name
+      if ((supplement.declaredLicense && supplement.declaredLicense !== metadata.license) ||
+          (supplement.declaredAuthor && supplement.declaredAuthor !== author)) throw new Error(`补充许可与已安装包的作者或授权声明不符：${identity}`)
       const bytes = await readFile(join(projectRoot, 'third_party', 'licenses', supplement.file))
       if (createHash('sha256').update(bytes).digest('hex') !== supplement.sha256) throw new Error(`补充许可 SHA-256 不符：${identity}`)
       const relativePath = `${relativeDirectory}/${supplement.file}`
@@ -62,6 +65,7 @@ export async function copyRuntimeLicenses(projectRoot, destination) {
       await writeFile(join(destination, relativePath), bytes)
       entry.files.push(relativePath)
       entry.supplementalSource = supplement.source
+      entry.noticeBasis = supplement.noticeBasis ?? 'upstream-license-text'
     }
     for (const dependency of Object.keys(metadata.dependencies ?? {})) {
       await visit(dependency, source, Object.hasOwn(metadata.optionalDependencies ?? {}, dependency))

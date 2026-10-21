@@ -91,3 +91,19 @@ test('上游补充许可只用于对应版本，完整哈希不符时停止收�
   const changed = await copyRuntimeLicenses(root, join(root, 'third-output'))
   assert.deepEqual(changed.missingNotices, ['supplemented@2.0.0'])
 })
+
+test('依据包元数据补充的许可保留整理依据，作者或许可声明不符时拒绝沿用', async () => {
+  const root = await fixture({ attributed: '1.0.0' })
+  const directory = await dependency(root, 'attributed', { author: { name: '测试作者' } })
+  const text = '按作者已发布的 MIT 声明整理，不冒充上游原始文件'
+  await mkdir(join(root, 'third_party/licenses'), { recursive: true })
+  const notice = { file: 'attribution-NOTICE.txt', source: 'https://example.com/metadata', sha256: createHash('sha256').update(text).digest('hex'),
+    declaredAuthor: '测试作者', declaredLicense: 'MIT', noticeBasis: 'published-package-metadata-and-standard-license' }
+  await writeFile(join(root, 'third_party/licenses', notice.file), text)
+  await writeFile(join(root, 'third_party/npm-notices.json'), JSON.stringify({ 'attributed@1.0.0': notice }))
+  const report = await copyRuntimeLicenses(root, join(root, 'first-output'))
+  assert.deepEqual(report.missingNotices, [])
+  assert.equal(report.dependencies[0].noticeBasis, notice.noticeBasis)
+  await writeFile(join(directory, 'package.json'), JSON.stringify({ name: 'attributed', version: '1.0.0', author: '其他作者', license: 'MIT' }))
+  await assert.rejects(copyRuntimeLicenses(root, join(root, 'second-output')), /作者或授权声明不符/)
+})

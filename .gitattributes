@@ -1,2 +1,6 @@
 # 许可原文按原始字节保存，避免换行转换破坏 SHA-256 校验。
-/third_party/licenses/* -text
+/third_party/licenses/* -text -whitespace
+/third_party/media-tools/LICENSE -text -whitespace
+/third_party/media-tools/licenses/* -text -whitespace
+# Windows PowerShell 5.1 需要保留 UTF-8 BOM，构建记录同时校验脚本原始字节。
+/scripts/build-media-tools.ps1 -text

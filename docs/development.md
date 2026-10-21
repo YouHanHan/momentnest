@@ -20,6 +20,8 @@ Windows 便携程序自带 Electron，运行无需 Node 或 Flutter。开发命�
 
 在根目录先 npm ci、npm run models:setup；开发 Android 时再 npm run mobile:deps。依赖分别锁在 package-lock.json 与 apps/mobile/pubspec.lock。models:setup 从 OpenCV Zoo 的固定提交下载 YuNet 与 SFace，以仓库内 models/manifest.json 的 SHA-256 和大小为准；校验失败不覆盖已有模型，不更新清单或许可文本。初次需要联网，已有模型通过校验时无需联网，运行时全部使用本地模型。
 
+Windows 桌面另需 Python 3，并运行一次 `npm.cmd run media:build -- -Python <Python可执行文件路径> -Jobs 2`，准备固定源码构建的 FFmpeg / ffprobe；内存较少时使用 `-Jobs 1`。便携编译器和构建工具只下载到项目缓存，不调整全局配置。来源清单、源码归档与各部分许可见 [本地媒体工具](../third_party/media-tools/README.md)。
+
 模型升级需要单独审核新版本、来源与许可，显式更新清单中的固定提交、大小和哈希，并验证识别行为；不要将安装过程变为自动追随上游 main。
 
 | 命令 | 用途 |
@@ -29,6 +31,7 @@ Windows 便携程序自带 Electron，运行无需 Node 或 Flutter。开发命�
 | npm run desktop:test | 真实 HTTPS、SQLite 与文件系统恢复测试 |
 | npm run desktop:ui:test | 先完成 build，再用独立 Electron 窗口、合成素材与真实 IPC 验收相册操作 |
 | npm run models:setup | 下载并校验本地人脸模型，发布包及 Android assets 共用 |
+| npm run media:build -- -Python <Python路径> -Jobs 2 | 从固定源码构建 Windows 媒体工具，并准备完整对应源码 ZIP |
 | npm run desktop:package | 编译、递增桌面版本并生成带版本号的 Windows x64 便携目录与 EXE |
 | npm run preview | 运行已编译桌面程序 |
 | npm run dev:web | 仅浏览器页面预览，无原生系统能力 |
@@ -49,6 +52,7 @@ Windows 便携程序自带 Electron，运行无需 Node 或 Flutter。开发命�
 ```powershell
 npm.cmd ci
 npm.cmd run models:setup
+npm.cmd run media:build -- -Python <Python可执行文件路径> -Jobs 2
 npm.cmd run package:test
 npm.cmd run build
 ```
@@ -75,7 +79,7 @@ Android 的 local.properties 含本机 SDK 路径，不纳入源码。若 Google
 
 service/worker.ts 承载 Receiver，处理 HTTPS、SQLite、历史扫描、流式哈希与文件提交。main 通过 ServiceBridge 请求工作线程；生产编译将运行依赖打包进 out，便携发布无额外 npm 安装步骤。
 
-0.3.0 新增 MediaCatalog 负责原内容索引、多个位置、冻结导入计划与相册记录；MediaTools 使用 sharp/exifr 和随程序分发的 FFmpeg/ffprobe。FaceEngine 使用 CPU ONNX Runtime、YuNet 检测与 SFace 128 维人物特征，工作线程运行，不向界面和手机导出特征向量。便携打包复制实际安装的原生运行依赖及模型，无需用户安装 Python、Node 或媒体工具。
+0.3.0 新增 MediaCatalog 负责原内容索引、多个位置、冻结导入计划与相册记录；MediaTools 使用 sharp/exifr 和随程序分发的 FFmpeg/ffprobe。两项媒体工具现在统一来自本地 `@momentnest/media-tools`，从固定源码构建，打包前校验二进制、构建脚本和对应源码的完整哈希，替代原先两个不同来源的静态工具包。FaceEngine 使用 CPU ONNX Runtime、YuNet 检测与 SFace 128 维人物特征，工作线程运行，不向界面和手机导出特征向量。便携打包复制实际安装的原生运行依赖及模型，运行应用无需用户安装 Python、Node 或媒体工具。
 
 手机 FamilyController 与传输队列分开，复用现有完整内容身份；Android FamilyMediaEngine 在单独 executor 中进行本地模型推理、视频抽帧与 Canvas 水印。宝宝档案、人工决定和参考人脸在各自设备处理，当前手机不调用旧宝宝相册同步或电脑原文件下载入口；历史协议代码保留不代表界面提供该能力。上传及核对沿用固定证书指纹、已授权设备凭据及局域网网络绑定。
 

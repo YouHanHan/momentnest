@@ -9,7 +9,7 @@ import vue from '@vitejs/plugin-vue'
 import { chromium } from 'playwright'
 import type { Browser, Locator, Page } from 'playwright'
 import { reactive } from 'vue'
-import ffmpegPath from 'ffmpeg-static'
+import { ffmpegPath } from '@momentnest/media-tools'
 import { plainData } from '../src/renderer/src/family-ui.ts'
 
 const executable = [process.env.MOMENTNEST_TEST_BROWSER, chromium.executablePath(), 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find((path): path is string => Boolean(path && existsSync(path)))

@@ -12,7 +12,8 @@
       "核对实际发行二进制与此上游构建的对应关系",
       "完整外部库版本、源码、补丁、编译脚本及工具链资料",
       "确定并验证最终发行时的对应源码提供方式"
-    ]
+    ],
+    "scope": "historical-prebuilt-binary"
   },
   "ffprobe": {
     "package": "ffprobe-static@3.1.0",
@@ -25,7 +26,8 @@
     "remaining": [
       "包内 README 指向已停运的 Zeranoe，需取得对应构建源码及资料",
       "完整外部库版本、源码、补丁、编译脚本及工具链资料"
-    ]
+    ],
+    "scope": "historical-prebuilt-binary"
   },
   "vdirs": {
     "package": "vdirs@0.1.8",
@@ -34,10 +36,32 @@
     "npmMetadataUrl": "https://registry.npmjs.org/vdirs/0.1.8",
     "npmGitHead": "a437193b3399502247732fc448bf2ddaa39916d7",
     "repository": "https://github.com/07akioni/vdirs",
-    "licenseStatus": "corresponding-copyright-and-license-text-unverified",
+    "licenseStatus": "publisher-declaration-preserved-with-standard-MIT-text",
     "remaining": [
-      "npm 包未携带许可全文，当前仓库 API 未声明许可证",
-      "npm gitHead 在该仓库的树查询返回 404，不能据此补造版权文字或许可文件"
-    ]
+      "未声称找到缺失的上游原始版权行或许可文件；通知保留已发布作者与许可声明，后续依赖更新须重新核实"
+    ],
+    "notice": "licenses/vdirs-0.1.8-NOTICE.txt",
+    "noticeBasis": "Published npm author and MIT declaration plus SPDX MIT standard text; not an upstream LICENSE file"
+  },
+  "mediaTools": {
+    "package": "@momentnest/media-tools@6.1.1",
+    "scope": "current-source-build",
+    "manifest": "media-tools/build-manifest.json",
+    "buildScript": "scripts/build-media-tools.ps1",
+    "sourceArchiveBuilder": "scripts/media-source-bundle.mjs",
+    "runtimeSourceComponents": [
+      "FFmpeg",
+      "x264",
+      "dav1d",
+      "zlib"
+    ],
+    "automaticExternalLibraryDetection": false,
+    "license": "GPL-3.0-or-later for independent executables; MIT for path adapter",
+    "sourceStatus": "full-fixed-source-archives-and-build-recipe",
+    "runtimeException": {
+      "source": "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-16.2.0/COPYING.RUNTIME",
+      "file": "media-tools/licenses/GCC-Runtime-Library-Exception-3.1.txt",
+      "sha256": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74"
+    }
   }
 }

@@ -3,7 +3,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFile } from 'node:child_process'
 import sharp from 'sharp'
-import ffmpegPath from 'ffmpeg-static'
+import { ffmpegPath } from '@momentnest/media-tools'
 
 const root=dirname(dirname(fileURLToPath(import.meta.url)))
 const source=join(root,'.cache','smoke-media'), archive=join(root,'.cache','smoke-archive'), output=join(root,'.cache','smoke-watermarks')
