@@ -5,10 +5,12 @@ import { createRequire } from 'node:module'
 import { packager } from '@electron/packager'
 import { advanceDesktopVersion } from './release-version.mjs'
 import { copyRuntimeLicenses } from './third-party-licenses.mjs'
+import { verifyMediaBuild } from './media-source-bundle.mjs'
 import { buildWindowsInstaller } from './windows-installer.mjs'
 import { windowsInstallerCompiler } from './setup-windows-installer.mjs'
 
 const root=dirname(dirname(fileURLToPath(import.meta.url)))
+const mediaBuild=await verifyMediaBuild(root)
 const stamp=new Date().toISOString().replace(/[:.]/g,'-')
 const output=join(root,'release',stamp)
 const input=join(output,'package-input')
@@ -20,7 +22,7 @@ await mkdir(input,{recursive:true})
 await cp(join(root,'apps/desktop/out'),join(input,'out'),{recursive:true})
 await mkdir(join(input,'assets','branding'),{recursive:true})
 await cp(join(root,'assets','branding','momentnest.ico'),join(input,'assets','branding','momentnest.ico'))
-const nativeModules=['sharp','onnxruntime-node','ffmpeg-static','ffprobe-static']
+const nativeModules=['sharp','onnxruntime-node','@momentnest/media-tools']
 const copied=new Map()
 /** 复制实际安装的运行依赖及其可用平台包，便携程序不需要联网安装。 */
 async function copyDependency(name,fromDirectory,parentDestination,optional=false) {
@@ -52,7 +54,8 @@ const licenseReport=await copyRuntimeLicenses(root,join(input,'licenses'))
 if(licenseReport.missingNotices.length) console.warn(`以下运行依赖未发现顶层许可文本，对外分发前需补核：${licenseReport.missingNotices.join('、')}`)
 await writeFile(join(input,'package.json'),JSON.stringify({name:'momentnest',version:desktop.version,description:'拾光匣：本地家庭相册与局域网传输',main:'out/main/index.js',author:'MomentNest',license:desktop.license,dependencies:Object.fromEntries(nativeModules.map(name=>[name,desktop.dependencies[name]]))},null,2))
 // 每次打包写入独立目录，主进程与工作线程已包含运行所需的 JavaScript 依赖。
-const paths=await packager({dir:input,name:packageName,icon:join(root,'assets','branding','momentnest.ico'),appCopyright:'MomentNest',platform:'win32',arch:'x64',electronVersion:desktop.devDependencies.electron,out:output,asar:false,prune:false,overwrite:false,win32metadata:{ProductName:'拾光匣',FileDescription:'拾光匣本地家庭相册'}})
+const paths=await packager({dir:input,name:packageName,icon:join(root,'assets','branding','momentnest.ico'),appCopyright:'MomentNest',platform:'win32',arch:'x64',electronVersion:desktop.devDependencies.electron,download:{cacheRoot:join(root,'.cache/electron-runtime')},out:output,asar:false,prune:false,overwrite:false,win32metadata:{ProductName:'拾光匣',FileDescription:'拾光匣本地家庭相册'}})
+await cp(mediaBuild.sourcePath,join(output,mediaBuild.build.sourceBundle.filename),{errorOnExist:true,force:false})
 const installer=await buildWindowsInstaller({root,directory:paths[0],version:desktop.version,compiler:installerCompiler})
 await writeFile(join(root,'release','latest.json'),JSON.stringify({version:desktop.version,directory:paths[0],executable:join(paths[0],`${packageName}.exe`),installer,createdAt:new Date().toISOString()},null,2))
 console.log(`Windows 便携程序已生成：${paths[0]}`)

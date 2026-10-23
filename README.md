@@ -78,12 +78,13 @@ MomentNest 使用独立 Android 应用标识 `dev.momentnest.app`、正式证书
 ```powershell
 npm.cmd ci
 npm.cmd run models:setup
+npm.cmd run media:build -- -Python <Python可执行文件路径> -Jobs 2
 npm.cmd run dev
 ```
 
-手机开发先执行 `npm.cmd run mobile:deps`，再执行 `npm.cmd run mobile:dev`。模型版本、大小及 SHA-256 固定在仓库清单中，准备脚本不会自动更新模型或许可文件。环境基线、模块边界和首次构建检查见 [开发说明](docs/development.md)。
+桌面媒体工具首次需要 Python 3，从固定源码编译；编译器等工具只准备到项目缓存，内存较少时使用 `-Jobs 1`。手机开发先执行 `npm.cmd run mobile:deps`，再执行 `npm.cmd run mobile:dev`，不需要构建 Windows 媒体工具。模型版本、大小及 SHA-256 固定在仓库清单中，准备脚本不会自动更新模型或许可文件。环境基线、模块边界和首次构建检查见 [开发说明](docs/development.md)。
 
-交付打包使用 `npm.cmd run desktop:package` 与 `npm.cmd run mobile:apk:all`，自动递增补丁版本；同轮调试和正式 APK 共用版本及构建号。旧包保留，不通过改文件名冒充新版本。向他人分发安装包前，须完成 [二进制发行许可核查](docs/binary-distribution.md)，当前 FFmpeg / ffprobe 的对应源码资料尚未补齐。
+交付打包使用 `npm.cmd run desktop:package` 与 `npm.cmd run mobile:apk:all`，自动递增补丁版本；同轮调试和正式 APK 共用版本及构建号。旧包保留，不通过改文件名冒充新版本。Windows 打包校验新媒体工具及完整对应源码，将源码 ZIP 放在便携目录旁；对外分发时同一 Release 同时提供程序和源码资料，具体要求见 [二进制发行许可核查](docs/binary-distribution.md)。
 
 ## 文档
 

@@ -3,6 +3,7 @@ import { lstat, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { copyRuntimeLicenses } from './third-party-licenses.mjs'
+import { verifyMediaBuild } from './media-source-bundle.mjs'
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 const credentialRules = [
@@ -90,24 +91,33 @@ export async function checkOpenSource(root = projectRoot) {
     runtimeLicenses = { status: 'unavailable', nextStep: '请完成 npm ci 后重跑，并核查运行依赖及补充许可文件。' }
   }
   const sourceChecksPassed = !findings.length && licenseMetadataMatches && desktopVersionsMatch && modelsPinned
+  let mediaTools
+  try {
+    const verified = await verifyMediaBuild(root)
+    mediaTools = { status: 'verified', version: verified.manifest.version, sourceBundle: verified.build.sourceBundle }
+  } catch {
+    mediaTools = { status: 'unavailable', nextStep: '请先运行 media:build，核对实际工具与完整对应源码。' }
+  }
   const report = {
     generatedAt: new Date().toISOString(), commit: git(['rev-parse', 'HEAD']).trim(), version: project.version,
     sourceChecksPassed, checkedFiles: files.length, checkedLocalRevisions: revisions.length,
-    checks: { licenseMetadataMatches, desktopVersionsMatch, modelsPinned }, findings, runtimeLicenses,
+    checks: { licenseMetadataMatches, desktopVersionsMatch, modelsPinned }, findings, runtimeLicenses, mediaTools,
     manualReview: [
       { id: 'copyright-and-assets', status: 'pending', detail: '维护者确认 LICENSE 署名及代码、图标、截图和素材的授权权利。' },
       { id: 'private-vulnerability-reporting', status: 'pending', detail: '公开仓库后启用并检查 GitHub 私密漏洞报告入口。' },
-      { id: 'binary-corresponding-source', status: 'pending', detail: '核查 FFmpeg / ffprobe、原生库、模型及 APK 的许可与完整对应源码资料。' },
+      { id: 'binary-distribution-review', status: 'pending', detail: '媒体工具哈希与源码结果见 mediaTools；发行时另核查 Electron、其他原生库、模型及 APK 的许可资料，并同时提供程序与媒体工具源码 ZIP。' },
     ],
     limitations: ['常见凭据模式检查不能证明没有秘密；二进制媒体内容不在文本检查范围内。',
       '只覆盖本地可达 Git 历史；不读取远程不可见引用，不替代法律审查、真机验证或完整安全审计。'],
   }
   await writeFile(join(directory, 'report.json'), JSON.stringify(report, null, 2) + '\n')
+  const missingNotices = runtimeLicenses.status === 'unavailable' ? '未完成采集' : runtimeLicenses.missingNotices.join('、') || '无'
   const summary = [
     '# 开源整备检查结果', '',
     `- 源码自动检查：${sourceChecksPassed ? '通过' : '发现待处理项'}`,
     `- 源码文件：${files.length}；本地可达提交：${revisions.length}`,
-    `- 运行依赖许可：${runtimeLicenses.status}；缺少原文：${runtimeLicenses.missingNotices?.join('、') || '详见 report.json'}`,
+    `- 运行依赖许可：${runtimeLicenses.status}；缺少声明：${missingNotices}`,
+    `- 媒体工具与对应源码：${mediaTools.status}`,
     '- 版权与素材权利、GitHub 安全入口、二进制发行资料仍需按 report.json 人工确认。', '',
     '自动检查通过仅说明本次已检查项目通过，不表示已批准公开仓库或分发程序。', '',
     ...findings.map(item => `- ${item.location}：${item.file}${item.line ? `:${item.line}` : ''}（${item.rule}）`), '',
@@ -121,7 +131,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const { report, directory } = await checkOpenSource()
     console.log(`源码自动检查：${report.sourceChecksPassed ? '通过' : '发现待处理项'}`)
     console.log(`源码文件 ${report.checkedFiles}，本地可达提交 ${report.checkedLocalRevisions}，敏感模式或路径命中 ${report.findings.length}。`)
-    console.log(`运行依赖许可：${report.runtimeLicenses.status}；缺少原文：${report.runtimeLicenses.missingNotices?.join('、') || '详见报告'}。`)
+    const missingNotices = report.runtimeLicenses.status === 'unavailable' ? '未完成采集' : report.runtimeLicenses.missingNotices.join('、') || '无'
+    console.log(`运行依赖许可：${report.runtimeLicenses.status}；缺少声明：${missingNotices}。`)
+    console.log(`媒体工具与对应源码：${report.mediaTools.status}。`)
     console.log(`脱敏报告：${relative(projectRoot, join(directory, 'report.json')).replaceAll('\\', '/')}`)
     console.log('版权与素材、安全报告入口、二进制发行资料仍需人工核查。')
     process.exitCode = report.sourceChecksPassed ? 0 : 1

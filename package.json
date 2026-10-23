@@ -22,6 +22,7 @@
     "desktop:ui:test": "node scripts/prepare-smoke.mjs && electron scripts/verify-desktop-ui.cjs",
     "desktop:layout:test": "node scripts/verify-desktop-layout.mjs",
     "models:setup": "node scripts/setup-models.mjs",
+    "media:build": "node scripts/build-media-tools.mjs",
     "icons:build": "node scripts/build-icons.mjs",
     "package:test": "node --test scripts/test/*.test.mjs",
     "desktop:package": "npm run icons:build && npm run build && node scripts/package-desktop.mjs",

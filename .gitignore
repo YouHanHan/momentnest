@@ -62,3 +62,6 @@ models/*.onnx
 *.pem
 *.apk
 *.aab
+
+# 固定源码构建的媒体工具二进制由构建入口准备，不提交 Git。
+/third_party/media-tools/bin/

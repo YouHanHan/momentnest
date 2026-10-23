@@ -23,5 +23,13 @@
     "file": "onnxruntime-LICENSE.txt",
     "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.30.0/LICENSE",
     "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+  },
+  "vdirs@0.1.8": {
+    "file": "vdirs-0.1.8-NOTICE.txt",
+    "source": "https://registry.npmjs.org/vdirs/0.1.8",
+    "sha256": "69f94cdd918f6da345c2c6d4e924bcc4dd789fed94b416d9a65095903a271d69",
+    "declaredAuthor": "07akioni",
+    "declaredLicense": "MIT",
+    "noticeBasis": "published-package-metadata-and-standard-license"
   }
 }
