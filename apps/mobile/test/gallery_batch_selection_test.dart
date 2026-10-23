@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class BatchAsset extends AssetEntity {
         modifiedDateSecond: 1,
       );
   final originalReads = [0];
+  final thumbnailReads = [0];
 
   @override
   Future<Uint8List?> thumbnailDataWithSize(
@@ -31,7 +33,10 @@ class BatchAsset extends AssetEntity {
     PMProgressHandler? progressHandler,
     PMCancelToken? cancelToken,
     int frame = 0,
-  }) async => null;
+  }) async {
+    thumbnailReads[0]++;
+    return null;
+  }
 
   @override
   Future<File?> get originFile async {
@@ -43,6 +48,9 @@ class BatchAsset extends AssetEntity {
 class BatchSource extends SystemGallerySource {
   final items = List.generate(36, BatchAsset.new);
   final pages = <int>[];
+  final gates = <int, Completer<void>>{};
+  final failOnce = <int>{};
+  int? shortPage;
   @override
   Future<int> count() async => items.length;
 
@@ -52,12 +60,18 @@ class BatchSource extends SystemGallerySource {
     required int size,
   }) async {
     pages.add(number);
-    return items.skip(number * size).take(size).toList();
+    if (failOnce.remove(number)) throw StateError('测试分页读取失败');
+    await gates[number]?.future;
+    return items
+        .skip(number * size)
+        .take(number == shortPage ? size - 1 : size)
+        .toList();
   }
 }
 
 class BatchGateway extends SystemGalleryGateway {
   final source = BatchSource();
+  final months = <DateTime>[];
   int opens = 0;
   @override
   Future<PermissionState> permission({required bool request}) async =>
@@ -68,6 +82,20 @@ class BatchGateway extends SystemGalleryGateway {
     opens++;
     return source;
   }
+
+  @override
+  Future<SystemGallerySource?> openMonth({
+    required RequestType type,
+    required DateTime month,
+  }) async {
+    months.add(month);
+    return source;
+  }
+
+  @override
+  Future<List<int>> years({required RequestType type}) async => [
+    DateTime.now().year,
+  ];
 
   @override
   Future<void> manageAccess({required bool limited}) async {}
@@ -221,6 +249,143 @@ void main() {
     ]);
     expect(find.text('相册'), findsOneWidget);
     expect(find.byKey(const ValueKey('gallery-select')), findsOneWidget);
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('选择月份自动全选未浏览的分页，可撤选后上传完整月份', (tester) async {
+    screenSize(tester);
+    await mountGallery(tester);
+    await tester.tap(find.byKey(const ValueKey('gallery-month')));
+    await tester.pumpAndSettle();
+    await tester.tap(filledAction('全选本月'));
+    await tester.pumpAndSettle();
+    expect(gateway.months, [
+      DateTime(DateTime.now().year, DateTime.now().month),
+    ]);
+    expect(gallery.assets, hasLength(12));
+    expect(gateway.source.pages, [0, 0, 0, 1, 2]);
+    expect(find.text('已选 36 项'), findsOneWidget);
+    expect(
+      gateway.source.items
+          .skip(12)
+          .every((asset) => asset.thumbnailReads.single == 0),
+      isTrue,
+    );
+    await tester.tap(tile(1));
+    await tester.pumpAndSettle();
+    expect(find.text('已选 35 项'), findsOneWidget);
+    await tester.tap(filledAction('传到电脑'));
+    await tester.pumpAndSettle();
+    expect(uploads.single, {
+      for (var index = 0; index < 36; index++)
+        if (index != 1) 'batch-$index',
+    });
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('整月全选分页失败保留原选择，重试后包含后续页', (tester) async {
+    screenSize(tester);
+    await gallery.setMonth(DateTime(2024, 2));
+    await mountGallery(tester);
+    await choose(tester, [0]);
+    gateway.source.failOnce.add(1);
+    await tester.tap(find.byKey(const ValueKey('gallery-select-all')));
+    await tester.pumpAndSettle();
+    expect(find.text('已选 1 项'), findsOneWidget);
+    expect(find.text('本月未能完整全选，请重试；已有选择保留。'), findsOneWidget);
+    expect(uploads, isEmpty);
+    expect(gallery.assets, hasLength(12));
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('gallery-select-all')));
+    await tester.pumpAndSettle();
+    expect(find.text('已选 36 项'), findsOneWidget);
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('整月全选遇到短页不把部分内容冒充完整月份', (tester) async {
+    screenSize(tester);
+    await gallery.setMonth(DateTime(2024, 2));
+    await mountGallery(tester);
+    await choose(tester, [0]);
+    gateway.source.shortPage = 1;
+    await tester.tap(find.byKey(const ValueKey('gallery-select-all')));
+    await tester.pumpAndSettle();
+    expect(find.text('已选 1 项'), findsOneWidget);
+    expect(find.text('本月未能完整全选，请重试；已有选择保留。'), findsOneWidget);
+    expect(uploads, isEmpty);
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  Future<void> beginDelayedSelection(WidgetTester tester) async {
+    await gallery.setMonth(DateTime(2024, 2));
+    await mountGallery(tester);
+    await choose(tester, [0]);
+    gateway.source.gates[1] = Completer<void>();
+    await tester.tap(find.byKey(const ValueKey('gallery-select-all')));
+    for (var frame = 0; frame < 4; frame++) {
+      await tester.pump(const Duration(milliseconds: 10));
+    }
+    expect(gateway.source.pages.last, 1);
+    expect(find.text('正在全选本月…'), findsOneWidget);
+    expect(tester.widget<FilledButton>(filledAction('传到电脑')).onPressed, isNull);
+  }
+
+  testWidgets('取消整月全选立即退出，迟到结果不恢复选择或读取下一页', (tester) async {
+    screenSize(tester);
+    await beginDelayedSelection(tester);
+    await tester.tap(find.byKey(const ValueKey('gallery-cancel-selection')));
+    await tester.pump();
+    gateway.source.gates[1]!.complete();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('gallery-select')), findsOneWidget);
+    expect(gateway.source.pages, isNot(contains(2)));
+    expect(uploads, isEmpty);
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('切换月份丢弃旧月份全选的迟到结果', (tester) async {
+    screenSize(tester);
+    await beginDelayedSelection(tester);
+    await gallery.setMonth(DateTime(2024, 3));
+    gateway.source.gates[1]!.complete();
+    await tester.pumpAndSettle();
+    expect(gallery.month, DateTime(2024, 3));
+    expect(find.byKey(const ValueKey('gallery-select')), findsOneWidget);
+    expect(gallery.assets, hasLength(12));
+    expect(uploads, isEmpty);
+    originalsUntouched();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('参考选图的月份浏览不自动进入上传全选', (tester) async {
+    screenSize(tester);
+    await gallery.initialize();
+    addTearDown(gallery.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SystemGalleryScreen(
+            controller: gallery,
+            onUpload: (_) async => true,
+            onOrganize: (_) async {},
+            onPick: (_) async {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('gallery-month')));
+    await tester.pumpAndSettle();
+    await tester.tap(filledAction('查看'));
+    await tester.pumpAndSettle();
+    expect(gateway.source.pages, [0, 0]);
+    expect(find.byKey(const ValueKey('gallery-select-all')), findsNothing);
     originalsUntouched();
     expect(tester.takeException(), isNull);
   });

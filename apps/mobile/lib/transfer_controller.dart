@@ -11,6 +11,7 @@ import 'models.dart';
 import 'receiver_api.dart';
 import 'backup_catalog.dart';
 import 'month_scan.dart';
+import 'background_work.dart';
 
 /// 在后台 isolate 中计算完整内容指纹，避免原图读取阻塞界面。
 Future<Json> fingerprintFile(String path) async {
@@ -43,8 +44,19 @@ Future<Json> fingerprintAndroidFile(String path) async {
 }
 
 class TransferController extends ChangeNotifier {
-  TransferController({LocalStore? store}) : store = store ?? LocalStore();
+  TransferController({LocalStore? store, BackgroundWork? backgroundWork})
+    : store = store ?? LocalStore(),
+      background = backgroundWork ?? BackgroundWork() {
+    _backgroundEvents = background.interruptions.listen(_backgroundInterrupted);
+  }
   final LocalStore store;
+  final BackgroundWork background;
+  late final StreamSubscription<String> _backgroundEvents;
+  BackgroundLease? _transferLease, _checkLease, _preparationLease;
+  String? _preparationInterrupted;
+  int _queueTotal = 0, _queueHandled = 0;
+  static const _uploadConcurrency = 3;
+  final _activeTasks = <UploadTask>{};
   bool ready = false,
       busy = false,
       running = false,
@@ -77,6 +89,7 @@ class TransferController extends ChangeNotifier {
   bool _scanFinished = false;
   final _visibleIds = <String>{};
   bool checking = false, checkPaused = false, catalogComplete = false;
+  bool _selectNewMonthPhotos = true;
   String checkProgress = '', checkNotice = '';
   int _catalogEpoch = 0, _checkEpoch = 0;
   int _receiverEpoch = 0;
@@ -86,13 +99,70 @@ class TransferController extends ChangeNotifier {
   final Map<String, String> checkErrors = {};
   Timer? _scanRefresh;
   bool _pause = false, _disposed = false;
-  ReceiverApi? _activeApi;
+  final _activeApis = <ReceiverApi>{};
   bool _foreground = true;
   bool _monthActive = true;
   static const _media = MethodChannel('dev.momentnest/media');
 
   void changed() {
+    final current = _activeTasks.firstOrNull;
+    background.update(
+      _transferLease,
+      '$_queueHandled / $_queueTotal 已处理${_activeTasks.length > 1
+          ? ' · ${_activeTasks.length} 个文件并行处理'
+          : current == null
+          ? ''
+          : ' · ${current.state == 'checking' ? '核对原文件与保存回执' : '上传 ${current.offset * 100 ~/ (current.size > 0 ? current.size : 1)}%'}'}',
+    );
+    background.update(
+      _checkLease,
+      checkProgress.isEmpty ? '正在核对原文件' : checkProgress,
+    );
+    background.update(
+      _preparationLease,
+      progress.isEmpty ? '读取原文件与核对保存状态' : progress,
+    );
     if (!_disposed) notifyListeners();
+  }
+
+  bool get _canTransfer =>
+      _foreground || background.allows(BackgroundTask.transfer);
+  bool get _canCheck =>
+      _foreground || background.allows(BackgroundTask.backupCheck);
+
+  void _backgroundInterrupted(String reason) {
+    _pause = true;
+    _preparationInterrupted = reason;
+    stopChecking(pause: true);
+    checkNotice = reason;
+    notice = reason;
+    changed();
+  }
+
+  /// 上传准备与排队也可能读取大量原文件，沿用同一后台服务。
+  Future<void> _withPreparation(Future<void> Function() work) async {
+    _preparationInterrupted = null;
+    BackgroundLease? lease;
+    try {
+      lease = await background.begin(
+        BackgroundTask.preparation,
+        '读取原文件与核对保存状态',
+      );
+      _preparationLease = lease;
+      _ensurePreparing();
+      await work();
+    } finally {
+      if (identical(_preparationLease, lease)) _preparationLease = null;
+      await background.finish(lease);
+    }
+  }
+
+  void _ensurePreparing() {
+    if (_disposed ||
+        _preparationInterrupted != null ||
+        (!_foreground && !background.allows(BackgroundTask.preparation))) {
+      throw StateError(_preparationInterrupted ?? '准备已中断，请回到应用重新核对后继续。');
+    }
   }
 
   /// 月份核对只在备份页面运行，避免普通相册浏览触发原图哈希。
@@ -484,6 +554,7 @@ class TransferController extends ChangeNotifier {
     selected.clear();
     prepared = [];
     _monthSource = null;
+    _selectNewMonthPhotos = true;
     photoPage = -1;
     hasMore = false;
     monthProgress.reset(0);
@@ -550,8 +621,22 @@ class TransferController extends ChangeNotifier {
       final number = photoPage + 1;
       final items = await source.page(number);
       if (_disposed || epoch != _catalogEpoch) return;
+      if (items.length <
+          (monthProgress.total - number * monthPageSize).clamp(
+            0,
+            monthPageSize,
+          )) {
+        throw StateError('本月目录未读取完整，请继续加载或刷新本月后重试。');
+      }
       photos.addAll(items);
-      _visibleIds.addAll(items.map((item) => item.id));
+      for (final item in items) {
+        if (_visibleIds.add(item.id) &&
+            _monthActive &&
+            _selectNewMonthPhotos &&
+            filter == 'all') {
+          selected.add(item.id);
+        }
+      }
       photoPage = number;
       hasMore =
           items.isNotEmpty &&
@@ -674,16 +759,21 @@ class TransferController extends ChangeNotifier {
     int epoch,
     ReceiverConnection target,
     String library,
-    int total,
-    {String scopeLabel = '本月扫描', void Function(AssetEntity, Json)? onObserved}
-  ) async {
-    bool active() => !_disposed && epoch == _checkEpoch && _foreground;
+    int total, {
+    String scopeLabel = '本月扫描',
+    void Function(AssetEntity, Json)? onObserved,
+  }) async {
+    bool active() => !_disposed && epoch == _checkEpoch && _canCheck;
+    BackgroundLease? lease;
     ReceiverApi? api;
     checking = true;
     checkNotice = '';
     var incomplete = false;
     changed();
     try {
+      lease = await background.begin(BackgroundTask.backupCheck, '正在核对原文件');
+      _checkLease = lease;
+      if (!active()) return;
       api = await openApi(target);
       if (!active()) return;
       _checkApi = api;
@@ -702,19 +792,29 @@ class TransferController extends ChangeNotifier {
           } catch (error) {
             if (!active()) break;
             checkErrors[asset.id] = explain(error);
-            final previous = (await store.observationsFor(target.id, library, [asset.id]))[asset.id];
+            final previous = (await store.observationsFor(target.id, library, [
+              asset.id,
+            ]))[asset.id];
             if (!active()) break;
             final unavailable = <String, dynamic>{
               if (previous?['version'] == version(asset)) ...previous!,
               'status': 'unknown',
-              'previousReceipt': previous?['version'] == version(asset) ? (previous?['receipt'] ?? previous?['previousReceipt']) : null,
+              'previousReceipt': previous?['version'] == version(asset)
+                  ? (previous?['receipt'] ?? previous?['previousReceipt'])
+                  : null,
               'receipt': null,
               'receiptState': 'unavailable',
               'checkedAt': DateTime.now().toIso8601String(),
               'checkError': explain(error),
               'version': version(asset),
             };
-            await store.observe(asset.id, target.id, library, version(asset), unavailable);
+            await store.observe(
+              asset.id,
+              target.id,
+              library,
+              version(asset),
+              unavailable,
+            );
             if (!active()) break;
             onObserved?.call(asset, unavailable);
             observations.remove(asset.id);
@@ -777,6 +877,8 @@ class TransferController extends ChangeNotifier {
       }
     } finally {
       api?.close();
+      if (identical(_checkLease, lease)) _checkLease = null;
+      await background.finish(lease);
       if (epoch == _checkEpoch) {
         _scanRefresh?.cancel();
         _scanRefresh = null;
@@ -790,7 +892,8 @@ class TransferController extends ChangeNotifier {
 
   /// 用户发起的普通相册核对复用月份核对、取消与内容回执校验流程。
   Future<void> checkGallery(
-    Stream<List<AssetEntity>> pages, int total,
+    Stream<List<AssetEntity>> pages,
+    int total,
     void Function(AssetEntity, Json) onObserved,
   ) async {
     if (!ready || busy || running || !online || !_foreground) return;
@@ -801,8 +904,15 @@ class TransferController extends ChangeNotifier {
     if (_disposed || epoch != _checkEpoch) return;
     _checked.clear();
     checkErrors.clear();
-    _checkJob = _checkScope(pages, epoch, connection!, libraryId!, total,
-        scopeLabel: '相册核对', onObserved: onObserved);
+    _checkJob = _checkScope(
+      pages,
+      epoch,
+      connection!,
+      libraryId!,
+      total,
+      scopeLabel: '相册核对',
+      onObserved: onObserved,
+    );
     await _checkJob;
   }
 
@@ -823,8 +933,16 @@ class TransferController extends ChangeNotifier {
     changed();
   }
 
+  /// 手动全选当前月份的筛选结果，不读取原文件。
   void selectVisible() {
     selected.addAll(visiblePhotos.map((item) => item.id));
+    changed();
+  }
+
+  /// 取消整月选择后，后续读取的批次不再自动勾选。
+  void clearSelection() {
+    _selectNewMonthPhotos = false;
+    selected.clear();
     changed();
   }
 
@@ -836,7 +954,13 @@ class TransferController extends ChangeNotifier {
     String library, {
     int? epoch,
   }) async {
-    final data = await recordBackupObservation(asset, identity, result, target, library);
+    final data = await recordBackupObservation(
+      asset,
+      identity,
+      result,
+      target,
+      library,
+    );
     if (connection?.id == target &&
         libraryId == library &&
         (epoch == null || epoch == _checkEpoch)) {
@@ -852,18 +976,33 @@ class TransferController extends ChangeNotifier {
 
   /// 普通相册和按月备份共用记录规则，旧回执仅保留为同一内容的历史证据。
   Future<Json> recordBackupObservation(
-    AssetEntity asset, Json identity, Json result, String target, String library,
+    AssetEntity asset,
+    Json identity,
+    Json result,
+    String target,
+    String library,
   ) async {
-    final previous = (await store.observationsFor(target, library, [asset.id]))[asset.id];
-    final historical = previous?['hash'] == identity['hash'] && previous?['size'] == identity['size']
-        ? (previous?['receipt'] ?? previous?['previousReceipt']) : null;
+    final previous = (await store.observationsFor(target, library, [
+      asset.id,
+    ]))[asset.id];
+    final historical =
+        previous?['hash'] == identity['hash'] &&
+            previous?['size'] == identity['size']
+        ? (previous?['receipt'] ?? previous?['previousReceipt'])
+        : null;
     final evidence = <String, dynamic>{
       ...result,
-      'previousReceipt': result['previousReceipt'] ?? result['receipt'] ?? historical,
+      'previousReceipt':
+          result['previousReceipt'] ?? result['receipt'] ?? historical,
     };
     for (final item in [result['receipt'], result['previousReceipt']]) {
       if (item is! Map) continue;
-      for (final field in {'receiverId': target, 'libraryId': library, 'hash': identity['hash'], 'size': identity['size']}.entries) {
+      for (final field in {
+        'receiverId': target,
+        'libraryId': library,
+        'hash': identity['hash'],
+        'size': identity['size'],
+      }.entries) {
         if (item.containsKey(field.key) && item[field.key] != field.value) {
           throw StateError('电脑回执与当前照片或目标不符，请重新核对。');
         }
@@ -931,7 +1070,10 @@ class TransferController extends ChangeNotifier {
       });
 
   /// 上传前读取当前原图并向电脑核对，不能仅依赖相册中的旧状态。
-  Future<void> prepareSelection({bool onlyUnbacked = false}) async {
+  Future<void> prepareSelection({bool onlyUnbacked = false}) =>
+      _withPreparation(() => _prepareSelection(onlyUnbacked: onlyUnbacked));
+
+  Future<void> _prepareSelection({required bool onlyUnbacked}) async {
     stopChecking();
     if (running) throw StateError('请先暂停当前传输。');
     if (connection == null) throw StateError('请先连接电脑。');
@@ -947,12 +1089,14 @@ class TransferController extends ChangeNotifier {
     int index = 0;
     try {
       for (final id in selected.toList()) {
+        _ensurePreparing();
         progress = '读取并核对 ${++index}/${selected.length}';
         changed();
         final asset = await AssetEntity.fromId(id);
         if (asset == null) throw StateError('部分所选照片不可访问，请刷新相册后重试。');
         if (onlyUnbacked && photoMonth(asset) != selectedMonth) continue;
         final identity = await inspectPhoto(asset);
+        _ensurePreparing();
         final response = await api.request(
           'POST',
           '/v1/assets/check',
@@ -970,6 +1114,7 @@ class TransferController extends ChangeNotifier {
             .map((item) => Map<String, dynamic>.from(item))
             .toList();
         await _observation(asset, identity, result, target.id, library);
+        _ensurePreparing();
         if (!onlyUnbacked || backupState(result) == 'pending') {
           prepared.add({...identity, ...result});
         }
@@ -986,6 +1131,13 @@ class TransferController extends ChangeNotifier {
   Future<void> enqueue({
     required bool skipHistory,
     bool onlyUnbacked = false,
+  }) => _withPreparation(
+    () => _enqueue(skipHistory: skipHistory, onlyUnbacked: onlyUnbacked),
+  );
+
+  Future<void> _enqueue({
+    required bool skipHistory,
+    required bool onlyUnbacked,
   }) async {
     stopChecking();
     if (running) throw StateError('请先暂停当前传输。');
@@ -1020,9 +1172,11 @@ class TransferController extends ChangeNotifier {
         },
       );
       for (final original in prepared) {
+        _ensurePreparing();
         final asset = await AssetEntity.fromId(original['assetId']);
         if (asset == null) throw StateError('照片权限或内容发生变化，请重新核对后上传。');
         final identity = await inspectPhoto(asset);
+        _ensurePreparing();
         if (identity['hash'] != original['hash'] ||
             identity['size'] != original['size']) {
           throw StateError('确认期间原图被修改，请重新选择照片。');
@@ -1041,6 +1195,7 @@ class TransferController extends ChangeNotifier {
           (checked['results'] as List).single,
         );
         await _observation(asset, identity, result, target.id, library);
+        _ensurePreparing();
         final photo = <String, dynamic>{...original, ...identity, ...result};
         if (onlyUnbacked && backupState(result) != 'pending') continue;
         if (photo['receipt'] != null) continue;
@@ -1104,14 +1259,26 @@ class TransferController extends ChangeNotifier {
 
   void foreground(bool value) {
     _foreground = value;
-    if (!value && running) pause();
-    if (!value) stopChecking();
+    if (!value &&
+        running &&
+        !background.allows(BackgroundTask.transfer) &&
+        !background.starting(BackgroundTask.transfer)) {
+      pause();
+    }
+    if (!value &&
+        !background.allows(BackgroundTask.backupCheck) &&
+        !background.starting(BackgroundTask.backupCheck)) {
+      stopChecking();
+    }
     if (value &&
         _monthActive &&
         ready &&
         !busy &&
         !running &&
+        !checking &&
         !loadingPhotos &&
+        selected.isEmpty &&
+        _selectNewMonthPhotos &&
         photos.isNotEmpty) {
       unawaited(action(() => loadPhotos(requestPermission: false)));
     }
@@ -1119,7 +1286,7 @@ class TransferController extends ChangeNotifier {
 
   void pause() {
     _pause = true;
-    notice = '将在当前分块确认后暂停；未确认数据会在继续时重新核对。';
+    notice = '将在各文件当前分块确认后暂停；未确认数据会在继续时重新核对。';
     changed();
   }
 
@@ -1216,57 +1383,104 @@ class TransferController extends ChangeNotifier {
   }
 
   Future<void> runQueue() async {
-    if (running || connection == null || !_foreground || _disposed) return;
+    if (running ||
+        connection == null ||
+        _disposed ||
+        (!_foreground && !background.allows(BackgroundTask.preparation))) {
+      return;
+    }
     stopChecking();
     running = true;
     _pause = false;
+    final pending = tasks
+        .where(
+          (item) => item.receiverId == connection!.id && item.state == 'queued',
+        )
+        .toList();
+    _queueTotal = pending.length;
+    _queueHandled = 0;
     changed();
+    BackgroundLease? lease;
     try {
-      await WakelockPlus.enable();
-      for (final task
-          in tasks
-              .where(
-                (item) =>
-                    item.receiverId == connection!.id && item.state == 'queued',
-              )
-              .toList()) {
-        if (_pause || !_foreground) break;
-        try {
-          await _transfer(task);
-        } catch (error) {
-          task.state = 'failed';
-          task.data['error'] = explain(error);
-          await store.saveTask(task);
-          notice = task.error;
-          changed();
-          if (error is SocketException ||
-              error is TimeoutException ||
-              error is HandshakeException ||
-              (error is PlatformException && error.code == 'LAN_ONLY') ||
-              (error is ApiException && [401, 503].contains(error.status))) {
-            online = false;
-            break;
+      if (pending.isEmpty) return;
+      lease = await background.begin(
+        BackgroundTask.transfer,
+        '0 / $_queueTotal 已处理',
+      );
+      _transferLease = lease;
+      if (!background.enabled) await WakelockPlus.enable();
+      var next = 0;
+      // 固定数量的工作槽按需取任务，每个文件只保留一个分块和独立连接。
+      Future<void> worker() async {
+        while (next < pending.length && !_pause && _canTransfer && !_disposed) {
+          final task = pending[next++];
+          _activeTasks.add(task);
+          try {
+            await _transfer(task);
+            if (['complete', 'skipped'].contains(task.state)) _queueHandled++;
+          } catch (error) {
+            if (error is SocketException ||
+                error is TimeoutException ||
+                error is HandshakeException ||
+                (error is PlatformException && error.code == 'LAN_ONLY') ||
+                (error is ApiException && [401, 503].contains(error.status))) {
+              online = false;
+              _pause = true;
+            }
+            task.state = 'failed';
+            task.data['error'] = explain(error);
+            await store.saveTask(task);
+            notice = task.error;
+          } finally {
+            _activeTasks.remove(task);
+            changed();
           }
         }
       }
+
+      await Future.wait([
+        for (
+          var slot = 0;
+          slot < _uploadConcurrency && slot < pending.length;
+          slot++
+        )
+          worker(),
+      ]);
     } catch (error) {
       notice = explain(error);
     } finally {
-      _activeApi?.close();
-      _activeApi = null;
-      for (final task in tasks.where(
-        (item) =>
-            item.receiverId == connection?.id &&
-            ['queued', 'uploading', 'checking'].contains(item.state),
-      )) {
-        task.state = 'paused';
-        await store.saveTask(task);
+      for (final api in _activeApis) {
+        api.close();
       }
-      running = false;
-      await WakelockPlus.disable();
+      _activeApis.clear();
+      try {
+        for (final task in tasks.where(
+          (item) =>
+              item.receiverId == connection?.id &&
+              ['queued', 'uploading', 'checking'].contains(item.state),
+        )) {
+          task.state = 'paused';
+          await store.saveTask(task);
+        }
+      } finally {
+        running = false;
+        _activeTasks.clear();
+        if (identical(_transferLease, lease)) _transferLease = null;
+        await background.finish(lease);
+        if (!background.enabled) await WakelockPlus.disable();
+      }
       changed();
       unawaited(checkPhotos());
     }
+  }
+
+  /// 暂停各工作槽并保存自己的偏移，不再创建后续上传请求。
+  Future<bool> _pauseTransferIfNeeded(UploadTask task) async {
+    if (!_pause && _canTransfer && !_disposed) return false;
+    task.state = 'paused';
+    await store.saveTask(task);
+    changed();
+    return true;
   }
 
   Future<void> _transfer(UploadTask task) async {
@@ -1280,9 +1494,11 @@ class TransferController extends ChangeNotifier {
     if (identity['hash'] != task.hash || identity['size'] != task.size) {
       throw StateError('原图已修改，请取消此任务并重新选择照片。');
     }
+    if (await _pauseTransferIfNeeded(task)) return;
     final file = File(identity['path']), api = await openApi(target);
-    _activeApi = api;
+    _activeApis.add(api);
     try {
+      if (await _pauseTransferIfNeeded(task)) return;
       // 排队期间另一台手机可能完成备份，发送原图前再核对一次。
       if (task.data['onlyUnbacked'] == true) {
         final response = await api.request(
@@ -1315,6 +1531,7 @@ class TransferController extends ChangeNotifier {
           return;
         }
       }
+      if (await _pauseTransferIfNeeded(task)) return;
       if (task.data['deviceId'] != target.deviceId) {
         final batch = await api.request(
           'POST',
@@ -1339,6 +1556,7 @@ class TransferController extends ChangeNotifier {
         task.data['sessionId'] = null;
         await store.saveTask(task);
       }
+      if (await _pauseTransferIfNeeded(task)) return;
       Json session;
       if (task.data['sessionId'] != null) {
         session = await api.request(
@@ -1365,14 +1583,14 @@ class TransferController extends ChangeNotifier {
       task.data['offset'] = session['offset'];
       task.data['archiveDate'] = session['archiveDate'];
       await store.saveTask(task);
+      if (session['state'] != 'complete' &&
+          await _pauseTransferIfNeeded(task)) {
+        return;
+      }
       final handle = await file.open();
       try {
         while (session['state'] != 'complete' && task.offset < task.size) {
-          if (_pause || !_foreground) {
-            task.state = 'paused';
-            await store.saveTask(task);
-            return;
-          }
+          if (await _pauseTransferIfNeeded(task)) return;
           await handle.setPosition(task.offset);
           final bytes = await handle.read(
             (task.size - task.offset).clamp(1, 4 * 1024 * 1024),
@@ -1383,7 +1601,7 @@ class TransferController extends ChangeNotifier {
           session = await api.request(
             'PUT',
             '/v1/uploads/${session['id']}/content?offset=${task.offset}',
-            bytes: Uint8List.fromList(bytes),
+            bytes: bytes,
           );
           task.data['offset'] = session['offset'];
           await store.saveTask(task);
@@ -1393,6 +1611,7 @@ class TransferController extends ChangeNotifier {
         await handle.close();
       }
       if (session['state'] != 'complete') {
+        if (await _pauseTransferIfNeeded(task)) return;
         task.state = 'checking';
         changed();
         session = await api.request(
@@ -1420,11 +1639,11 @@ class TransferController extends ChangeNotifier {
         task.receiverId,
         task.libraryId,
       );
-      online = true;
+      if (!_pause) online = true;
       changed();
     } finally {
       api.close();
-      _activeApi = null;
+      _activeApis.remove(api);
     }
   }
 
@@ -1434,7 +1653,11 @@ class TransferController extends ChangeNotifier {
     _catalogEpoch++;
     stopChecking();
     _pause = true;
-    _activeApi?.close();
+    for (final api in _activeApis) {
+      api.close();
+    }
+    unawaited(_backgroundEvents.cancel());
+    background.dispose();
     super.dispose();
   }
 }

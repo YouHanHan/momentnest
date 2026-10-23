@@ -86,6 +86,7 @@ class ResumeStore extends LocalStore {
 }
 
 class ResumeTransfer extends TransferController {
+  ResumeTransfer({super.backgroundWork});
   final inspected = <String>[];
   @override
   Future<void> initialize() async {
@@ -196,7 +197,9 @@ void main() {
 
   setUp(() async {
     homeOwnsControllers = false;
-    directory = await Directory.systemTemp.createTemp('momentnest-scan-resume-');
+    directory = await Directory.systemTemp.createTemp(
+      'momentnest-scan-resume-',
+    );
     messenger.setMockMethodCallHandler(
       directoryChannel,
       (_) async => directory.path,
