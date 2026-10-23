@@ -47,7 +47,7 @@ Windows 桌面另需 Python 3，并运行一次 `npm.cmd run media:build -- -Pyt
 
 ## 首次检出的验证顺序
 
-桌面只需 Node 和 npm；Android 另需上表中的 Flutter、Android SDK 与 JDK。以下命令不启动应用界面，也不分配新版本：
+桌面开发需要 Node 和 npm，首次准备媒体工具另需 Python 3；Android 另需上表中的 Flutter、Android SDK 与 JDK。以下命令不启动应用界面，也不分配新版本：
 
 ```powershell
 npm.cmd ci
@@ -83,7 +83,9 @@ service/worker.ts 承载 Receiver，处理 HTTPS、SQLite、历史扫描、流�
 
 手机 FamilyController 与传输队列分开，复用现有完整内容身份；Android FamilyMediaEngine 在单独 executor 中进行本地模型推理、视频抽帧与 Canvas 水印。宝宝档案、人工决定和参考人脸在各自设备处理，当前手机不调用旧宝宝相册同步或电脑原文件下载入口；历史协议代码保留不代表界面提供该能力。上传及核对沿用固定证书指纹、已授权设备凭据及局域网网络绑定。
 
-手机 HomeScreen/PairingScreen 负责页面；TransferController 管理相册、状态与队列；ReceiverApi 负责固定证书指纹的 HTTPS；LocalStore 保存任务、核对记录与安全令牌。Android 平台通道只读取原始拍摄日及媒体库日期。没有后台 Service；App 生命周期进入后台后主动暂停。
+手机 HomeScreen/PairingScreen 负责页面；TransferController 管理相册、状态与队列；ReceiverApi 负责固定证书指纹的 HTTPS；LocalStore 保存任务、核对记录与安全令牌。BackgroundWork 为上传准备、同步、核对和人脸扫描分别取得后台资格，等待原生服务确认就绪后允许离开界面继续；进度通知按秒合并，系统中断统一转为暂停。
+
+Android MomentNestApplication 持有共享 FlutterEngine 和 MediaPlatformChannels 原生工作线程，MainActivity 只持有界面相关选择器。BackgroundWorkService 根据任务启用 dataSync / mediaProcessing（Android 15 之前的本地文件处理使用 dataSync），显示通知并按实际任务持有部分 CPU 唤醒锁与传输 Wi-Fi 锁，完成或暂停后释放。服务采用 START_NOT_STICKY，不在系统强制停止后自行重启；Android 15 超时立即停止服务并通知业务保留断点。人脸缓存每 100 项或约 10 秒保存检查点，单项推理结束后再响应暂停。
 
 ## 数据可靠性
 

@@ -19,10 +19,12 @@ $packageRoot = Join-Path $projectRoot 'third_party/media-tools'
 $manifestPath = Join-Path $packageRoot 'build-manifest.json'
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 $buildScriptHash = Get-Sha256 $PSCommandPath
-$buildRoot = Join-Path $projectRoot '.cache/media-tool-build'
-$downloadsRoot = Join-Path $buildRoot 'downloads'
+$cacheRoot = Join-Path $projectRoot '.cache/media-tool-build'
+# 每轮使用独立源码和构建目录，避免旧缓存中的修改或目标文件影响对应源码。
+$buildRoot = Join-Path (Join-Path $cacheRoot 'builds') ([Guid]::NewGuid().ToString('N'))
+$downloadsRoot = Join-Path $cacheRoot 'downloads'
 $sourcesRoot = Join-Path $buildRoot 'sources'
-$toolsRoot = Join-Path $buildRoot 'toolchain'
+$toolsRoot = Join-Path $cacheRoot 'toolchain'
 $prefix = Join-Path $buildRoot 'prefix'
 $logsRoot = Join-Path $buildRoot 'logs'
 foreach ($directory in @($downloadsRoot, $sourcesRoot, $toolsRoot, $prefix, $logsRoot)) {

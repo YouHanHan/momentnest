@@ -36,11 +36,16 @@ export async function createMediaSourceBundle(root = projectRoot) {
   const archiveDirectory = join(cacheRoot, 'archives')
   await mkdir(archiveDirectory, { recursive: true })
   const key = hash(JSON.stringify({ binaries: build.binaries, manifestSha256: build.manifestSha256,
-    script: build.buildScriptSha256, bundler: hash(await readFile(join(root, 'scripts/media-source-bundle.mjs'))) })).slice(0, 12)
+    script: build.buildScriptSha256, createdAt: build.createdAt,
+    bundler: hash(await readFile(join(root, 'scripts/media-source-bundle.mjs'))) })).slice(0, 12)
   const filename = `MomentNest-media-tools-${manifest.version}-${key}-sources.zip`
   const sourcePath = join(archiveDirectory, filename)
   let exists = false
   try { await access(sourcePath); exists = true } catch (error) { if (error.code !== 'ENOENT') throw error }
+  // 缓存只能复用已记录且指纹一致的归档，不能重新认可被替换或未完成登记的文件。
+  if (exists && (build.sourceBundle?.filename !== filename || build.sourceBundle.sha256 !== hash(await readFile(sourcePath)))) {
+    throw new Error('已有媒体工具对应源码归档 SHA-256 不匹配或缺少可核验记录。')
+  }
   if (!exists) {
     const staging = await mkdtemp(join(cacheRoot, 'source-bundle-'))
     const repository = join(staging, 'repository')

@@ -10,7 +10,7 @@ JavaScript 路径适配代码采用项目 MIT 许可证，见 `LICENSE`；独立
 npm.cmd run media:build -- -Python <Python可执行文件路径> -Jobs 2
 ```
 
-需要 Python 3、Node.js 22.12+ 和 Windows 自带的 `tar.exe`。编译器、NASM、Meson 与 Ninja 由脚本下载到项目 `.cache`，按清单校验 SHA-256，不做全局安装；可用内存较少时使用 `-Jobs 1`。首次编译需要时间，失败后复用已核实的下载和编译结果。
+需要 Python 3、Node.js 22.12+ 和 Windows 自带的 `tar.exe`。编译器、NASM、Meson 与 Ninja 由脚本下载到项目 `.cache`，按清单校验 SHA-256，不做全局安装；可用内存较少时使用 `-Jobs 1`。首次编译需要时间；重跑复用已核实的下载和工具链，每轮重新解包源码并使用独立的安装前缀与编译目录，避免旧缓存影响对应源码。
 
 `build-manifest.json` 固定源码提交、下载 URL、工具版本、大小和 SHA-256。`scripts/build-media-tools.ps1` 是实际构建与安装脚本，没有修改四个库的上游源码。所有工具输出都在项目目录内，只有当前构建进程的环境变量会临时调整，结束后恢复。
 

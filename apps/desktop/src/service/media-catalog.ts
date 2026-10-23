@@ -549,6 +549,17 @@ export class MediaCatalog {
     const items = matches.slice(offset, offset + limit).map(({ asset, similarity }) => ({ ...this.decorated(asset, context, libraryId), similarity }))
     return { items, total: matches.length, page, limit, scope: query.scope, threshold, coverage }
   }
+  /** 扫描只跟踪开始时可用的位置，保留期间新上传或重新校验生成的位置。 */
+  private scanLocationSnapshot(field: 'rootId' | 'libraryId', id: string): Set<CatalogLocation> {
+    const snapshot = new Set<CatalogLocation>()
+    for (const asset of this.assets.values()) for (const location of asset.locations) if (location[field] === id && location.available) snapshot.add(location)
+    return snapshot
+  }
+  /** 只失效本轮未见且仍为原对象的位置，不覆盖并发上传的有效索引。 */
+  private markUnseenLocations(snapshot: Set<CatalogLocation>, seen?: Set<string>): void {
+    const unseen = (location: CatalogLocation): boolean => location.available && snapshot.has(location) && !seen?.has(locationId(location.path, location.rootId, location.libraryId))
+    for (const asset of this.assets.values()) if (asset.locations.some(unseen)) this.putAsset({ ...asset, locations: asset.locations.map(location => unseen(location) ? { ...location, available: false } : location) })
+  }
   private async walk(root: string, onFile: (path: string, relativePath: string) => Promise<void>, onError?: (path: string, error: unknown) => void, options: { concurrency?: number; countOnly?: boolean } = {}): Promise<void> {
     requireValue(await canonicalDirectory(root) === root, '目录身份已变化，请重新选择。')
     const pending = new Set<Promise<void>>(), concurrency = options.concurrency ?? 1
@@ -726,6 +737,7 @@ export class MediaCatalog {
       }
       for (const root of roots) {
         const seen = new Set<string>(), skippedBefore = job.skipped ?? 0
+        const snapshot = this.scanLocationSnapshot('rootId', root.id)
         this.store.put('root', { ...root, state: 'scanning', count: 0, error: '' })
         let state = 'ready', error = ''
         try {
@@ -739,17 +751,18 @@ export class MediaCatalog {
           }, (path, failure) => this.skip(job, path, failure), { concurrency: 2 })
           const skipped = (job.skipped ?? 0) - skippedBefore
           if (skipped) { state = 'partial'; error = `${skipped} 项未能读取，不能视为完整扫描。` }
-          else for (const asset of this.assets.values()) if (asset.locations.some(location => location.rootId === root.id && !seen.has(locationId(location.path, location.rootId, location.libraryId)))) this.putAsset({ ...asset, locations: asset.locations.map(location => location.rootId === root.id && !seen.has(locationId(location.path, location.rootId, location.libraryId)) ? { ...location, available: false } : location) })
+          else this.markUnseenLocations(snapshot, seen)
         } catch (failure) {
           if (this.closed) throw failure
           this.skip(job, root.path, failure); state = 'unavailable'; error = '目录不可访问或身份已变化，请检查后重试。'
-          for (const asset of this.assets.values()) if (asset.locations.some(location => location.rootId === root.id)) this.putAsset({ ...asset, locations: asset.locations.map(location => location.rootId === root.id ? { ...location, available: false } : location) })
+          this.markUnseenLocations(snapshot)
         }
         const latestRoot = this.store.get<ScanRoot>('root', root.id)
         this.store.put('root', { ...root, enabled: latestRoot?.enabled ?? false, state, count: seen.size, scannedAt: now(), error })
       }
       for (const library of libraries) {
         const seen = new Set<string>()
+        const snapshot = this.scanLocationSnapshot('libraryId', library.id)
         const skippedBefore = job.skipped ?? 0
         try {
           await this.walk(library.path, async (path, child) => {
@@ -762,11 +775,11 @@ export class MediaCatalog {
             seen.add(locationId(path, undefined, library.id))
             scannedFile(path, identity); await pause()
           }, (path, failure) => this.skip(job, path, failure), { concurrency: 2 })
-          if ((job.skipped ?? 0) === skippedBefore) for (const asset of this.assets.values()) if (asset.locations.some(location => location.libraryId === library.id && !seen.has(locationId(location.path, location.rootId, location.libraryId)))) this.putAsset({ ...asset, locations: asset.locations.map(location => location.libraryId === library.id && !seen.has(locationId(location.path, location.rootId, location.libraryId)) ? { ...location, available: false } : location) })
+          if ((job.skipped ?? 0) === skippedBefore) this.markUnseenLocations(snapshot, seen)
         } catch (failure) {
           if (this.closed) throw failure
           this.skip(job, library.path, failure)
-          for (const asset of this.assets.values()) if (asset.locations.some(location => location.libraryId === library.id)) this.putAsset({ ...asset, locations: asset.locations.map(location => location.libraryId === library.id ? { ...location, available: false } : location) })
+          this.markUnseenLocations(snapshot)
         }
       }
     }, libraryId, 'library')

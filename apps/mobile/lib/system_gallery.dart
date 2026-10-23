@@ -398,7 +398,9 @@ class SystemGalleryController extends ChangeNotifier {
     for (var page = 0; page * pageSize < count; page++) {
       final batch = await source.page(number: page, size: pageSize);
       if (!_current(epoch, requestedType)) return;
-      if (batch.isEmpty) throw StateError('相册内容已变化，请刷新后重新核对。');
+      if (batch.length < (count - page * pageSize).clamp(0, pageSize)) {
+        throw StateError('相册内容已变化，请刷新后重新核对。');
+      }
       yield favoritesOnly
           ? batch
                 .where((asset) => _favorites?.isFavorite(asset) == true)

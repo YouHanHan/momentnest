@@ -79,3 +79,38 @@ test('打包时拒绝缺少源码归档，或归档与记录不一致', async ()
   await writeFile(archive.sourcePath, '不匹配的归档')
   await assert.rejects(verifyMediaBuild(root), /对应源码归档 SHA-256 不匹配/)
 })
+
+test('重复生成不能将已被替换的源码归档重新登记为有效', async () => {
+  const { root, packageRoot } = await fixture()
+  const archive = await createMediaSourceBundle(root)
+  const record = join(packageRoot, 'bin/win32-x64/build-info.json')
+  const before = await readFile(record, 'utf8')
+  await writeFile(archive.sourcePath, '被替换的源码归档')
+  await assert.rejects(createMediaSourceBundle(root), /对应源码归档.*不匹配/)
+  assert.equal(await readFile(record, 'utf8'), before)
+})
+
+test('没有可核验记录的同名缓存归档不能直接复用', async () => {
+  const { root, packageRoot } = await fixture()
+  const archive = await createMediaSourceBundle(root)
+  const record = join(packageRoot, 'bin/win32-x64/build-info.json')
+  const build = JSON.parse(await readFile(record, 'utf8'))
+  delete build.sourceBundle
+  await writeFile(record, JSON.stringify(build))
+  await assert.rejects(createMediaSourceBundle(root), /对应源码归档.*不匹配/)
+  assert.ok((await readFile(archive.sourcePath)).length > 0)
+})
+
+test('相同二进制重新构建后生成独立源码归档并保留旧归档', async () => {
+  const { root, packageRoot } = await fixture()
+  const first = await createMediaSourceBundle(root)
+  const record = join(packageRoot, 'bin/win32-x64/build-info.json')
+  const build = JSON.parse(await readFile(record, 'utf8'))
+  delete build.sourceBundle
+  build.createdAt = '2026-10-23T12:00:00.000Z'
+  await writeFile(record, JSON.stringify(build))
+  const second = await createMediaSourceBundle(root)
+  assert.notEqual(second.filename, first.filename)
+  assert.equal(hash(await readFile(first.sourcePath)), first.sha256)
+  assert.equal((await verifyMediaBuild(root)).sourcePath, second.sourcePath)
+})

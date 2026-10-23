@@ -4,7 +4,6 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import androidx.exifinterface.media.ExifInterface
-import android.content.ContentUris
 import android.content.Intent
 import android.app.Activity
 import android.graphics.Bitmap
@@ -14,160 +13,66 @@ import android.os.Build
 import android.provider.MediaStore
 import java.io.File
 import java.util.UUID
-import java.time.LocalDate
-import java.time.Instant
-import java.time.ZoneId
-import java.util.concurrent.Executors
+
+import android.content.Context
+import android.Manifest
+import android.content.pm.PackageManager
 
 class MainActivity : FlutterActivity() {
-    private val executor = Executors.newSingleThreadExecutor()
-    private val familyEngine by lazy { FamilyMediaEngine(this) }
+    private val executor get() = (application as MomentNestApplication).media.executor
     private var avatarResult: MethodChannel.Result? = null
     private val avatarRequestCode = 5042
+    var taskForeground = false
+        private set
 
-    // 优先保留 EXIF 原始拍摄日，没有时使用系统明确记录的拍摄时间。
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/family")
-            .setMethodCallHandler { call, result ->
-                if (call.method == "chooseAvatar") {
-                    if (avatarResult != null) {
-                        result.error("AVATAR_BUSY", "请先完成当前头像选择。", null)
-                        return@setMethodCallHandler
-                    }
-                    avatarResult = result
-                    try {
-                        val intent = if (Build.VERSION.SDK_INT >= 33) Intent(MediaStore.ACTION_PICK_IMAGES).setType("image/*")
-                        else Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*")
-                        startActivityForResult(intent, avatarRequestCode)
-                    } catch (error: Exception) {
-                        avatarResult = null
-                        result.error("AVATAR_PICK", error.message ?: "无法打开系统照片选择器。", null)
-                    }
-                    return@setMethodCallHandler
-                }
-                executor.execute {
-                    try {
-                        val value = when (call.method) {
-                            "ready" -> familyEngine.ready()
-                            "analyze" -> familyEngine.analyze(call.argument<String>("path") ?: "", call.argument<String>("kind") ?: "photo", call.argument<Int>("frames") ?: 4)
-                            "watermark" -> {
-                                val arguments = call.arguments as? Map<*, *> ?: throw IllegalArgumentException("水印参数无效。")
-                                familyEngine.watermark(arguments.entries.associate { entry ->
-                                    val key = entry.key as? String ?: throw IllegalArgumentException("水印参数名称无效。")
-                                    key to entry.value
-                                })
-                            }
-                            else -> null
-                        }
-                        runOnUiThread { if (value == null) result.notImplemented() else result.success(value) }
-                    } catch (error: Exception) {
-                        runOnUiThread { result.error("FAMILY_MEDIA", error.message ?: "媒体处理失败。", null) }
-                    } catch (_: OutOfMemoryError) {
-                        // 内存不足属于 Error，必须单独返回页面，避免工作线程异常终止进程。
-                        familyEngine.close()
-                        runOnUiThread { result.error("FAMILY_MEDIA_MEMORY", "手机可用内存不足，暂时无法处理媒体。请关闭其他应用后重试，或换一张分辨率较低的照片。", null) }
-                    }
-                }
-            }
-        val networkGuard = LanNetworkGuard(this)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/network")
-            .setMethodCallHandler { call, result ->
-                if (call.method != "bindLan") {
-                    result.notImplemented()
-                } else {
-                    try {
-                        networkGuard.bind(call.argument<String>("host") ?: "")
-                        result.success(null)
-                    } catch (error: Exception) {
-                        result.error("LAN_ONLY", error.message ?: "局域网不可用。", null)
-                    }
-                }
-            }
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.momentnest/media")
-            .setMethodCallHandler { call, result ->
-                if (call.method == "sdkInt") {
-                    result.success(android.os.Build.VERSION.SDK_INT)
-                    return@setMethodCallHandler
-                }
-                if (call.method == "fingerprint") {
-                    val path = call.argument<String>("path")
-                    executor.execute {
-                        try {
-                            if (path.isNullOrBlank()) throw IllegalArgumentException("缺少原文件路径。")
-                            val identity = fingerprintMediaFile(File(path))
-                            runOnUiThread { result.success(identity) }
-                        } catch (error: Exception) {
-                            runOnUiThread { result.error("MEDIA_FINGERPRINT", error.message ?: "原文件指纹读取失败。", null) }
-                        }
-                    }
-                    return@setMethodCallHandler
-                }
-                if (call.method == "creationDate") {
-                    val assetId = call.argument<String>("assetId")
-                    val kind = call.argument<String>("kind") ?: "photo"
-                    executor.execute {
-                        val date = sourceCreationDate(assetId, kind)
-                        runOnUiThread { result.success(date) }
-                    }
-                    return@setMethodCallHandler
-                }
-                if (call.method != "captureDate") {
-                    result.notImplemented()
-                    return@setMethodCallHandler
-                }
-                val path = call.argument<String>("path")
-                val assetId = call.argument<String>("assetId")
-                val kind = call.argument<String>("kind") ?: "photo"
-                executor.execute {
-                    var date: String? = null
-                    if (kind == "video") {
-                        try { date = familyEngine.captureDate(path, assetId, kind) }
-                        catch (_: Exception) { /* 无可靠拍摄日期时交给批次规则处理。 */ }
-                        val captured = date
-                        runOnUiThread { result.success(captured) }
-                        return@execute
-                    }
-                    try {
-                        val exif = path?.let { ExifInterface(it) }
-                        val value = exif?.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL)
-                        if (value != null && value.length >= 10) {
-                            date = LocalDate.parse(value.substring(0, 10).replace(':', '-')).toString()
-                        }
-                    } catch (_: Exception) { /* 缺少有效元数据时继续查询系统拍摄时间。 */ }
-                    if (date == null) {
-                        try {
-                            val id = assetId?.toLongOrNull()
-                            if (id != null) {
-                                val uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                                contentResolver.query(uri, arrayOf(MediaStore.Images.Media.DATE_TAKEN), null, null, null)?.use { cursor ->
-                                    if (cursor.moveToFirst()) {
-                                        val millis = cursor.getLong(0)
-                                        if (millis > 0) date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate().toString()
-                                    }
-                                }
-                            }
-                        } catch (_: Exception) { /* 返回空值，由批次规则明确回退到上传日。 */ }
-                    }
-                    val captured = date
-                    runOnUiThread { result.success(captured) }
-                }
-            }
+    override fun provideFlutterEngine(context: Context): FlutterEngine {
+        val app = application as MomentNestApplication
+        app.activity = this
+        return app.obtainEngine()
     }
 
-    // 手机创建日使用媒体首次加入系统相册的时间，截图与微信保存图沿用此日期。
-    private fun sourceCreationDate(assetId: String?, kind: String): String? {
-        val id = assetId?.toLongOrNull() ?: return null
-        val base = if (kind == "video") MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        return try {
-            contentResolver.query(ContentUris.withAppendedId(base, id), arrayOf(MediaStore.MediaColumns.DATE_ADDED), null, null, null)?.use { cursor ->
-                if (!cursor.moveToFirst() || cursor.isNull(0)) return@use null
-                val seconds = cursor.getLong(0)
-                if (seconds <= 0) null
-                else Instant.ofEpochSecond(seconds).atZone(ZoneId.systemDefault()).toLocalDate().toString()
-            }
-        } catch (_: Exception) { null }
+    override fun shouldDestroyEngineWithHost(): Boolean = false
+
+    override fun onResume() {
+        super.onResume()
+        taskForeground = true
+    }
+
+    override fun onPause() {
+        taskForeground = false
+        super.onPause()
+    }
+
+    /// 通知授权只询问一次，拒绝不绕过系统决定，也不重复弹窗。
+    fun requestTaskNotifications() {
+        if (Build.VERSION.SDK_INT < 33 || !taskForeground ||
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return
+        val mediaGranted = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
+            checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED ||
+            (Build.VERSION.SDK_INT >= 34 && checkSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED)
+        if (!mediaGranted) return
+        val preferences = getSharedPreferences("background-work", MODE_PRIVATE)
+        if (preferences.getBoolean("notification-requested", false)) return
+        preferences.edit().putBoolean("notification-requested", true).apply()
+        try { requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 5044) }
+        catch (_: Exception) { /* 通知授权失败时保留系统任务管理入口，不终止正在运行的任务。 */ }
+    }
+
+    /// 头像选择依赖当前界面，后台媒体处理仍使用应用级线程。
+    fun chooseAvatar(result: MethodChannel.Result) {
+        if (avatarResult != null) {
+            result.error("AVATAR_BUSY", "请先完成当前头像选择。", null)
+            return
+        }
+        avatarResult = result
+        try {
+            val intent = if (Build.VERSION.SDK_INT >= 33) Intent(MediaStore.ACTION_PICK_IMAGES).setType("image/*")
+            else Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*")
+            startActivityForResult(intent, avatarRequestCode)
+        } catch (error: Exception) {
+            avatarResult = null
+            result.error("AVATAR_PICK", error.message ?: "无法打开系统照片选择器。", null)
+        }
     }
 
     // 系统选图仅生成应用私有头像副本，原图与旧头像副本均保留。
@@ -221,8 +126,8 @@ class MainActivity : FlutterActivity() {
     override fun onDestroy() {
         avatarResult?.success(null)
         avatarResult = null
-        executor.execute { familyEngine.close() }
-        executor.shutdown()
+        val app = application as MomentNestApplication
+        if (app.activity === this) app.activity = null
         super.onDestroy()
     }
 }
