@@ -16,6 +16,7 @@ type Page = 'receive' | 'directories' | 'history' | 'folder' | 'all' | 'people' 
 const module = ref<Module>('library')
 const page=ref<Page>('all'),notice=ref(''),busy=ref(false),state=ref<ReceiverState|null>(null)
 const stateReadError=ref(''),refreshing=ref(false)
+const appVersion = ref(''), versionError = ref(''), versionLoading = ref(false)
 const libraryMenu = ref(false), settingsOpen = ref(false), transferDetail = ref('')
 const processingRecordsOpen = ref(false), processingStatus = ref({ running: 0, unread: false })
 const pairing=ref<PairingInfo|null>(null),preview=ref(''),currentTime=ref(Date.now())
@@ -119,6 +120,19 @@ async function refresh(force=false):Promise<void> {
     if(sequence===refreshSequence){if(state.value)notice.value=userError(error);else stateReadError.value=userError(error)}
   } finally {if(sequence===refreshSequence)refreshing.value=false}
 }
+/** 读取当前运行程序的实际版本，独立于照片库状态并允许失败后重试。 */
+async function loadAppVersion(): Promise<void> {
+  if (versionLoading.value) return
+  versionError.value = ''
+  if (!api) { versionError.value = '请使用拾光匣桌面程序查看版本。'; return }
+  versionLoading.value = true
+  try {
+    const info = await api.getAppInfo()
+    if (!info.version.trim()) throw new Error('无法读取当前应用版本。')
+    appVersion.value = info.version
+  } catch (error) { versionError.value = userError(error) }
+  finally { versionLoading.value = false }
+}
 async function run(action:()=>Promise<unknown>):Promise<void> {
   if(busy.value) return
   busy.value=true;notice.value=''
@@ -214,7 +228,7 @@ function closeTransferPreview(): void {
   preview.value = ''; previewContext.value = null; previewAsset.value = null
   previewLoading.value = false; previewError.value = ''; previewActionError.value = ''
 }
-onMounted(()=>{void refresh();timer=setInterval(()=>{currentTime.value=Date.now();void refresh()},2000)})
+onMounted(()=>{void loadAppVersion();void refresh();timer=setInterval(()=>{currentTime.value=Date.now();void refresh()},2000)})
 onUnmounted(()=>{clearInterval(timer);previewSequence++})
 </script>
 
@@ -228,6 +242,7 @@ onUnmounted(()=>{clearInterval(timer);previewSequence++})
         <button aria-label="导入与归档" title="导入与归档" :class="{selected:module==='import'&&!settingsOpen}" @click="setModule('import')"><UiIcon name="transfer" /><span>导入与归档</span></button>
       </nav>
       <button aria-label="设置" title="设置" class="settings-link" :class="{selected:settingsOpen}" @click="settingsOpen=!settingsOpen"><UiIcon name="settings" /><span>设置</span></button>
+      <small class="app-version" :title="appVersion?`当前版本：${appVersion}`:versionError">{{appVersion?`v${appVersion}`:versionError?'版本未知':'读取版本…'}}</small>
     </aside>
     <main>
       <header class="topbar">
@@ -250,7 +265,15 @@ onUnmounted(()=>{clearInterval(timer);previewSequence++})
           <template v-if="stateReadError"><UiIcon name="folder" :size="38" /><h2>读取照片库失败</h2><p role="alert">{{stateReadError}}</p><button class="primary-button" :disabled="refreshing||!api" @click="refresh(true)">重新读取照片库</button></template>
           <UiLoading v-else label="正在读取照片库…" :size="24" />
         </section>
-        <template v-else-if="settingsOpen"><div class="compact-page-heading"><h1>设置</h1></div><section class="directory-panel"><div class="section-heading"><h2>接收服务</h2><button class="secondary-button" :disabled="busy||!state" @click="run(()=>api.setAccepting(!state!.accepting))">{{state?.accepting?'暂停接收':'继续接收'}}</button></div><p>{{state?.name??'正在启动'}} · {{state?.addresses.join(' / ')}}</p><button class="text-button" @click="settingsOpen=false;module='import';page='directories'">管理照片库与历史目录 →</button><details class="compact-help"><summary>原文件保留规则</summary><p>照片、视频、归档与水印副本均保留；移出相册、取消收藏及移除参考只修改记录。</p></details></section></template>
+        <template v-else-if="settingsOpen">
+          <div class="compact-page-heading"><h1>设置</h1></div>
+          <section class="directory-panel" aria-label="关于拾光匣">
+            <h2>关于拾光匣</h2>
+            <p>当前版本 <strong class="about-version">{{appVersion?`v${appVersion}`:versionLoading?'正在读取…':'暂时无法读取'}}</strong></p>
+            <p v-if="versionError" role="alert">{{versionError}} <button class="text-button" :disabled="versionLoading||!api" @click="loadAppVersion">重新读取版本</button></p>
+          </section>
+          <section class="directory-panel"><div class="section-heading"><h2>接收服务</h2><button class="secondary-button" :disabled="busy||!state" @click="run(()=>api.setAccepting(!state!.accepting))">{{state?.accepting?'暂停接收':'继续接收'}}</button></div><p>{{state?.name??'正在启动'}} · {{state?.addresses.join(' / ')}}</p><button class="text-button" @click="settingsOpen=false;module='import';page='directories'">管理照片库与历史目录 →</button><details class="compact-help"><summary>原文件保留规则</summary><p>照片、视频、归档与水印副本均保留；移出相册、取消收藏及移除参考只修改记录。</p></details></section>
+        </template>
         <div v-else-if="!state?.currentLibraryId" class="library-empty family-empty"><UiIcon name="folder" :size="38" /><h2>选择照片库文件夹</h2><p>直接查看这个文件夹中的照片与视频，也可以从其他目录或手机导入。</p><button class="primary-button" :disabled="busy" @click="chooseDirectory(false)">选择照片库文件夹</button><button v-if="enabledLibraries.length" class="text-button" @click="libraryMenu=true">使用已有照片库</button></div>
         <FamilyWorkspace v-else-if="module!=='import'||page==='folder'" :module="module" :page="page" :receiver="state" :records-open="processingRecordsOpen" @close-records="processingRecordsOpen=false" @processing-status="processingStatus=$event" @refresh-receiver="refresh" @navigate="setModule" @change-page="page=$event as Page" />
         <template v-else-if="page==='receive'">
@@ -300,6 +323,8 @@ onUnmounted(()=>{clearInterval(timer);previewSequence++})
 
 <style scoped>
 .brand-logo{display:block;width:100%;height:100%;object-fit:contain}
+.app-version{display:block;flex:none;margin:4px 0 0;color:#65706a;font-size:10px;line-height:1.6;text-align:center;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.about-version{margin-left:8px;font-variant-numeric:tabular-nums}
 .library-switcher-trigger{display:flex;align-items:center;gap:12px;min-width:0}
 .processing-records-entry{display:flex;align-items:center;gap:6px;flex:none;min-height:32px;padding:5px 9px;border:1px solid #e5eae6;border-radius:7px;background:#fff;color:#52675b;font-size:11px;white-space:nowrap}.processing-records-entry:hover{background:#edf2f0}.processing-records-badge{display:grid;place-items:center;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#edf2f0;color:#3b755c;font-size:10px;font-weight:500}.processing-records-unread{width:6px;height:6px;flex:none;border-radius:50%;background:#ad7949}@media(max-width:450px){.processing-records-entry{gap:5px;padding:5px 7px}.processing-records-entry>.ui-icon{display:none}}
 </style>

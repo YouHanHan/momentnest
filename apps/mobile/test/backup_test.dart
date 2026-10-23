@@ -70,7 +70,8 @@ class FakeApi extends ReceiverApi {
 }
 
 class CheckController extends TransferController {
-  CheckController(this.respond) : super(store: MemoryStore()) {
+  CheckController(this.respond, {super.backgroundWork})
+    : super(store: MemoryStore()) {
     ready = true;
     online = true;
     catalogComplete = true;
@@ -120,11 +121,37 @@ Json result(
 void main() {
   test('历史回执明确缺失或损坏才需补传；不可访问和旧协议不能证明丢失', () {
     for (final state in ['missing', 'corrupt']) {
-      expect(backupState({'previousReceipt': {'id': 'saved'}, 'receiptState': state, 'complete': true}), 'missing');
+      expect(
+        backupState({
+          'previousReceipt': {'id': 'saved'},
+          'receiptState': state,
+          'complete': true,
+        }),
+        'missing',
+      );
     }
-    expect(backupState({'previousReceipt': {'id': 'saved'}, 'receiptState': 'unavailable', 'complete': true}), 'unknown');
-    expect(backupState({'previousReceipt': {'id': 'saved'}, 'complete': true}), 'unknown');
-    expect(backupState({'receipt': {'id': 'saved'}, 'receiptState': 'present'}), 'uploaded');
+    expect(
+      backupState({
+        'previousReceipt': {'id': 'saved'},
+        'receiptState': 'unavailable',
+        'complete': true,
+      }),
+      'unknown',
+    );
+    expect(
+      backupState({
+        'previousReceipt': {'id': 'saved'},
+        'complete': true,
+      }),
+      'unknown',
+    );
+    expect(
+      backupState({
+        'receipt': {'id': 'saved'},
+        'receiptState': 'present',
+      }),
+      'uploaded',
+    );
   });
 
   test('反复核对保留同内容历史回执，编辑后的新内容不继承成功记录', () async {
@@ -133,14 +160,38 @@ void main() {
     final asset = model.photos.first;
     final identity = {'hash': 'a', 'size': 12};
     final receipt = {'id': 'old-receipt'};
-    await model.recordBackupObservation(asset, identity, {'receipt': receipt}, 'computer', 'first');
-    final missing = await model.recordBackupObservation(asset, identity, {'receiptState': 'missing', 'complete': true}, 'computer', 'first');
+    await model.recordBackupObservation(
+      asset,
+      identity,
+      {'receipt': receipt},
+      'computer',
+      'first',
+    );
+    final missing = await model.recordBackupObservation(
+      asset,
+      identity,
+      {'receiptState': 'missing', 'complete': true},
+      'computer',
+      'first',
+    );
     expect(missing['status'], 'missing');
     expect(missing['previousReceipt'], receipt);
-    final again = await model.recordBackupObservation(asset, identity, {'receiptState': 'unavailable', 'complete': false}, 'computer', 'first');
+    final again = await model.recordBackupObservation(
+      asset,
+      identity,
+      {'receiptState': 'unavailable', 'complete': false},
+      'computer',
+      'first',
+    );
     expect(again['status'], 'unknown');
     expect(again['previousReceipt'], receipt);
-    final edited = await model.recordBackupObservation(photo('a', 2, modified: 200), {'hash': 'new', 'size': 15}, {'complete': true, 'receiptState': 'none'}, 'computer', 'first');
+    final edited = await model.recordBackupObservation(
+      photo('a', 2, modified: 200),
+      {'hash': 'new', 'size': 15},
+      {'complete': true, 'receiptState': 'none'},
+      'computer',
+      'first',
+    );
     expect(edited['status'], 'pending');
     expect(edited['previousReceipt'], isNull);
   });
@@ -222,7 +273,14 @@ void main() {
     addTearDown(model.dispose);
     final first = model.checkPhotos();
     final request = await entered.future;
-    model.applyReceiverSnapshot({'currentLibraryId': 'second', 'currentLibraryAvailable': true, 'libraries': [{'id': 'first'}, {'id': 'second'}]});
+    model.applyReceiverSnapshot({
+      'currentLibraryId': 'second',
+      'currentLibraryAvailable': true,
+      'libraries': [
+        {'id': 'first'},
+        {'id': 'second'},
+      ],
+    });
     old.complete(result(request));
     await first;
     await model.checkPhotos();

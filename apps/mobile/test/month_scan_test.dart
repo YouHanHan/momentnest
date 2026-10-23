@@ -65,6 +65,20 @@ class InterruptedMonth extends GeneratedMonth {
   }
 }
 
+class ShortMonth extends GeneratedMonth {
+  ShortMonth() : super(2, 250);
+  bool shortened = false;
+  @override
+  Future<List<AssetEntity>> page(int number) async {
+    final batch = await super.page(number);
+    if (number == 1 && !shortened) {
+      shortened = true;
+      return batch.take(99).toList();
+    }
+    return batch;
+  }
+}
+
 void main() {
   test('原生查询月份区间覆盖闰年、月初月末、日期回退及视频', () async {
     final start = DateTime(2024, 2).millisecondsSinceEpoch;
@@ -123,8 +137,10 @@ void main() {
     expect(model.photos.first.id, '2-0');
     expect(model.photos.last.id, '2-49999');
     expect(model.hasMore, isFalse);
-    model.selectVisible();
     expect(model.selected.length, 50000);
+    model.toggle('2-0');
+    expect(model.selected, isNot(contains('2-0')));
+    expect(model.selected.length, 49999);
     expect(model.inspected, isEmpty);
   });
 
@@ -154,7 +170,7 @@ void main() {
     expect(model.visiblePhotos.single.id, '1-0');
     expect(model.monthProgress.total, 1);
     expect(model.monthProgress.pending, 0);
-    expect(model.selected, isEmpty);
+    expect(model.selected, {'1-0'});
     expect(model.photos.single.id, '1-0');
   });
 
@@ -193,9 +209,66 @@ void main() {
     await model.morePhotos();
     expect(model.photos.length, 250);
     expect(model.photos.map((asset) => asset.id).toSet().length, 250);
-    expect(model.selected, {'2-0'});
+    expect(model.selected.length, 249);
+    expect(model.selected, isNot(contains('2-0')));
     expect(model.catalogComplete, isTrue);
     expect(model.hasMore, isFalse);
+  });
+
+  test('取消整月选择后继续读取目录不会重新勾选', () async {
+    final month = InterruptedMonth();
+    final model = MonthController((data) async => fixtures.result(data), {
+      '2024-02': month,
+    });
+    addTearDown(model.dispose);
+    await expectLater(model.loadMonth(), throwsStateError);
+    expect(model.selected, hasLength(100));
+    model.clearSelection();
+    await model.morePhotos();
+    expect(model.photos, hasLength(250));
+    expect(model.selected, isEmpty);
+    model.selectVisible();
+    expect(model.selected, hasLength(250));
+    expect(model.inspected, isEmpty);
+  });
+
+  test('返回前台保留整月撤选和取消状态，不重读目录自动勾选', () async {
+    final month = GeneratedMonth(2, 250);
+    final model = MonthController((data) async => fixtures.result(data), {
+      '2024-02': month,
+    });
+    addTearDown(model.dispose);
+    await model.loadMonth();
+    model.toggle('2-0');
+    model.foreground(false);
+    model.foreground(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(model.selected, hasLength(249));
+    expect(model.selected, isNot(contains('2-0')));
+    model.clearSelection();
+    model.foreground(false);
+    model.foreground(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(model.selected, isEmpty);
+    expect(month.pages, [0, 1, 2]);
+    expect(model.inspected, isEmpty);
+  });
+
+  test('按月备份遇到短页保留读取位置，重试补齐后才完成整月选择', () async {
+    final month = ShortMonth();
+    final model = MonthController((data) async => fixtures.result(data), {
+      '2024-02': month,
+    });
+    addTearDown(model.dispose);
+    await expectLater(model.loadMonth(), throwsStateError);
+    expect(model.catalogComplete, isFalse);
+    expect(model.photos, hasLength(100));
+    expect(model.selected, hasLength(100));
+    await model.morePhotos();
+    expect(month.pages, [0, 1, 1, 2]);
+    expect(model.catalogComplete, isTrue);
+    expect(model.selected, hasLength(250));
+    expect(model.inspected, isEmpty);
   });
 
   test('切换月份后旧页面查询迟到结果不能覆盖新月份', () async {

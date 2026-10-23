@@ -57,7 +57,8 @@ class SystemGalleryScreen extends StatefulWidget {
 class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
   final selected = <String>{};
   late Listenable _viewChanges;
-  bool selecting = false, sending = false;
+  bool selecting = false, sending = false, collectingMonth = false;
+  int _selectionEpoch = 0;
   SystemGalleryController get model => widget.controller;
   List<AssetEntity> get visibleAssets => widget.backup?.visible ?? model.assets;
   bool get canUpload => widget.uploadAvailable?.call() ?? widget.canUpload;
@@ -88,9 +89,75 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
   }
 
   void cancelSelection() => updateSelection(() {
+    _selectionEpoch++;
+    collectingMonth = false;
     selected.clear();
     selecting = false;
   });
+
+  /// 整月全选只分批收集当前查询的 ID，不改变浏览分页或读取原图。
+  Future<void> selectAll() async {
+    if (sending ||
+        collectingMonth ||
+        model.loading ||
+        widget.backup?.readingFilter == true) {
+      return;
+    }
+    if (model.month == null) {
+      updateSelection(() {
+        selecting = true;
+        selected.addAll(visibleAssets.map((asset) => asset.id));
+      });
+      return;
+    }
+    final epoch = ++_selectionEpoch;
+    final gallery = model;
+    final generation = model.generation;
+    final filter = widget.backup?.filter ?? 'all';
+    final ids = <String>{};
+    bool current() =>
+        mounted &&
+        epoch == _selectionEpoch &&
+        identical(gallery, model) &&
+        generation == model.generation &&
+        filter == (widget.backup?.filter ?? 'all');
+    updateSelection(() {
+      selecting = true;
+      collectingMonth = true;
+    });
+    try {
+      await for (final batch in gallery.verificationPages()) {
+        if (!current()) return;
+        ids.addAll(
+          batch
+              .where(
+                (asset) =>
+                    filter == 'all' || widget.backup?.state(asset) == filter,
+              )
+              .map((asset) => asset.id),
+        );
+        // 每批让出事件循环，取消和界面操作无需等待整月读取完毕。
+        await Future<void>.delayed(Duration.zero);
+        if (!current()) return;
+      }
+      if (!current()) return;
+      updateSelection(() {
+        selected
+          ..clear()
+          ..addAll(ids);
+      });
+    } catch (_) {
+      if (mounted && current()) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('本月未能完整全选，请重试；已有选择保留。')));
+      }
+    } finally {
+      if (mounted && epoch == _selectionEpoch) {
+        setState(() => collectingMonth = false);
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -132,6 +199,7 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
 
   @override
   void dispose() {
+    _selectionEpoch++;
     model.removeListener(resetSelectionOnRefresh);
     super.dispose();
   }
@@ -237,13 +305,18 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
             ),
             FilledButton(
               onPressed: yearsReady ? () => Navigator.pop(context, date) : null,
-              child: const Text('查看'),
+              child: Text(widget.onPick == null ? '全选本月' : '查看'),
             ),
           ],
         ),
       ),
     );
-    if (selectedMonth != null && mounted) await model.setMonth(selectedMonth);
+    if (selectedMonth != null && mounted) {
+      await model.setMonth(selectedMonth);
+      if (mounted && widget.onPick == null && model.notice.isEmpty) {
+        await selectAll();
+      }
+    }
   }
 
   Map<String, List<AssetEntity>> get dateGroups {
@@ -268,7 +341,11 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
             children: [
               Expanded(
                 child: Text(
-                  selecting ? '已选 ${selected.length} 项' : widget.title,
+                  collectingMonth
+                      ? '正在全选本月…'
+                      : selecting
+                      ? '已选 ${selected.length} 项'
+                      : widget.title,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -388,7 +465,7 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
               ],
             ),
           ),
-        if (model.loading || sending)
+        if (model.loading || sending || collectingMonth)
           const LinearProgressIndicator(minHeight: 2),
         Expanded(
           child: model.assets.isEmpty
@@ -477,14 +554,17 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
                                       : () => showBackupInfo(asset),
                                   selecting: selecting,
                                   selected: selected.contains(asset.id),
-                                  onTap: sending
+                                  onTap: sending || collectingMonth
                                       ? null
                                       : () => widget.onPick != null
                                             ? pick(asset)
                                             : selecting
                                             ? toggle(asset.id)
                                             : preview(asset),
-                                  onLongPress: sending || widget.onPick != null
+                                  onLongPress:
+                                      sending ||
+                                          collectingMonth ||
+                                          widget.onPick != null
                                       ? null
                                       : () => toggle(asset.id),
                                 );
@@ -533,17 +613,20 @@ class _SystemGalleryScreenState extends State<SystemGalleryScreen> {
               children: [
                 TextButton(
                   key: const ValueKey('gallery-select-all'),
-                  onPressed: sending
+                  onPressed:
+                      sending ||
+                          collectingMonth ||
+                          widget.backup?.readingFilter == true
                       ? null
-                      : () => updateSelection(
-                          () => selected.addAll(
-                            visibleAssets.map((asset) => asset.id),
-                          ),
-                        ),
-                  child: const Text('全选已加载媒体'),
+                      : selectAll,
+                  child: Text(model.month == null ? '全选已加载媒体' : '全选本月筛选结果'),
                 ),
                 FilledButton.icon(
-                  onPressed: selected.isEmpty || sending || !canUpload
+                  onPressed:
+                      selected.isEmpty ||
+                          sending ||
+                          collectingMonth ||
+                          !canUpload
                       ? null
                       : send,
                   icon: const Icon(Icons.upload_outlined, size: 18),

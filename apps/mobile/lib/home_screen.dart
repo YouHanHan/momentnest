@@ -95,14 +95,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    model.foreground(state == AppLifecycleState.resumed);
     if (state != AppLifecycleState.inactive) {
+      model.foreground(state == AppLifecycleState.resumed);
       family.foreground(state == AppLifecycleState.resumed);
     }
     if (state == AppLifecycleState.resumed) {
       if (_selectingGallery) {
         _galleryRefreshPending = true;
-      } else {
+      } else if (!model.checking) {
         unawaited(gallery.refresh());
       }
     }
@@ -150,7 +150,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         builder: (context) => AlertDialog(
           title: const Text('退出拾光匣？'),
           content: Text(
-            model.running ? '退出后传输会暂停，重新打开后可继续。确定要退出吗？' : '确定要退出拾光匣吗？',
+            model.running || family.scanning
+                ? model.background.enabled
+                      ? '同步或人脸整理会在后台继续，可在通知栏暂停任务。确定要退出吗？'
+                      : '退出后任务会暂停，重新打开后可继续。确定要退出吗？'
+                : '确定要退出拾光匣吗？',
           ),
           actions: [
             TextButton(
@@ -336,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     subtitle: const Text('取消勾选可在本次目录再保存一份。'),
                   ),
                 const SizedBox(height: 12),
-                const Text('传输时请保持 App 在前台。切到后台后暂停，回来可继续。'),
+                const Text('开始同步后可切换应用或锁屏，通知栏显示进度并可暂停；系统中断后可继续。'),
               ],
             ),
           ),
@@ -821,7 +825,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                     if (model.photos.isNotEmpty)
                       TextButton(
-                        onPressed: model.busy || model.running
+                        onPressed:
+                            model.busy || model.running || model.loadingPhotos
                             ? null
                             : model.selectVisible,
                         child: const Text('全选本月筛选结果'),
@@ -869,10 +874,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ChoiceChip(
                         label: Text(entry.value),
                         selected: model.filter == entry.key,
-                        onSelected: (_) {
-                          model.filter = entry.key;
-                          model.changed();
-                        },
+                        onSelected:
+                            model.loadingPhotos || model.busy || model.running
+                            ? null
+                            : (_) {
+                                if (model.filter == entry.key) return;
+                                model.clearSelection();
+                                model.filter = entry.key;
+                                model.changed();
+                              },
                       ),
                   ],
                 ),
@@ -888,16 +898,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       spacing: 8,
                       children: [
                         FilledButton(
-                          onPressed: model.busy || model.running
+                          onPressed:
+                              model.busy ||
+                                  model.running ||
+                                  !model.catalogComplete
                               ? null
                               : confirmUpload,
                           child: Text('核对并上传 ${model.selected.length} 项'),
                         ),
                         TextButton(
-                          onPressed: () {
-                            model.selected.clear();
-                            model.changed();
-                          },
+                          onPressed: model.clearSelection,
                           child: const Text('取消选择'),
                         ),
                       ],
@@ -1009,7 +1019,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             if (model.loadingPhotos)
               Text('正在读取本月照片和视频：已加载 ${model.photos.length} / $total 项…')
             else
-              const Text('直接展示所选月份的全部已授权照片和视频，可全选上传；连接电脑后逐批核对备份状态。'),
+              const Text('自动选中所选月份的全部已授权照片和视频，可取消个别项目后上传；连接电脑后逐批核对备份状态。'),
             if (model.checking) ...[
               const SizedBox(height: 10),
               const LinearProgressIndicator(),

@@ -1,6 +1,6 @@
 {
   "name": "momentnest",
-  "version": "0.4.35",
+  "version": "0.4.39",
   "private": true,
   "license": "MIT",
   "description": "拾光匣：本地家庭相册、成长记忆与局域网原文件备份",
@@ -25,6 +25,7 @@
     "icons:build": "node scripts/build-icons.mjs",
     "package:test": "node --test scripts/test/*.test.mjs",
     "desktop:package": "npm run icons:build && npm run build && node scripts/package-desktop.mjs",
+    "desktop:installer:setup": "node scripts/setup-windows-installer.mjs",
     "dev:web": "npm run dev:web --workspace @momentnest/desktop",
     "mobile:deps": "node scripts/mobile.mjs deps",
     "mobile:dev": "node scripts/mobile.mjs dev",

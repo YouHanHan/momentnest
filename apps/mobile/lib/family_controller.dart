@@ -11,6 +11,7 @@ import 'models.dart';
 import 'transfer_controller.dart';
 import 'system_gallery.dart';
 import 'media_favorites.dart';
+import 'background_work.dart';
 
 /// 管理手机相册索引、宝宝归类与记录同步，不写入上传回执。
 class FamilyController extends ChangeNotifier {
@@ -25,6 +26,9 @@ class FamilyController extends ChangeNotifier {
     favorites = MediaFavorites(this.store);
     favorites.addListener(changed);
     transfer.addListener(_transferChanged);
+    _backgroundEvents = transfer.background.interruptions.listen((reason) {
+      if (scanning || _resumeScan) _pauseScan(resume: false, message: reason);
+    });
   }
   final TransferController transfer;
   final LocalStore store;
@@ -55,10 +59,16 @@ class FamilyController extends ChangeNotifier {
   bool _foreground = true, _resumeScan = false;
   String _scanMode = 'scan';
   final List<String> _retryPending = [];
+  late final StreamSubscription<String> _backgroundEvents;
+  BackgroundLease? _scanLease;
 
   void changed() {
     _scanNotification?.cancel();
     _scanNotification = null;
+    transfer.background.update(
+      _scanLease,
+      '$scanProcessed / $scanTotal · $scanStage',
+    );
     if (!_disposed) notifyListeners();
   }
 
@@ -404,9 +414,21 @@ class FamilyController extends ChangeNotifier {
     changed();
     late final Future<void> task;
     task = () async {
+      BackgroundLease? lease;
       try {
         await previous;
-        if (!_disposed && epoch == _epoch) await run(epoch);
+        if (_disposed || epoch != _epoch) return;
+        lease = await transfer.background.begin(
+          BackgroundTask.faceScan,
+          '读取系统相册',
+        );
+        _scanLease = lease;
+        if (!_disposed &&
+            epoch == _epoch &&
+            (_foreground ||
+                transfer.background.allows(BackgroundTask.faceScan))) {
+          await run(epoch);
+        }
       } catch (error) {
         if (!_disposed && epoch == _epoch) {
           notice = transfer.explain(error);
@@ -429,6 +451,8 @@ class FamilyController extends ChangeNotifier {
           }
           changed();
         }
+        if (identical(_scanLease, lease)) _scanLease = null;
+        await transfer.background.finish(lease);
       }
     }();
     _scanTask = task;
@@ -519,6 +543,7 @@ class FamilyController extends ChangeNotifier {
     progress = '整理已授权媒体 $scanProcessed / $total';
     changed();
     var handled = 0;
+    var nextCheckpoint = DateTime.now().add(const Duration(seconds: 10));
     for (final media in pending) {
       if (_disposed || epoch != _epoch) return;
       scanStage = '读取文件与指纹';
@@ -557,7 +582,11 @@ class FamilyController extends ChangeNotifier {
       scanProcessed++;
       progress = '整理已授权媒体 $scanProcessed / $total';
       _scanChanged();
-      if (++handled % 100 == 0 && !_disposed) await persist();
+      if (!_disposed &&
+          (++handled % 100 == 0 || DateTime.now().isAfter(nextCheckpoint))) {
+        await persist();
+        nextCheckpoint = DateTime.now().add(const Duration(seconds: 10));
+      }
     }
     if (_disposed || epoch != _epoch) return;
     for (final item in assets.values) {
@@ -607,7 +636,10 @@ class FamilyController extends ChangeNotifier {
   /// 应用回到前台后续接此前运行的任务，手工暂停不自动恢复。
   void foreground(bool value) {
     _foreground = value;
-    if (!value && scanning) {
+    if (!value &&
+        scanning &&
+        !transfer.background.allows(BackgroundTask.faceScan) &&
+        !transfer.background.starting(BackgroundTask.faceScan)) {
       _pauseScan(resume: true, message: '应用进入后台，整理进度已保留，回到前台后继续。');
     } else if (value) {
       _resumePendingScan();
@@ -1088,6 +1120,7 @@ class FamilyController extends ChangeNotifier {
     _disposed = true;
     _epoch++;
     transfer.removeListener(_transferChanged);
+    unawaited(_backgroundEvents.cancel());
     _scanNotification?.cancel();
     favorites.removeListener(changed);
     favorites.dispose();

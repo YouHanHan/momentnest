@@ -373,7 +373,9 @@ async function appendMediaPage(): Promise<void> {
 async function loadThumbnails(assets: MediaAsset[], sequence: number, contextId?: string): Promise<void> {
   for (const asset of assets) {
     const key = `${sequence}:${contextId}:${asset.id}`
-    if (!asset.available || thumbnails[asset.id] || thumbnailPending.has(key) || thumbnailFailed.has(key) || isMonthCollapsed(asset.date?.slice(0,7)??'unknown')) continue
+    // 旧扫描可能误标手机文件，交由服务端完整校验；明确缺失或变化的文件保持提示。
+    const recheckAvailability = !asset.available && asset.locations.some(location => location.source === 'phone' && !location.unavailableReason)
+    if ((!asset.available && !recheckAvailability) || thumbnails[asset.id] || thumbnailPending.has(key) || thumbnailFailed.has(key) || isMonthCollapsed(asset.date?.slice(0,7)??'unknown')) continue
     thumbnailPending.add(key); thumbnailQueue.push({asset,sequence,contextId,accessId:mediaAccessLibraryId.value,key})
   }
   drainThumbnails()

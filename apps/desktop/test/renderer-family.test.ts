@@ -3570,6 +3570,42 @@ test('人脸分析准备阶段显示明确状态和未知进度，禁止重复�
   } finally { await page.close() }
 })
 
+test('手机文件旧误标会在可见区重新核验恢复，明确缺失和变化继续提示', options, async () => {
+  const page = await openPage({ module: 'import', page: 'folder', count: 3, noReferences: true })
+  try {
+    const recovered = await page.evaluate(() => {
+      const fixtures = (window as any).__fixtures, api = (window as any).momentnest, original = api.mediaUrl
+      fixtures.assets.forEach((asset: any, index: number) => {
+        asset.available = false
+        for (const location of asset.locations) {
+          location.available = false; location.source = 'phone'
+          if (index > 0) location.unavailableReason = index === 1 ? 'missing' : 'changed'
+          else delete location.unavailableReason
+        }
+      })
+      const asset = fixtures.assets[0]
+      api.mediaUrl = async (id: string, thumbnail: boolean, libraryId?: string) => {
+        if (id === asset.id && thumbnail) {
+          asset.available = true
+          asset.locations.forEach((location: any) => { location.available = true })
+          fixtures.family.browseRevision = 'availability-restored'
+        }
+        return original(id, thumbnail, libraryId)
+      }
+      Object.assign((window as any).__testProps, { module: 'library', page: 'all' })
+      return { id: asset.id, filename: asset.filename, kind: asset.kind }
+    })
+    await page.waitForFunction(id => (window as any).__fixtures.calls.mediaScopes?.some((call: any) => call.id === id && call.thumbnail && call.libraryId === 'library-one'), recovered.id)
+    const card = page.locator('.media-card').filter({ has: page.getByRole('button', { name: `查看${recovered.kind === 'video' ? '视频' : '照片'} ${recovered.filename}`, exact: true }) })
+    await card.locator('img').waitFor()
+    await card.locator('.media-unavailable').waitFor({ state: 'detached' })
+    assert.equal(await page.locator('.media-card').count(), 3)
+    assert.equal(await page.locator('.media-unavailable').count(), 2)
+    assert.ok((await page.evaluate(() => (window as any).__fixtures.calls.mediaScopes)).every((call: any) => call.id === recovered.id && call.thumbnail))
+    assert.deepEqual(await page.evaluate(() => (window as any).__fixtures.calls.scans ?? []), [])
+  } finally { await page.close() }
+})
+
 test('缩略图读取失败明确提示，重试保留图库记录且不重新扫描原文件', options, async () => {
   const page = await openPage({ module: 'import', page: 'folder', count: 2, noReferences: true })
   try {
