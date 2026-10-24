@@ -40,15 +40,19 @@ Android 宝宝整理与上传核对的完整内容指纹改由原生工作线程
 
 ## 界面演示
 
-以下截图来自当前界面代码，使用合成图片、虚构档案与测试接口，不包含私人照片或配对信息。它们用于展示界面，不代表真机安装或实际人脸识别验收。生成方式见 [截图说明](docs/screenshots/README.md)。
+Windows 截图来自 0.4.41 打包程序的实际运行，使用 AI 生成的虚构宝宝照片、独立演示图库与虚构档案，通过真实 IPC 和本地数据库展示相册及成长水印。Android 截图来自当前界面代码与测试接口。图片不包含私人照片或配对信息，不代表物理手机安装或实际人脸识别准确率验收；早期截图生成方式见 [截图说明](docs/screenshots/README.md)。
 
 Windows 家庭图库：
 
-![Windows 家庭图库](docs/screenshots/desktop-library-cream-apricot.png)
+![Windows 家庭图库：AI 虚构宝宝示例照片](https://github.com/YouHanHan/momentnest/releases/download/v0.4.41/MomentNest-actual-library.png)
 
 Windows 宝宝成长相册与水印：
 
-![Windows 宝宝成长相册](docs/screenshots/desktop-growth-cream-apricot.png)
+![Windows 宝宝成长相册：AI 虚构宝宝示例照片](https://github.com/YouHanHan/momentnest/releases/download/v0.4.41/MomentNest-actual-growth.png)
+
+Windows 原图与成长水印预览：
+
+![Windows 原图与成长水印预览](https://github.com/YouHanHan/momentnest/releases/download/v0.4.41/MomentNest-actual-preview.png)
 
 Android 相册与宝宝相册：
 
