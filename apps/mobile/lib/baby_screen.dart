@@ -293,7 +293,7 @@ class _BabyScreenState extends State<BabyScreen> {
                       ),
                       child: Text(
                         '人物模型：${model.modelError}',
-                        style: const TextStyle(color: Colors.deepOrange),
+                        style: const TextStyle(color: galleryError),
                       ),
                     ),
                   if (model.notice.isNotEmpty)
@@ -840,7 +840,7 @@ class _BabyScreenState extends State<BabyScreen> {
                       ? Icons.check_circle
                       : Icons.radio_button_unchecked,
                   color: watermarkSelection.contains(asset.id)
-                      ? galleryGreen
+                      ? galleryAccent
                       : Colors.white,
                   size: 24,
                 ),
@@ -859,7 +859,7 @@ class _BabyScreenState extends State<BabyScreen> {
                 top: 4,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: galleryPhotoBadge,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Padding(
@@ -873,7 +873,7 @@ class _BabyScreenState extends State<BabyScreen> {
                           : babyStatusLabel(
                               model.decisions['${baby.id}:${asset.id}'],
                             ),
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                      style: const TextStyle(color: galleryInk, fontSize: 10),
                     ),
                   ),
                 ),
@@ -884,12 +884,12 @@ class _BabyScreenState extends State<BabyScreen> {
                 top: displayText == null ? null : 28,
                 bottom: displayText == null ? 4 : null,
                 child: const DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.black54),
+                  decoration: BoxDecoration(color: galleryPhotoBadge),
                   child: Padding(
                     padding: EdgeInsets.all(3),
                     child: Text(
                       '已作参考',
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                      style: TextStyle(color: galleryInk, fontSize: 10),
                     ),
                   ),
                 ),
@@ -900,7 +900,7 @@ class _BabyScreenState extends State<BabyScreen> {
                 bottom: 6,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: galleryPhotoBadge,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Padding(
@@ -913,7 +913,7 @@ class _BabyScreenState extends State<BabyScreen> {
                       children: [
                         const Icon(
                           Icons.videocam,
-                          color: Colors.white,
+                          color: galleryInk,
                           size: 14,
                         ),
                         if (asset.data['duration'] is num &&
@@ -923,7 +923,7 @@ class _BabyScreenState extends State<BabyScreen> {
                           Text(
                             '${((asset.data['duration'] as num).toInt() ~/ 60).toString().padLeft(2, '0')}:${((asset.data['duration'] as num).toInt() % 60).toString().padLeft(2, '0')}',
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: galleryInk,
                               fontSize: 11,
                             ),
                           ),
@@ -1189,8 +1189,11 @@ class _BabyScreenState extends State<BabyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (baby != null)
-                  Row(
-                    children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(color: gallerySelected, borderRadius: BorderRadius.circular(14)),
+                    child: Row(
+                      children: [
                       Tooltip(
                         message: '更换头像',
                         child: InkWell(
@@ -1256,7 +1259,8 @@ class _BabyScreenState extends State<BabyScreen> {
                         onPressed: () => editBaby(baby),
                         icon: const Icon(Icons.edit_outlined, size: 20),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 if (scope == 'library')
                   Row(
@@ -1282,7 +1286,7 @@ class _BabyScreenState extends State<BabyScreen> {
                           minimumSize: const Size(48, 48),
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           foregroundColor: allMonths
-                              ? galleryGreen
+                              ? galleryAccent
                               : galleryMuted,
                         ),
                         onPressed: () => setState(() {
@@ -1326,7 +1330,7 @@ class _BabyScreenState extends State<BabyScreen> {
                                     border: Border(
                                       bottom: BorderSide(
                                         color: selected
-                                            ? galleryGreen
+                                            ? galleryAccent
                                             : Colors.transparent,
                                         width: 2,
                                       ),

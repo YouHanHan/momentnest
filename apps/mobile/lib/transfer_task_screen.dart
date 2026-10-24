@@ -52,9 +52,9 @@ IconData taskStatusIcon(UploadTask task) => taskSaved(task)
     : Icons.schedule;
 
 Color taskStatusColor(UploadTask task) => taskSaved(task)
-    ? galleryGreen
+    ? galleryAccent
     : task.state == 'failed'
-    ? const Color(0xFFE4583E)
+    ? galleryError
     : galleryMuted;
 
 /// 任务缩略图按需读取已授权系统媒体，不扫描或计算整库指纹。
@@ -254,7 +254,7 @@ class TransferTaskDetailScreen extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: _progress(task),
                     minHeight: 10,
-                    color: taskSaved(task) ? galleryGreen : transferPending,
+                    color: taskSaved(task) ? galleryAccent : transferPending,
                     backgroundColor: gallerySelected,
                   ),
                 ),
@@ -318,7 +318,7 @@ class TransferTaskDetailScreen extends StatelessWidget {
                     FilledButton(
                       key: const ValueKey('transfer-task-cancel'),
                       style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFE9EDEC),
+                        backgroundColor: gallerySelected,
                         foregroundColor: galleryInk,
                       ),
                       onPressed: canAct
@@ -341,7 +341,7 @@ class TransferTaskDetailScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFE9EDEC),
+                    backgroundColor: gallerySelected,
                     foregroundColor: galleryInk,
                   ),
                   onPressed: controller.busy ? null : controller.pause,

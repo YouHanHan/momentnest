@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'gallery_style.dart';
 import 'package:video_player/video_player.dart';
 import 'family_controller.dart';
 import 'family_models.dart';
@@ -292,7 +293,7 @@ class _MediaPreviewState extends State<MediaPreview> {
               Text(
                 error,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70),
+                style: const TextStyle(color: galleryMuted),
               ),
               TextButton(onPressed: () => load(), child: const Text('重试预览')),
             ],
@@ -313,7 +314,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                     File(asset.thumbnailPath!),
                     fit: BoxFit.contain,
                     errorBuilder: (_, _, _) =>
-                        const Icon(Icons.image_outlined, color: Colors.white70),
+                        const Icon(Icons.image_outlined, color: galleryMuted),
                   ),
                 ),
               const SizedBox(height: 12),
@@ -322,7 +323,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                     ? '手机原文件已变更，请回到手机相册重新选择照片。'
                     : '本机原文件暂不可读，请检查相册权限，并确认照片仍在手机相册中。',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70),
+                style: const TextStyle(color: galleryMuted),
               ),
               const SizedBox(height: 12),
               FilledButton.icon(
@@ -413,7 +414,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                     errorBuilder: (_, _, _) => const Center(
                       child: Text(
                         '系统暂无法预览此格式，原文件仍可完整传输。',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(color: galleryMuted),
                       ),
                     ),
                   ),
@@ -458,7 +459,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: faceIndex == face
-                          ? Colors.deepOrange
+                          ? gallerySoftPink
                           : Colors.white,
                       width: 2,
                     ),
@@ -661,7 +662,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                   if (actionError.isNotEmpty)
                     Text(
                       actionError,
-                      style: const TextStyle(color: Colors.deepOrange),
+                      style: const TextStyle(color: galleryError),
                     ),
                   if (busy) const LinearProgressIndicator(),
                   const SizedBox(height: 12),
@@ -687,7 +688,7 @@ class _MediaPreviewState extends State<MediaPreview> {
   Widget playbackButton() => ValueListenableBuilder<VideoPlayerValue>(
     valueListenable: player!,
     builder: (_, value, _) => IconButton(
-      color: Colors.white,
+      color: galleryInk,
       tooltip: '播放或暂停',
       onPressed: () => value.isPlaying ? player!.pause() : player!.play(),
       icon: Icon(value.isPlaying ? Icons.pause_circle : Icons.play_circle),
@@ -774,7 +775,7 @@ class _MediaPreviewState extends State<MediaPreview> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: galleryInk,
         leading: IconButton(
           tooltip: '返回相册',
           onPressed: () => Navigator.pop(context),
@@ -787,14 +788,14 @@ class _MediaPreviewState extends State<MediaPreview> {
               asset.filename,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 15, color: Colors.white),
+              style: const TextStyle(fontSize: 15, color: galleryInk),
             ),
             if (sequence.length > 1 || profile != null)
               Text(
                 '${sequence.length > 1 ? '${index + 1} / ${sequence.length}' : ''}${profile != null ? '${sequence.length > 1 ? ' · ' : ''}${profile.name} · $status' : ''}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                style: const TextStyle(color: galleryMuted, fontSize: 12),
               ),
           ],
         ),
@@ -908,8 +909,8 @@ class _MediaPreviewState extends State<MediaPreview> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: actionError.isNotEmpty
-                            ? Colors.orangeAccent
-                            : Colors.white70,
+                            ? galleryError
+                            : galleryMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -920,7 +921,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                     child: Text(
                       '$busyMessage\n已等待 $busySeconds 秒',
                       style: const TextStyle(
-                        color: Colors.white70,
+                        color: galleryMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -937,7 +938,7 @@ class _MediaPreviewState extends State<MediaPreview> {
                               child: Text(
                                 '请选择宝宝对应的脸',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: galleryMuted,
                                   fontSize: 12,
                                 ),
                               ),

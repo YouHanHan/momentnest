@@ -59,9 +59,9 @@ class TransferBatchTile extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(batch.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-          if (showProgress) ...[const SizedBox(height: 10), ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: batch.progress, minHeight: 6, color: galleryGreen, backgroundColor: gallerySelected))],
+          if (showProgress) ...[const SizedBox(height: 10), ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: batch.progress, minHeight: 6, color: galleryAccentIndicator, backgroundColor: gallerySelected))],
           const SizedBox(height: 8),
-          Text(batch.summary, style: TextStyle(color: batch.saved == batch.tasks.length ? galleryGreen : galleryMuted, fontSize: 13)),
+          Text(batch.summary, style: TextStyle(color: batch.saved == batch.tasks.length ? galleryAccent : galleryMuted, fontSize: 13)),
         ])),
         const SizedBox(width: 8),
         const Icon(Icons.chevron_right, size: 22),
@@ -95,10 +95,10 @@ class _TransferBatchDetailScreenState extends State<TransferBatchDetailScreen> {
           Text(batch.title, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
           Container(decoration: BoxDecoration(color: gallerySelected, borderRadius: BorderRadius.circular(8)), padding: const EdgeInsets.symmetric(vertical: 16), child: Row(children: [
-            _BatchCount(batch.saved, '已保存', galleryGreen), _BatchCount(batch.pending, '待处理', galleryMuted), _BatchCount(batch.failed, '失败', const Color(0xFFE4583E)),
+            _BatchCount(batch.saved, '已保存', galleryAccent), _BatchCount(batch.pending, '待处理', galleryMuted), _BatchCount(batch.failed, '失败', galleryError),
           ])),
           if (batch.skipped + batch.cancelled > 0) Padding(padding: const EdgeInsets.only(top: 8), child: Text('跳过 ${batch.skipped} · 取消 ${batch.cancelled}', style: const TextStyle(color: galleryMuted, fontSize: 12))),
-          Row(children: [for (final entry in {'all': '全部', 'pending': '待处理', 'failed': '失败'}.entries) Expanded(child: InkWell(onTap: () => setState(() => filter = entry.key), child: Container(padding: const EdgeInsets.symmetric(vertical: 16), decoration: BoxDecoration(border: Border(bottom: BorderSide(color: filter == entry.key ? galleryGreen : Colors.transparent, width: 2))), child: Text(entry.value, textAlign: TextAlign.center, style: TextStyle(color: filter == entry.key ? galleryGreen : galleryMuted)))))]),
+          Row(children: [for (final entry in {'all': '全部', 'pending': '待处理', 'failed': '失败'}.entries) Expanded(child: InkWell(onTap: () => setState(() => filter = entry.key), child: Container(padding: const EdgeInsets.symmetric(vertical: 16), decoration: BoxDecoration(border: Border(bottom: BorderSide(color: filter == entry.key ? galleryAccent : Colors.transparent, width: 2))), child: Text(entry.value, textAlign: TextAlign.center, style: TextStyle(color: filter == entry.key ? galleryAccent : galleryMuted)))))]),
         ])),
         Expanded(child: files.isEmpty ? const Center(child: Text('暂无此类任务')) : ListView.separated(
           key: PageStorageKey('batch-${widget.batchId}-$filter'),

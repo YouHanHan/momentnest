@@ -1,0 +1,28 @@
+拾光匣 A 方案宣传图；2026-10-23。
+生成方式：内置 image_gen。
+成品：momentnest-cream-apricot-poster.png。
+界面与宝宝照片均为宣传示意，实际界面见 docs/screenshots 中 cream-apricot 截图。
+
++Use case: ads-marketing.
+Create a finished promotional poster for 拾光匣 · MomentNest in the USER-SELECTED “A · 奶油杏桃” direction. Landscape about 16:9, high resolution. This is a new, brighter redesign of the previous campaign, not a dark rose recolor.
+References:
+1. A-cream-apricot.png is the approved STYLE and design direction. Match its airy cream/apricot surfaces, soft rounded geometry, warm gray text, and gentle family-album feel.
+2. current-1180-baby.png is the newly IMPLEMENTED Windows UI. Use its actual structure: 3 left navigation modules, compact baby profile header, readable search/media controls, growth month and review tabs, FOUR photo columns, light peach selected fills. Replace its synthetic geometric test photos with realistic fictional baby/family images.
+3. baby-390.png is the newly IMPLEMENTED Android UI. Match the cream background, light apricot profile strip and active review pill, THREE photo columns, small cream status badges and bottom navigation 相册 / 宝宝 / 传输. Replace its test placeholders with fictional photographs.
+4. momentnest-logo-baby-pink.png is the existing bright logo. Keep its stacked photos and small peach heart, light pink rather than dark berry.
+Primary request: show what the real product does in an attractive, calm, warm baby-family software campaign. Color palette: cream #FFF9F2, pale apricot #FFE2CD, light peach-pink #F5C5C0, readable medium WARM GRAY #756962. Selected buttons must be pale apricot with warm gray text. NO dark burgundy, plum, deep rose or dark green large typography or fills. The main headline should be warm gray, medium-bold rounded Chinese sans, without shadows or heavy poster-black weight.
+Composition: generous cream/white negative space, small brand at upper left, two-line headline clearly separated from supporting description. A large flat desktop APP WINDOW in the middle/right, clean WHITE rounded frame and almost front-facing, no black laptop casing or dark hardware. A white-framed Android phone overlaps the right edge slightly. Screens and photographic product details occupy the majority of the design. Below the left-side headline, one modest photo print demonstrates the age/date watermark, not a huge unrelated baby portrait. All baby/family photos must be fully fictional, clothed, wholesome, sunny and natural, varied memories of the same fictional child. No plants/teddy-bear room scene or decorative clutter; the software is the subject.
+A subtle thin one-way line FROM Android phone TO Windows app is labeled “原文件备份”; no bidirectional sync. Four concise features in a quiet bottom strip with light line icons and hairline separators, not big glossy rounded cards. The campaign should feel like the approved A board, brighter and calmer than the old deep-red poster.
+Text verbatim:
+Brand “拾光匣” and “MomentNest”
+Main headline two lines “把家庭照片收好” / “让成长有迹可循”
+Description “家庭照片与视频管理 · Android 原图备份到 Windows”
+Transfer label “原文件备份”
+Feature 1 “原图备份” / “局域网直连 · 断点续传”
+Feature 2 “成长相册” / “本地人脸辅助 · 人工确认”
+Feature 3 “成长水印” / “记录年龄与日期 · 导出副本”
+Feature 4 “本地整理” / “按月浏览 · 搜索与收藏”
+Platform “Windows + Android”
+Watermark on example print “1岁8个月” and “2026·10·01”
+Small disclosure “界面与照片为宣传示意”
+Constraints: readable accurate Chinese; show current implemented functionality only. No cloud, iOS, automatic cross-device baby-album synchronization, trash/delete buttons, QR code, website URL, app-store badges, fabricated speed/count/recognition claims. Preserve photo content’s natural colors. No dark large headline or solid dark action buttons. Deliver one opaque landscape PNG.

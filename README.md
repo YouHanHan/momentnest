@@ -4,6 +4,10 @@
 
 **把家庭照片收好，让成长有迹可循。**
 
+![拾光匣：原图备份、成长相册、成长水印与本地整理](assets/promotion/momentnest-cream-apricot-poster.png)
+
+宣传图使用 AI 生成的虚构照片与界面示意，展示当前功能；实际界面截图见下方「界面演示」。
+
 拾光匣是一款面向家庭的本地照片与视频管理工具。它帮助你整理电脑图库、建立宝宝成长相册，并通过局域网将 Android 手机上的原文件备份到 Windows 电脑。
 
 相册与人脸辅助整理在本机运行。手机和电脑各自维护宝宝记录，电脑连接用于原文件上传和备份核对；当前不提供宝宝相册跨设备同步或从电脑下载原文件。
@@ -16,7 +20,11 @@
 | Android 8.0 / API 26 及以上 | Flutter 手机应用，APK 按版本、架构和签名类型区分 |
 | iOS、macOS、Linux | 尚未提供经过验收的发行版本 |
 
-源码仓库为 [YouHanHan/momentnest](https://github.com/YouHanHan/momentnest)，采用 [MIT 许可证](LICENSE)，访问范围以 GitHub 仓库设置为准。尚未发布 GitHub Release；发布后从 Releases 获取安装包，GitHub 自动生成的源码 ZIP 不包含可直接运行的 Windows 应用。源码版本以 [桌面配置](apps/desktop/package.json) 和 [手机配置](apps/mobile/pubspec.yaml) 为准，具体构建与设备验证见 [验收记录](docs/verification.md)。
+**下载与开始使用：**[正式安装包](https://github.com/YouHanHan/momentnest/releases/latest) · [中文上手说明](docs/quick-start.md) · [问题与建议](https://github.com/YouHanHan/momentnest/issues/new/choose)。Windows 常规安装选择 Setup.exe；Android 选择正式 release.apk，并核对支持的平台与架构。
+
+[0.4.41 桌面实际运行演示](https://github.com/YouHanHan/momentnest/releases/download/v0.4.41/MomentNest-0.4.41-actual-demo.mp4)使用打包程序、独立演示图库与虚构档案，展示图库、原图预览、宝宝相册和成长水印。宣传图仍为 AI 合成示意。
+
+源码仓库为 [YouHanHan/momentnest](https://github.com/YouHanHan/momentnest)，采用 [MIT 许可证](LICENSE)。安装包请从 Releases 已发布版本获取，GitHub 自动生成的 Source code ZIP 是开发源码，不包含可直接运行的 Windows 应用。源码版本以 [桌面配置](apps/desktop/package.json) 和 [手机配置](apps/mobile/pubspec.yaml) 为准，具体构建与设备验证见 [验收记录](docs/verification.md)。
 
 ## 可以做什么
 
@@ -36,19 +44,19 @@ Android 宝宝整理与上传核对的完整内容指纹改由原生工作线程
 
 Windows 家庭图库：
 
-![Windows 家庭图库](docs/screenshots/desktop-library.png)
+![Windows 家庭图库](docs/screenshots/desktop-library-cream-apricot.png)
 
 Windows 宝宝成长相册与水印：
 
-![Windows 宝宝成长相册](docs/screenshots/desktop-baby.png)
+![Windows 宝宝成长相册](docs/screenshots/desktop-growth-cream-apricot.png)
 
 Android 相册与宝宝相册：
 
-<img src="docs/screenshots/mobile-gallery.png" alt="Android 相册" width="260" /> <img src="docs/screenshots/mobile-baby.png" alt="Android 宝宝相册" width="260" />
+<img src="docs/screenshots/mobile-gallery-cream-apricot.png" alt="Android 相册" width="260" /> <img src="docs/screenshots/mobile-baby-cream-apricot.png" alt="Android 宝宝相册" width="260" />
 
 ## 第一次使用
 
-1. 解压完整 Windows 程序目录，运行其中的 EXE。在电脑上登记照片库，并选择新照片保存位置。
+1. 运行 Windows 安装程序，或解压完整便携目录并运行其中的 EXE。在电脑上登记照片库，并选择新照片保存位置。
 2. 安装适合手机架构与现有签名身份的 APK，授权需要访问的相册。将手机和电脑连接到同一个 IPv4 子网的普通局域网。
 3. 在电脑显示配对二维码，手机扫码或粘贴配对信息。选择照片或按月备份，核对目标与日期归档规则后开始上传；收到保存回执后才算完成。
 4. 需要成长相册时，在各自设备建立宝宝档案并选定参考人脸。检查疑似与待核对结果，再制作需要的水印副本。

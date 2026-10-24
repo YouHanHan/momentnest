@@ -25,7 +25,7 @@ defineExpose({ get element() { return host.value } })
 
 <style>
 .n-modal-body-wrapper{box-sizing:border-box;padding:72px 18px 18px}
-.ui-dialog-surface{box-sizing:border-box;position:relative;display:flex;flex-direction:column;width:min(480px,calc(100vw - 36px));max-height:calc(100dvh - 96px)!important;margin:auto!important;overflow:visible!important;background:#fff;color:#27332d;border:1px solid #dce5df;border-radius:12px;box-shadow:0 20px 64px #172d222e}
-.n-modal-mask{background-color:#172d225e!important}
-@media(prefers-reduced-motion:reduce){.n-modal,.n-modal-mask,.n-popover,.n-date-panel,.n-base-select-menu{transition-duration:0s!important;animation-duration:0s!important}}
+.ui-dialog-surface{box-sizing:border-box;position:relative;display:flex;flex-direction:column;width:min(480px,calc(100vw - 36px));max-height:calc(100dvh - 96px)!important;margin:auto!important;overflow:visible!important;background:var(--theme-surface);color:var(--theme-ink);border:1px solid var(--theme-line);border-radius:18px;box-shadow:0 20px 64px color-mix(in srgb,var(--theme-ink) 18.04%,transparent)}
+.n-modal-mask{background-color:color-mix(in srgb,var(--theme-line-strong) 38%,transparent)!important}
+@media(prefers-reduced-motion:reduce){.n-modal,.n-modal-mask,.n-popover,.n-date-panel,.n-base-select-menu{transition-duration:0s!important;animation-duration:0s!important;background-color:color-mix(in srgb,var(--theme-line-strong) 38%,transparent)}}
 </style>

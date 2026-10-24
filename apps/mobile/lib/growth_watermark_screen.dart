@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'family_controller.dart';
 import 'family_models.dart';
 import 'models.dart';
+import 'gallery_style.dart';
 
 /// 水印调整使用真实照片预览，导出路径与预览副本彼此独立。
 class WatermarkScreen extends StatefulWidget {
@@ -434,7 +435,7 @@ class _WatermarkScreenState extends State<WatermarkScreen> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const ColoredBox(color: Color(0xFF191816)),
+                  const ColoredBox(color: galleryPreview),
                   if (imagePath != null)
                     Image.file(
                       File(imagePath),
@@ -444,7 +445,7 @@ class _WatermarkScreenState extends State<WatermarkScreen> {
                       errorBuilder: (_, _, _) => const Center(
                         child: Icon(
                           Icons.broken_image_outlined,
-                          color: Colors.white70,
+                          color: galleryMuted,
                           size: 40,
                         ),
                       ),
@@ -498,7 +499,7 @@ class _WatermarkScreenState extends State<WatermarkScreen> {
                       right: 12,
                       child: Text(
                         '正在更新预览…',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: galleryMuted, fontSize: 12),
                       ),
                     ),
                 ],

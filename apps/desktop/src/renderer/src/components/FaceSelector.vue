@@ -26,11 +26,11 @@ function frameLabel(face: MediaFace): string {
 
 <style scoped>
 .face-selector { display: flex; gap: 8px; width: 100%; min-width: 0; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: thin; }
-.face-selector__option { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 6px; min-width: 80px; max-width: 160px; padding: 8px 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #232b27; cursor: pointer; font: inherit; font-size: 13px; }
-.face-selector__option:hover { background: #f6f8f8; }
-.face-selector__option--selected { border-color: #3b755c; background: #edf2f0; color: #3b755c; }
-.face-selector__option:focus-visible { outline: 2px solid #3b755c; outline-offset: -2px; }
+.face-selector__option { display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; gap: 6px; min-width: 80px; max-width: 160px; padding: 8px 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--theme-ink); cursor: pointer; font: inherit; font-size: 13px; }
+.face-selector__option:hover { background: var(--theme-background); }
+.face-selector__option--selected { border-color: var(--theme-accent); background: var(--theme-raised); color: var(--theme-primary-text); }
+.face-selector__option:focus-visible { outline: 2px solid var(--theme-accent); outline-offset: -2px; }
 .face-selector__option:disabled { opacity: .55; cursor: default; }
 .face-selector__name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.face-selector__option small { color: #718078; font-size: 11px; }
+.face-selector__option small { color: var(--theme-muted); font-size: 11px; }
 </style>

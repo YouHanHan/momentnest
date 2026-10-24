@@ -36,8 +36,8 @@ function loaded(event: Event): void {
 </template>
 
 <style scoped>
-.face-avatar { display: inline-flex; position: relative; flex: 0 0 auto; width: var(--face-size); height: var(--face-size); overflow: hidden; border-radius: 50%; background: #edf2f0; color: #718078; align-items: center; justify-content: center; }
+.face-avatar { display: inline-flex; position: relative; flex: 0 0 auto; width: var(--face-size); height: var(--face-size); overflow: hidden; border-radius: 50%; background: var(--theme-raised); color: var(--theme-muted); align-items: center; justify-content: center; }
 .face-avatar img { position: absolute; max-width: none; max-height: none; display: block; }
 .face-avatar__placeholder { width: 48%; height: 48%; }
-.face-avatar__video { position: absolute; right: 6px; bottom: 5px; width: 15px; height: 15px; padding: 2px; background: #edf2f0; border-radius: 4px; }
+.face-avatar__video { position: absolute; right: 6px; bottom: 5px; width: 15px; height: 15px; padding: 2px; background: var(--theme-raised); border-radius: 4px; }
 </style>

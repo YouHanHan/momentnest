@@ -21,5 +21,5 @@ const percentage = computed(() => props.job.total > 0 ? Math.min(99, Math.floor(
 </template>
 
 <style scoped>
-.face-analysis-progress{margin:0 0 12px;padding:10px 12px;border:1px solid #dce9df;border-radius:9px;background:#f4f8f5;color:#52685a;font-size:11px}.face-analysis-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}.face-analysis-heading strong{color:#32664b;font-weight:600}.face-analysis-progress progress{display:block;width:100%;height:5px;margin:7px 0;accent-color:#52846a}.face-analysis-timing{margin-bottom:4px}.face-analysis-progress small{display:block;color:#718078;font-size:10px;line-height:1.5}
+.face-analysis-progress{margin:0 0 12px;padding:10px 12px;border:1px solid var(--theme-line);border-radius:9px;background:var(--theme-background);color:var(--theme-secondary);font-size:11px}.face-analysis-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}.face-analysis-heading strong{color:var(--theme-primary-text);font-weight:600}.face-analysis-progress progress{display:block;width:100%;height:5px;margin:7px 0;accent-color:var(--theme-accent)}.face-analysis-timing{margin-bottom:4px}.face-analysis-progress small{display:block;color:var(--theme-muted);font-size:10px;line-height:1.5}
 </style>
