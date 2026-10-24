@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'family_controller.dart';
 import 'family_models.dart';
 import 'models.dart';
+import 'gallery_style.dart';
 
 /// 档案草稿由弹窗管理，关闭动画结束后再释放输入控制器。
 class BabyProfileDialog extends StatefulWidget {
@@ -108,7 +109,7 @@ class _BabyProfileDialogState extends State<BabyProfileDialog> {
           ),
           if (saving) const LinearProgressIndicator(minHeight: 2),
           if (failure.isNotEmpty)
-            Text(failure, style: const TextStyle(color: Colors.deepOrange)),
+            Text(failure, style: const TextStyle(color: galleryError)),
         ],
       ),
     ),

@@ -31,6 +31,6 @@ const dateLabel = (asset: MediaAsset) => ({ capture: '拍摄日期', creation: '
 
 <style scoped>
 .media-candidate{position:absolute;left:6px;bottom:6px;padding:3px 6px;border-radius:4px;background:rgba(255,255,255,.94);color:#89672d;font-size:11px;line-height:1.4;pointer-events:none}.media-age~.media-candidate{bottom:34px}
-.media-confirmed{color:#32664b}.media-automatic{color:#617467}.media-reference{position:absolute;left:6px;top:38px;padding:2px 5px;border-radius:4px;background:#edf5efe8;color:#426951;font-size:10px;pointer-events:none}
+.media-confirmed{color:var(--theme-primary-text)}.media-automatic{color:var(--theme-secondary)}.media-reference{position:absolute;left:6px;top:38px;padding:2px 5px;border-radius:4px;background:color-mix(in srgb,var(--theme-raised) 90.98%,transparent);color:var(--theme-primary-text);font-size:10px;pointer-events:none}
 .media-candidate.above-growth-stamp{bottom:auto;top:6px;left:36px;max-width:calc(100% - 72px);white-space:nowrap;font-size:9px;padding:2px 4px}
 </style>

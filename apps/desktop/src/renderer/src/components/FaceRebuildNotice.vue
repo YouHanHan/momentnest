@@ -21,5 +21,5 @@ defineEmits<{ resume: [] }>()
 </template>
 
 <style scoped>
-.face-rebuild-notice{margin:0 0 12px;padding:10px 12px;border:1px solid #e6eae6;border-radius:8px;background:#f7f9f6;color:#52675b;font-size:12px;overflow-wrap:anywhere}.rebuild-summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.rebuild-summary strong{font-weight:600;color:#89672d}.face-rebuild-notice small{display:block;margin-top:5px;color:#718078;line-height:1.5}.rebuild-summary button{margin-left:auto;white-space:nowrap}@media(max-width:600px){.face-rebuild-notice{padding:9px}.rebuild-summary{gap:6px}}
+.face-rebuild-notice{margin:0 0 12px;padding:10px 12px;border:1px solid var(--theme-line);border-radius:8px;background:var(--theme-background);color:var(--theme-secondary);font-size:12px;overflow-wrap:anywhere}.rebuild-summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.rebuild-summary strong{font-weight:600;color:#89672d}.face-rebuild-notice small{display:block;margin-top:5px;color:var(--theme-muted);line-height:1.5}.rebuild-summary button{margin-left:auto;white-space:nowrap}@media(max-width:600px){.face-rebuild-notice{padding:9px}.rebuild-summary{gap:6px}}
 </style>

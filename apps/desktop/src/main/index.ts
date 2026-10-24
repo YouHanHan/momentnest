@@ -3,6 +3,7 @@ import type { IpcMainInvokeEvent } from 'electron'
 import { join, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { AppInfo } from '../shared/desktop-api'
+import { themePalette } from '../shared/theme-palette'
 import { ServiceBridge } from './service-bridge'
 import QRCode from 'qrcode'
 import { extname } from 'node:path'
@@ -142,9 +143,9 @@ async function createWindow(): Promise<void> {
     icon: app.isPackaged
       ? join(process.resourcesPath, 'app', 'assets', 'branding', 'momentnest.ico')
       : resolve(__dirname, '../../../../assets/branding/momentnest.ico'),
-    backgroundColor: '#FEFEFE',
+    backgroundColor: themePalette.background,
     titleBarStyle: 'hidden',
-    titleBarOverlay: { color: '#fafbfa', symbolColor: '#65706a', height: 56 },
+    titleBarOverlay: { color: themePalette.surface, symbolColor: themePalette.secondary, height: 56 },
     show: false,
     autoHideMenuBar: true,
     webPreferences: {

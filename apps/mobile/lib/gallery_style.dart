@@ -1,12 +1,26 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-const galleryGreen = Color(0xFF3B755C);
-const galleryInk = Color(0xFF232B27);
-const galleryMuted = Color(0xFF718078);
-const galleryBackground = Color(0xFFFEFEFE);
-const gallerySelected = Color(0xFFEDF2F0);
-const transferPending = Color(0xFF78909C);
+/// 奶油白与柔粉色共用色板，浅色装饰和深色操作文字分别管理。
+const galleryAccent = Color(0xFF7C6255);
+const galleryAccentPressed = Color(0xFF674F42);
+const galleryPrimary = Color(0xFFFFE2CD);
+const galleryOnPrimary = Color(0xFF674F42);
+const galleryAccentIndicator = Color(0xFFB9836E);
+const gallerySoftPink = Color(0xFFF1BACC);
+const galleryInk = Color(0xFF675C55);
+const galleryMuted = Color(0xFF806F64);
+const galleryBackground = Color(0xFFFFF9F2);
+const gallerySurface = Color(0xFFFFFEFC);
+const gallerySelected = Color(0xFFFFEBDD);
+const galleryLine = Color(0xFFEEE4DC);
+const galleryPeach = Color(0xFFFFF0DC);
+const galleryError = Color(0xFFA55950);
+const galleryPreview = Color(0xFFFFFBF6);
+const galleryPreviewTransparent = Color(0x00FFFBF6);
+const galleryPhotoBadge = Color(0xF5FFFBF6);
+const gallerySuccess = Color(0xFF47745A);
+const transferPending = Color(0xFF8C7C72);
 
 /// 三个模块共用简单线图标，选中时只改变颜色。
 class GalleryModuleIcon extends StatelessWidget {
@@ -17,7 +31,7 @@ class GalleryModuleIcon extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox.square(
     dimension: 24,
     child: CustomPaint(
-      painter: _ModulePainter(module, selected ? galleryGreen : galleryMuted),
+      painter: _ModulePainter(module, selected ? galleryAccent : galleryMuted),
     ),
   );
 }

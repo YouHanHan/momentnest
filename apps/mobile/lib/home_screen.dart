@@ -738,7 +738,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             children: [
               Icon(
                 Icons.computer,
-                color: model.online ? Colors.green : Colors.grey,
+                color: model.online ? gallerySuccess : galleryMuted,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -1007,7 +1007,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               children: [
                 Text(
                   '已备份 $backed',
-                  style: const TextStyle(color: Color(0xFF236239)),
+                  style: const TextStyle(color: gallerySuccess),
                 ),
                 Text('未备份 $pending'),
                 if (model.monthProgress.missing > 0)
@@ -1160,7 +1160,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           return Container(
             key: ValueKey('active-batch-card-${items[index].id}'),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE6EBE7)),
+              border: Border.all(color: galleryLine),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -1196,7 +1196,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ? list
           : DecoratedSliver(
               decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFFE6EBE7)),
+                border: Border.all(color: galleryLine),
                 borderRadius: BorderRadius.circular(8),
               ),
               sliver: list,
@@ -1224,7 +1224,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       Icon(
                         Icons.desktop_windows_outlined,
                         size: 36,
-                        color: model.online ? galleryGreen : galleryMuted,
+                        color: model.online ? galleryAccent : galleryMuted,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -1246,7 +1246,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   : '离线',
                               style: TextStyle(
                                 color: model.online
-                                    ? galleryGreen
+                                    ? galleryAccent
                                     : galleryMuted,
                                 fontSize: 12,
                               ),
@@ -1270,13 +1270,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   '查看',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: galleryGreen,
+                                    color: galleryAccent,
                                   ),
                                 ),
                                 const Icon(
                                   Icons.chevron_right,
                                   size: 18,
-                                  color: galleryGreen,
+                                  color: galleryAccent,
                                 ),
                               ],
                             ),
@@ -1488,7 +1488,7 @@ class _PhotoTileState extends State<PhotoTile> {
     label: '${widget.asset.title ?? '照片'} ${widget.label}',
     selected: widget.selected,
     child: Material(
-      color: widget.selected ? const Color(0xFFF0D7C9) : Colors.white,
+      color: widget.selected ? gallerySelected : gallerySurface,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1513,7 +1513,7 @@ class _PhotoTileState extends State<PhotoTile> {
                       widget.selected
                           ? Icons.check_circle
                           : Icons.radio_button_unchecked,
-                      color: widget.selected ? Colors.deepOrange : Colors.white,
+                      color: widget.selected ? galleryAccent : Colors.white,
                       shadows: const [Shadow(blurRadius: 3)],
                     ),
                   ),

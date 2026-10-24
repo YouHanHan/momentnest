@@ -1,0 +1,30 @@
+生成方式：内置 image_gen；2026-10-23。
+宣传图：momentnest-baby-pink-poster.png。
+品牌 Logo：../branding/momentnest-logo-baby-pink.png。
+原始绿色素材和较深粉色试稿均保留。
+生成照片与界面均为宣传示意；两端实际主题见源代码及 docs/screenshots。
+
+最终 Logo 提示词（参考原始绿色透明 Logo）：
+Edit target: existing MomentNest transparent stacked-photo logo. The user says the dark rose version is too dark. Create a clearly brighter, light warm BABY PINK version, not dusty mauve, not dark raspberry. Recolor ONLY and keep exact shapes/proportions and transparent outer canvas of the provided original green logo. Replace green with luminous soft sakura/strawberry-milk pink: base #E7A0B5, light areas #F1BACC, shadows no darker than #CE7F9C. The inner mountain shapes should also be soft light pink #DEA0B5 rather than deep berry. Preserve the off-white photo area as creamy #FFFAF7 and brighten the heart to warm pastel peach #FFC094. Preserve thin ivory outlines and fine natural shading. The result should feel airy, gentle, baby-album appropriate, clearly much brighter than #AD526E. No dark red/burgundy, no green, no text, no added objects, no enclosing background tile. Genuine alpha transparency around the entire original stacked-photo silhouette. Original logo layout and recognizable brand geometry must remain unchanged. Deliver one high resolution transparent PNG.
+
+最终宣传图提示词（参考首版绿色宣传图与最终浅粉 Logo）：
++Use case: ads-marketing / precise recolor and compositing.
+Image 1 is the edit target: the completed green MomentNest family-photo software poster.
+Image 2 is the required final brand logo: the brighter sakura-pink version approved direction by the user's latest feedback. Use this exact recognizable mark, no dark rose version.
+Create the finished warm pink baby-album version of Image 1. Preserve its successful layout, Chinese headline, meaningful laptop/Android UI, fictional baby photo imagery, growth watermark, one-way phone-to-laptop original-file backup indication, and four real product feature columns.
+Replace ALL brand-green design elements (logo, headings, feature icons, small interface accent controls, selected tabs, menu highlights and bottom platform icons) with a coordinated warm pink palette. The logo itself must be light strawberry-milk/sakura pink like Image 2 (#E7A0B5, #F1BACC), with cream white and pastel peach heart #FFC094. The general backdrop should be brighter soft blush/cream #FFF8F5 with delicate peach lighting, not a green/botanical visual palette. Dark text may be soft readable plum #704453 and actionable UI accents muted rose #AD526E, selected backgrounds #FBE8EF and lines #EEDBE1. Avoid dark burgundy as the overall feel. Natural green inside the fictional outdoor photos should remain natural, do not recolor photographic content.
+Preserve clear proof of the actual app: dense monthly photo grid on Windows with left nav, original Android baby album structure on the phone, photo detail with age and date. No redesign into a generic photo cloud app.
+All major copy must stay exactly:
+“拾光匣” / “MomentNest”
+“把家庭照片收好”
+“让成长有迹可循”
+“家庭照片与视频管理 · Android 原图备份到 Windows”
+“原文件备份”
+“原图备份” / “局域网直连 · 断点续传”
+“成长相册” / “本地人脸辅助 · 人工确认”
+“成长水印” / “记录年龄与日期 · 导出副本”
+“本地整理” / “按月浏览 · 搜索与收藏”
+“Windows + Android”
+“界面与照片为宣传示意”
+Photo watermark: “1岁8个月” and “2026·10·01”.
+All Chinese must be clean and legible. Keep one-way original-file backup only, no album sync or cloud claims, no QR code, no URL, no store badges, no unsupported platforms. Fictional generated child/family photos only. Warm caring baby-memory product advertising, airy and bright. Deliver a high-resolution opaque PNG at 16:9 landscape.

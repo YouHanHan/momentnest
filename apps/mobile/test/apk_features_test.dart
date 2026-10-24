@@ -141,7 +141,7 @@ Future<void> prepareCapture(WidgetTester tester) async {
 
 ThemeData get captureTheme => ThemeData(
   fontFamily: 'Microsoft YaHei',
-  colorScheme: ColorScheme.fromSeed(seedColor: galleryGreen),
+  colorScheme: ColorScheme.fromSeed(seedColor: galleryAccent),
   scaffoldBackgroundColor: galleryBackground,
 );
 

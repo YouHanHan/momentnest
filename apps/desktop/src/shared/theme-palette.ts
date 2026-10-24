@@ -1,0 +1,28 @@
+/** 两端沿用奶油白与柔粉色层级，深色文字和操作色保证浅色界面的可读性。 */
+export const themePalette = {
+  // A 方案用浅杏桃填充与独立暖灰文字，避免用深色按钮承载白字。
+  primary: '#ffe2cd',
+  'primary-hover': '#ffd7b9',
+  'primary-pressed': '#f9cba9',
+  'on-primary': '#674f42',
+  'primary-text': '#7c6255',
+  accent: '#b9836e',
+  ink: '#675c55',
+  secondary: '#786b63',
+  muted: '#806f64',
+  background: '#fff9f2',
+  surface: '#fffefc',
+  raised: '#fff4eb',
+  selected: '#ffebdd',
+  'selected-hover': '#ffe4d1',
+  line: '#eee4dc',
+  'line-strong': '#ddc0ae',
+  focus: '#b9836e',
+  peach: '#fff0dc',
+  warning: '#926130',
+  error: '#a55950',
+  pending: '#8c7c72',
+  preview: '#fffbf6',
+  'preview-control': '#fffefc',
+  'preview-text': '#786b63',
+} as const

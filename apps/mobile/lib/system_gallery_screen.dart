@@ -905,8 +905,8 @@ class _SystemPhotoTileState extends State<SystemPhotoTile> {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: widget.backupLabel == '需补传'
-                          ? const Color(0xDDAD5A25)
-                          : Colors.black54,
+                          ? galleryPeach
+                          : galleryPhotoBadge,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Padding(
@@ -918,7 +918,7 @@ class _SystemPhotoTileState extends State<SystemPhotoTile> {
                         widget.backupLabel!,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: galleryInk,
                           fontSize: 10,
                         ),
                       ),
@@ -934,7 +934,7 @@ class _SystemPhotoTileState extends State<SystemPhotoTile> {
                   widget.selected
                       ? Icons.check_circle
                       : Icons.radio_button_unchecked,
-                  color: widget.selected ? galleryGreen : Colors.white,
+                  color: widget.selected ? galleryAccent : Colors.white,
                   size: 23,
                   shadows: const [Shadow(color: Colors.black38, blurRadius: 4)],
                 ),
@@ -945,7 +945,7 @@ class _SystemPhotoTileState extends State<SystemPhotoTile> {
                 right: 6,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: galleryPhotoBadge,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Padding(
@@ -955,7 +955,7 @@ class _SystemPhotoTileState extends State<SystemPhotoTile> {
                     ),
                     child: Text(
                       '${widget.asset.duration ~/ 60}:${(widget.asset.duration % 60).toString().padLeft(2, '0')}',
-                      style: const TextStyle(color: Colors.white, fontSize: 11),
+                      style: const TextStyle(color: galleryInk, fontSize: 11),
                     ),
                   ),
                 ),
@@ -1142,7 +1142,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      foregroundColor: Colors.white,
+      foregroundColor: galleryInk,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1150,14 +1150,14 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
             (asset.createDateSecond ?? 0) > 0
                 ? '${asset.createDateTime.year}年${asset.createDateTime.month}月${asset.createDateTime.day}日'
                 : '日期未知',
-            style: const TextStyle(fontSize: 16, color: Colors.white),
+            style: const TextStyle(fontSize: 16, color: galleryInk),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           if (sequence.length > 1 || widget.onLoadMore != null)
             Text(
               '${index + 1} / ${sequence.length}',
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              style: const TextStyle(color: galleryMuted, fontSize: 12),
             ),
         ],
       ),
@@ -1193,7 +1193,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
                         padding: const EdgeInsets.all(28),
                         child: Text(
                           error,
-                          style: const TextStyle(color: Colors.white70),
+                          style: const TextStyle(color: galleryMuted),
                           textAlign: TextAlign.center,
                         ),
                       )
@@ -1212,7 +1212,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
                             fit: BoxFit.contain,
                             errorBuilder: (_, _, _) => const Text(
                               '系统暂无法预览此格式',
-                              style: TextStyle(color: Colors.white70),
+                              style: TextStyle(color: galleryMuted),
                             ),
                           ),
                         ),
@@ -1235,7 +1235,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
                 valueListenable: player!,
                 builder: (_, value, _) => IconButton(
                   tooltip: value.isPlaying ? '暂停' : '播放',
-                  color: Colors.white,
+                  color: galleryInk,
                   icon: Icon(
                     value.isPlaying ? Icons.pause_circle : Icons.play_circle,
                   ),
@@ -1248,7 +1248,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
                 key: const ValueKey('system-preview-backup-info'),
                 tooltip: '备份信息',
                 onPressed: () => widget.onBackupInfo!(asset),
-                color: Colors.white,
+                color: galleryInk,
                 icon: const Icon(Icons.fact_check_outlined, size: 18),
               ),
             Expanded(
@@ -1261,7 +1261,7 @@ class _SystemMediaPreviewState extends State<SystemMediaPreview> {
                     ? null
                     : organize,
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
+                  foregroundColor: galleryInk,
                   minimumSize: const Size(48, 48),
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                 ),

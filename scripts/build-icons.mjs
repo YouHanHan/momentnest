@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const branding = join(root, 'assets', 'branding')
 const androidResources = join(root, 'apps', 'mobile', 'android', 'app', 'src', 'main', 'res')
-const logo = await sharp(join(branding, 'momentnest-logo.png')).trim().png().toBuffer()
+const logo = await sharp(join(branding, 'momentnest-logo-baby-pink.png')).trim().png().toBuffer()
 
 /** 从同一份透明 Logo 生成居中的图标，不改变设计原稿。 */
 async function renderIcon(size, markSize, background = '#00000000') {
@@ -44,7 +44,7 @@ for (const [density, scale] of [['mdpi', 1], ['hdpi', 1.5], ['xhdpi', 2], ['xxhd
   const foregroundDirectory = join(androidResources, `drawable-${density}`)
   await mkdir(legacyDirectory, { recursive: true })
   await mkdir(foregroundDirectory, { recursive: true })
-  await writeFile(join(legacyDirectory, 'momentnest_launcher.png'), await renderIcon(48 * scale, Math.round(38 * scale), '#F2F7F0'))
+  await writeFile(join(legacyDirectory, 'momentnest_launcher.png'), await renderIcon(48 * scale, Math.round(38 * scale), '#FFF9F2'))
   // 前景保留 Android 自适应图标的裁切余量，圆形和圆角方形共用同一标记。
   await writeFile(join(foregroundDirectory, 'momentnest_launcher_foreground.png'), await renderIcon(108 * scale, 60 * scale))
 }

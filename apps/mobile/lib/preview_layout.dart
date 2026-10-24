@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'gallery_style.dart';
 
 /// 原文件铺满预览区域，工具浮在画面上，点图可收起与恢复。
 class PreviewLayout extends StatefulWidget {
@@ -31,9 +32,9 @@ class _PreviewLayoutState extends State<PreviewLayout> {
 
   @override
   Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
-    value: SystemUiOverlayStyle.light,
+    value: SystemUiOverlayStyle.dark,
     child: Scaffold(
-      backgroundColor: const Color(0xFF191816),
+      backgroundColor: galleryPreview,
       extendBodyBehindAppBar: true,
       appBar: controlsVisible ? widget.topBar : null,
       body: Stack(
@@ -61,7 +62,7 @@ class _PreviewLayoutState extends State<PreviewLayout> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.black87, Colors.transparent],
+                      colors: [galleryPreview, galleryPreviewTransparent],
                     ),
                   ),
                 ),
@@ -78,7 +79,7 @@ class _PreviewLayoutState extends State<PreviewLayout> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black87],
+                      colors: [galleryPreviewTransparent, galleryPreview],
                       stops: [0, 0.35],
                     ),
                   ),

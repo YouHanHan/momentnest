@@ -73,4 +73,4 @@ onMounted(bindInput); onUpdated(bindInput); onBeforeUnmount(() => removeUiLayer(
   </div>
 </template>
 
-<style scoped>.ui-date-picker{min-width:0;width:100%}.ui-field-error{display:block;font-size:12px;color:#a04436;margin-top:5px}.ui-calendar-trigger{display:flex;align-items:center;justify-content:center;padding:0;width:24px;height:24px;min-height:24px;border:0;background:transparent;color:#78877e}</style>
+<style scoped>.ui-date-picker{min-width:0;width:100%}.ui-field-error{display:block;font-size:12px;color:var(--theme-error);margin-top:5px}.ui-calendar-trigger{display:flex;align-items:center;justify-content:center;padding:0;width:24px;height:24px;min-height:24px;border:0;background:transparent;color:var(--theme-muted)}</style>

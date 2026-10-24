@@ -18,9 +18,11 @@ const emit = defineEmits<{ toggle: [string, MouseEvent]; open: [MediaAsset]; sel
 const host = ref<HTMLElement | null>(null), width = ref(1), viewport = ref({ top: 0, bottom: 0 })
 const windowWidth = ref(window.innerWidth), offsets = ref(new Map<string, number>()), stickyTop = ref(0)
 let scroll: HTMLElement | null = null, resize: ResizeObserver | undefined, frame = 0, disposed = false
-const columns = computed(() => windowWidth.value <= 450 ? 2 : windowWidth.value <= 760 ? 3 : 5)
-const rowHeight = computed(() => Math.max(1, (width.value - (columns.value - 1) * 4) / columns.value) + 4)
-const heights = computed(() => new Map(props.groups.map(group => [group.key, Math.ceil(group.assets.length / columns.value) * rowHeight.value - 4])))
+const gridGap = 8
+const columns = computed(() => windowWidth.value <= 450 ? 2 : windowWidth.value <= 760 ? 3 : 4)
+// 行高与 CSS 间距共用同一值，保证虚拟滚动定位与四列照片布局一致。
+const rowHeight = computed(() => Math.max(1, (width.value - (columns.value - 1) * gridGap) / columns.value) + gridGap)
+const heights = computed(() => new Map(props.groups.map(group => [group.key, Math.ceil(group.assets.length / columns.value) * rowHeight.value - gridGap])))
 /** 月份标题保留在文档流，只为当前可视区域及前后缓冲创建照片卡片。 */
 const rows = computed(() => new Map<string, { index: number; assets: MediaAsset[] }[]>(props.groups.map(group => {
   if (props.collapsed(group.key)) return [group.key, []]
@@ -59,7 +61,7 @@ defineExpose({ refresh: schedule })
 </script>
 
 <template>
-  <div ref="host" class="virtual-month-gallery" :style="{'--month-sticky-top':`${stickyTop}px`}">
+  <div ref="host" class="virtual-month-gallery" :style="{'--month-sticky-top':`${stickyTop}px`,'--gallery-gap':`${gridGap}px`}">
     <section v-for="group in groups" :key="group.key" class="media-date-group">
       <UiProvider><NButton class="date-group-heading month-group-toggle" quaternary :aria-expanded="!collapsed(group.key)" :aria-controls="`month-media-${group.key}`" :disabled="folding" @click="emit('toggle',group.key,$event)"><UiIcon name="chevron" :size="16" :class="{'month-chevron-collapsed':collapsed(group.key)}" /><h2>{{group.label}}</h2><span class="month-item-count">已加载 {{group.assets.length}} 项</span></NButton></UiProvider>
       <div v-show="!collapsed(group.key)" :id="`month-media-${group.key}`" class="media-grid virtual-media-grid" :data-month-grid="group.key" :style="{height:`${heights.get(group.key)}px`}">
@@ -72,9 +74,9 @@ defineExpose({ refresh: schedule })
 </template>
 
 <style scoped>
-.virtual-media-grid{display:block;position:relative;contain:layout style}.virtual-media-row{display:grid;gap:4px;position:absolute;left:0;right:0}.virtual-media-row :deep(.media-card){min-width:0}
+.virtual-media-grid{display:block;position:relative;contain:layout style}.virtual-media-row{display:grid;gap:var(--gallery-gap);position:absolute;left:0;right:0}.virtual-media-row :deep(.media-card){min-width:0}
 /* 月份栏在本组照片滚动时吸顶，下一月份到达时自然接替，并遮住下方缩略图。 */
-.month-group-toggle.n-button{position:sticky;top:var(--month-sticky-top,0px);z-index:2;background:#fff;box-shadow:0 1px 0 #e5eae6}
-.month-group-toggle.n-button{width:100%;height:36px;min-height:36px;align-items:center;padding:0 var(--gallery-row-padding,10px);margin:0 0 6px;text-align:left;border:0;border-radius:8px;color:#27332d}.month-group-toggle :deep(.n-button__content){display:flex;align-items:center;justify-content:flex-start;width:100%;min-width:0;gap:var(--gallery-heading-gap,9px);color:inherit;font-size:inherit}.month-group-toggle .ui-icon{flex:none;color:#628471}.month-group-toggle h2{margin:0;font:600 15px/1.4 "Microsoft YaHei UI",sans-serif;letter-spacing:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.month-group-toggle .month-item-count{margin-left:auto;flex:none;border-radius:5px;padding:3px 7px;background:#f0f5f1;color:#73867a;font-size:10px;font-weight:400;line-height:1.4}.month-group-toggle[aria-expanded=false]{background:#f7f9f7}.month-chevron-collapsed{transform:rotate(-90deg)}.month-group-toggle:focus-visible{outline:2px solid #3b755c;outline-offset:2px}
+.month-group-toggle.n-button{position:sticky;top:var(--month-sticky-top,0px);z-index:2;background:var(--theme-surface);box-shadow:0 1px 0 var(--theme-selected)}
+.month-group-toggle.n-button{width:100%;height:36px;min-height:36px;align-items:center;padding:0 var(--gallery-row-padding,10px);margin:0 0 6px;text-align:left;border:0;border-radius:8px;color:var(--theme-ink)}.month-group-toggle :deep(.n-button__content){display:flex;align-items:center;justify-content:flex-start;width:100%;min-width:0;gap:var(--gallery-heading-gap,9px);color:inherit;font-size:inherit}.month-group-toggle .ui-icon{flex:none;color:var(--theme-muted)}.month-group-toggle h2{margin:0;font:600 15px/1.4 "Microsoft YaHei UI",sans-serif;letter-spacing:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.month-group-toggle .month-item-count{margin-left:auto;flex:none;border-radius:5px;padding:3px 7px;background:var(--theme-raised);color:var(--theme-muted);font-size:10px;font-weight:400;line-height:1.4}.month-group-toggle[aria-expanded=false]{background:var(--theme-background)}.month-chevron-collapsed{transform:rotate(-90deg)}.month-group-toggle:focus-visible{outline:2px solid var(--theme-accent);outline-offset:2px}
 @media(max-width:450px){.month-group-toggle h2{font-size:14px}.month-group-toggle .month-item-count{padding:3px 5px;font-size:9px}}
 </style>

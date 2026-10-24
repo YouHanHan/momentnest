@@ -34,6 +34,6 @@ onUnmounted(() => { disposed = true; sequence++ })
 </template>
 
 <style scoped>
-.photo-avatar{position:relative;display:inline-flex;flex:none;align-items:center;justify-content:center;width:var(--avatar-size);height:var(--avatar-size);overflow:hidden;border-radius:50%;background:#e7eee9;color:#6e8979}
+.photo-avatar{position:relative;display:inline-flex;flex:none;align-items:center;justify-content:center;width:var(--avatar-size);height:var(--avatar-size);overflow:hidden;border-radius:50%;background:var(--theme-selected);color:var(--theme-muted)}
 .photo-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 </style>

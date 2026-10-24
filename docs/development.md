@@ -75,7 +75,7 @@ Android 的 local.properties 含本机 SDK 路径，不纳入源码。若 Google
 
 桌面 main 负责窗口、来源验证和受控系统文件夹选择；preload 仅开放明确 IPC；renderer 展示服务快照。窗口启用 contextIsolation 与 sandbox，禁用 nodeIntegration，并限制导航和本地资源协议。
 
-桌面基础交互使用 Naive UI 2.45.3，通过 UiDatePicker、UiSelect、UiPopover、UiDialog 共用中文语言、浅绿主题与紧凑尺寸。日期保持 YYYY-MM-DD 字符串，以本地日历校验；手动输入在确认时更新，非法草稿阻止提交。临时浮层统一管理互斥与 Esc 顺序，日期与下拉挂载在所属弹窗或预览内部，避免焦点约束和全屏造成遮挡。照片画布、视频播放、缩放和翻页仍由 MediaPreview 负责。
+桌面基础交互使用 Naive UI 2.45.3，通过 UiDatePicker、UiSelect、UiPopover、UiDialog 共用中文语言、A「奶油杏桃」主题与紧凑尺寸。桌面窗口、CSS 与组件库从 `apps/desktop/src/shared/theme-palette.ts` 读取色板；手机使用 `apps/mobile/lib/gallery_style.dart` 中对应的语义色。浅杏桃填充与暖灰前景分别维护，避免为白字对比度而加深大面积按钮。桌面照片网格为四列，并与虚拟列表共用 8 像素间距；窄屏保留自适应列数，Android 主相册继续使用三列。日期保持 YYYY-MM-DD 字符串，以本地日历校验；手动输入在确认时更新，非法草稿阻止提交。临时浮层统一管理互斥与 Esc 顺序，日期与下拉挂载在所属弹窗或预览内部，避免焦点约束和全屏造成遮挡。照片画布、视频播放、缩放和翻页仍由 MediaPreview 负责，浅奶油画布与工具叠层不改变原文件、完整画面和预览分辨率。
 
 service/worker.ts 承载 Receiver，处理 HTTPS、SQLite、历史扫描、流式哈希与文件提交。main 通过 ServiceBridge 请求工作线程；生产编译将运行依赖打包进 out，便携发布无额外 npm 安装步骤。
 
@@ -105,7 +105,7 @@ Windows 原生 Electron 验收需在正常本机执行环境运行，使用独�
 
 ## 应用 Logo 与 Android 正式签名
 
-Logo 原稿位于 `assets/branding/momentnest-logo.png`，采用相叠照片、绿色与暖色爱心。`npm run icons:build` 使用已有 sharp 依赖生成 Windows 多尺寸 ICO、PNG 与 Android 各密度启动图标；Android 自适应图标由独立前景和浅色背景组成。原有 Flutter 默认图标文件保留，清单指向新的 `momentnest_launcher`。Windows 打包和窗口使用同一 ICO。
+当前 Logo 位于 `assets/branding/momentnest-logo-baby-pink.png`，采用相叠照片、明亮樱花粉与蜜桃色爱心，早期绿色原稿 `assets/branding/momentnest-logo.png` 保留。`npm run icons:build` 从当前 Logo 使用已有 sharp 依赖生成 Windows 多尺寸 ICO、PNG 与 Android 各密度启动图标；Android 自适应图标由独立前景和奶油白背景组成。原有 Flutter 默认图标文件保留，清单指向新的 `momentnest_launcher`。Windows 打包和窗口使用同一 ICO。
 
 首次在本机执行 `npm run mobile:signing:init`，生成 RSA 3072 位、有效期 10000 天的正式签名证书。私钥、密码及 `release.properties` 位于 `.local/momentnest-signing/`，已由 `.gitignore` 的 `.local/` 规则排除。生成脚本拒绝覆盖已有文件；后续版本沿用同一证书。`momentnest-release.cer` 和 `.pem` 为不含私钥的公开证书，指纹及有效期见 `certificate-info.json`。
 
